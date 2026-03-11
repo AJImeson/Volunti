@@ -9,7 +9,7 @@
 
 	Name: Relevant for purpose
 	Expiration: Optional
-	Scopes: Basic VS-Code, check api, read_user and write_repository
+	Scopes: Basic VS-Code, check following; api, read_user, read_repository and write_repository
 
 6. Click Create personal access token
 
