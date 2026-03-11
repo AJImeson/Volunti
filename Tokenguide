@@ -28,6 +28,6 @@ A | In vs-code:
 B | Terminal:
 
 1. First clone our repo (Burgundy) and a login prompt will appear.
-2. When asked for Username, enter your credentials. When asked for username, paste your Personal Access Token, Windows/Mac/Linux should save this in credential manager for future pull/push without the need of manually entering your credentials every time you perform an action
+2. When asked for Username, enter your credentials. When asked for password , paste your Personal Access Token, Windows/Mac/Linux should save this in credential manager for future pull/push without the need of manually entering your credentials every time you perform an action
 
  
