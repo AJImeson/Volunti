@@ -42,24 +42,24 @@
 
 - How do we work together?
 
-    Communication, listen to each other
-    Everyone has their specific area and tasks they are responsible for, and are responsible that these are executed properly
-    Open minded attiude towards each other, don't hesitate asking for help when needed
-    Hype each other!
-    Short standups (Undecided how often or when)
+    -Communication, listen to each other
+    -Everyone has their specific area and tasks they are responsible for, and are responsible that these are executed properly
+    -Open minded attiude towards each other, don't hesitate asking for help when needed
+    -Hype each other!
+    -Short standups (Undecided how often or when)
     
 - How do we handle problems?
 
-    Communication, say how you feel/think
-    Don't panic when problems arise, we will handle it as a team
-    One channel in discord for questions and assistance from other team members
-    When stuck or problems have persisted, ask for help
-    Problems should be solved as a team and discussed openly
+    -Communication, say how you feel/think
+    -Don't panic when problems arise, we will handle it as a team
+    -One channel in discord for questions and assistance from other team members
+    -When stuck or problems have persisted, ask for help
+    -Problems should be solved as a team and discussed openly
 
 - How do we act when things go well?
 
-    Celebrate and appreciate
-    See to that we have a good time 
-    Stay humble 
+    -Celebrate and appreciate
+    -See to that we have a good time 
+    -Stay humble 
 
 
