@@ -28,7 +28,6 @@
 
 * Agreement 
 
-test
 
 * Working code of conduct 
 
