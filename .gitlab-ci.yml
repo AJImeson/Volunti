@@ -1,0 +1,7 @@
+
+# Pipepline .yml file 
+
+include:
+  - local: ##
+  - local: ##
+  - local: ##
