@@ -4,7 +4,7 @@
 
 - Welcome to Gitlab, just like GitHub, but different, but still the same.
 
-- Since Mika and Axel will be DevOps (with high leaning towards ops) they will be Owners of the project and Reza, Ali, Geovanni, Jakob, Andres and Sara will have the role of Developers - Check the Permission/Role table in GitLab for more info
+Since Mika and Axel will be DevOps (with high leaning towards ops) they will be Owners of the project and Reza, Ali, Geovanni, Jakob, Andres, Mustafa and Sara will have the role of Developers - Check the Permission/Role table in GitLab for more info
 
 - When working with GitLab authentication will work slightly different than GitHub, after reading this check the Token-Guide.md for instructions. 
 
