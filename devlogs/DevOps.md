@@ -19,5 +19,5 @@
 
 * 2026-03-17
 
-    - Created pipeline/build files as template
-    
+    - Created pipeline/build files as template - Axel
+    - Added .gitignore to repository - Axel  
