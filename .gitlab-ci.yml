@@ -12,4 +12,4 @@ include:
   - local: 'backend/container-build.yml'
   - local: 'frontend/build.yml'
   - local: 'frontend/container-build.yml'
-
+  - template: Security/SAST.gitlab-ci.yml
