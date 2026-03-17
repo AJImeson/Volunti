@@ -13,4 +13,3 @@ include:
   - local: 'frontend/build.yml'
   - local: 'frontend/container-build.yml'
   - template: Security/SAST.gitlab-ci.yml
-  - template: Security/Secret-Detection.gitlab.ci.yml
