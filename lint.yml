@@ -1,0 +1,20 @@
+backend-lint:
+  stage: lint
+  image: mcr.microsoft.com/dotnet/sdk:8.0
+  script:
+    - cd backend
+    - dotnet format --verify-no-changes
+  rules:
+    - changes:
+      - backend/**/
+
+frontend-lint:
+  stage: lint
+  image: 
+  script:
+    - cd frontend
+    - npm ci
+    - npm run lint
+  rules:
+    - changes:
+      - frontend/**/*

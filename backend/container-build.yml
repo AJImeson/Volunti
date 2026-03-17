@@ -1,0 +1,14 @@
+backend-container-build:
+  stage: container-build
+  image: docker:latest
+  services:
+
+  variables:
+    IMAGE_TAG:
+
+  script:
+
+  rules:
+
+    changes:
+      - backend/**/*

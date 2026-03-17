@@ -1,12 +1,13 @@
 
 stages:
 
+  - lint
   - build
   - container-build
 
-
 include:
 
+  - local: 'lint.yml'
   - local: 'backend/build.yml'
   - local: 'backend/container-build.yml'
   - local: 'frontend/build.yml'
