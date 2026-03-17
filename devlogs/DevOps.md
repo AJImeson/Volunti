@@ -17,4 +17,7 @@
     - Dockerfile created for each directory - Axel
     - docker-compose.yml created in root - Mika
 
+* 2026-03-17
+
+    - Created pipeline/build files as template
     
