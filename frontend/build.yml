@@ -1,0 +1,9 @@
+frontend-build:
+  stage: build
+  image:
+  script:
+
+
+  rules:
+    - changes:
+      - frontend/**/*
