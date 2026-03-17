@@ -20,4 +20,6 @@
 * 2026-03-17
 
     - Created pipeline/build files as template - Axel
-    - Added .gitignore to repository - Axel  
+    - Added .gitignore to repository - Axel
+    - Dockerfile mapping added - Axel
+       - At this point, complete mapping of .yml files and container related files will need to wait until tech stacks are decided
