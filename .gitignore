@@ -1,0 +1,17 @@
+# Environment
+
+.env
+
+#.NET Build
+
+bin/
+obj/
+
+# IDE / Editor
+
+.vs/
+.idea/
+
+# Logs
+
+*.log 
