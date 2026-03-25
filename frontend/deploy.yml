@@ -1,0 +1,4 @@
+frontend-deploy:
+  stages: deploy
+  image:
+  script: 

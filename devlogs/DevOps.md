@@ -23,3 +23,7 @@
     - Added .gitignore to repository - Axel
     - Dockerfile mapping added - Axel
        - At this point, complete mapping of .yml files and container related files will need to wait until tech stacks are decided
+
+* 2026-03-25
+
+    - Added .yml files for deploy stage in front end and back end directories. Updated .gitlab-ci.yml with stage logic - Axel
