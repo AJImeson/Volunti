@@ -5,6 +5,7 @@ stages:
   - build
   - test
   - container-build
+  - deploy
 
 include:
 
@@ -12,8 +13,10 @@ include:
   - local: 'backend/build.yml'
   - local: 'backend/test.yml'
   - local: 'backend/container-build.yml'
+  - local: 'backend/deploy.yml'
   - local: 'frontend/build.yml'
   - local: 'frontend/test.yml'
   - local: 'frontend/container-build.yml'
+  - local: 'frontend/deploy.yml'
   - template: Security/SAST.gitlab-ci.yml
   - template: Jobs/Secret-Detection.gitlab-ci.yml
