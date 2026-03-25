@@ -7,7 +7,7 @@
 
     * Commits
 
-        - English, examples: 
+        - English descriptive, examples: 
 
             - "Fixed typo in frontend"
             - "ci/build:fixed volumes for docker"
