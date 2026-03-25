@@ -1,8 +1,14 @@
 
 * CI/CD Tools
 
-    - SonarQube? - SeC & Code quality 
-    
-* Pipeline Schematic
+    - Built in:
 
-    - Build: for dotnet (restore, build, test) 
+        - SAST Security test - GitLab
+        - Secret Detection - GitLab
+    
+* Pipeline Needed
+
+    - Lint: Check language "grammar"
+    - Build: Build app/projects code
+    - Test: Run through before packaging
+    - Container: Docker    
