@@ -24,43 +24,43 @@ Since Mika and Axel will be DevOps (with high leaning towards ops) they will be 
     - In Progress
     - Done
 
-- More documentation will stay in GitLab or separate platforms (Google etc).
+- Other documentations will stay in GitLab or separate platforms (Google etc).
 
 * Agreement 
 
 
-* Working code of conduct 
+    * Working code of conduct 
 
-- Will be off-site but also on-site, on site meetings and workdays will e decidedtogether. 
+        - Off-site but also on-site, on site meetings and workdays will be decided together. 
 
-- When off site, our platform will be discord.
+        - When off site, our platform will be discord.
 
-- Important to notify your colleagues if you are lacking behind regardless of reason
+        - Important to notify your colleagues if you are lacking behind regardless of reason
 
-- Show your colleagues that you are participating, wether it be answering to suggestions or messages in Discord, simplest form of reacting with an emoji acknowledges that you have read and received information
+        - Show your colleagues that you are participating, wether it be answering to suggestions or messages in Discord, simplest form of reacting with an emoji acknowledges that you have read and received information
 
 * Code of Conduct
 
-- How do we work together?
+    - How do we work together?
 
-    - Communication, listen to each other
-    - Everyone has their specific area and tasks they are responsible for, and are responsible that these are executed properly
-    - Open minded attiude towards each other, don't hesitate asking for help when needed
-    - Hype each other!
-    - Short standups (Undecided how often or when)
+        - Communication, listen to each other
+        - Everyone has their specific area and tasks they are responsible for, and are responsible that these are executed properly
+        - Open minded attiude towards each other, don't hesitate asking for help when needed
+        - Hype each other!
+        - Short standups (Undecided how often or when)
     
-- How do we handle problems?
+    - How do we handle problems?
 
-    - Communication, say how you feel/think
-    - Don't panic when problems arise, we will handle it as a team
-    - One channel in discord for questions and assistance from other team members
-    - When stuck or problems have persisted, ask for help
-    - Problems should be solved as a team and discussed openly
+        - Communication, say how you feel/think
+        - Don't panic when problems arise, we will handle it as a team
+        - One channel in discord for questions and assistance from other team members
+        - When stuck or problems have persisted, ask for help
+        - Problems should be solved as a team and discussed openly
 
-- How do we act when things go well?
+    - How do we act when things go well?
 
-    - Celebrate and appreciate
-    - See to that we have a good time 
-    - Stay humble 
+        - Celebrate and appreciate
+        - See to that we have a good time 
+        - Stay humble 
 
 
