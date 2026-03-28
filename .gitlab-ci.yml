@@ -7,6 +7,12 @@ stages:
   - container-build
   - deploy
 
+
+default:
+  tags:
+    - lab-vm # runner på VM från skolan
+
+
 include:
 
   - local: 'lint.yml'
