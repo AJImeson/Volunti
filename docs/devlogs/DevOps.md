@@ -27,3 +27,7 @@
 * 2026-03-25
 
     - Added .yml files for deploy stage in front end and back end directories. Updated .gitlab-ci.yml with stage logic - Axel
+
+* 2026-03-28
+
+    - Runner created in gitlab-ci - Mika
