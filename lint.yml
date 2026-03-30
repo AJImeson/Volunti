@@ -4,13 +4,10 @@ backend-lint:
   script:
     - cd backend
     - dotnet format --verify-no-changes
-  rules:
-    - changes:
-      - backend/**/
 
 frontend-lint:
   stage: lint
-  image: 
+  image: node:20 
   script:
     - cd frontend
     - npm ci
