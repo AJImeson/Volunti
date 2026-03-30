@@ -31,3 +31,7 @@
 * 2026-03-28
 
     - Runner created in gitlab-ci - Mika
+
+* 2026-03-30
+
+    - Debuging runner, issue with docker socket connection - Mika&Axel
