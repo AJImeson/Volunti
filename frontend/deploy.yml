@@ -1,5 +1,5 @@
 frontend-deploy:
-  stages: deploy
+  stage: deploy
   image:
   script:
 
