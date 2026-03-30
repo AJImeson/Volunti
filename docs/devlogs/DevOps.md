@@ -35,3 +35,4 @@
 * 2026-03-30
 
     - Debuging runner, issue with docker socket connection - Mika&Axel
+        Fixed: typo in docker-compose
