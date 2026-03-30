@@ -22,7 +22,7 @@
     - Created pipeline lint/build/test files as template - Axel
     - Added .gitignore to repository - Axel
     - Dockerfile mapping added - Axel
-       - At this point, complete mapping of .yml files and container related files will need to wait until tech stacks are decided
+        At this point, complete mapping of .yml files and container related files will need to wait until tech stacks are decided
 
 * 2026-03-25
 
@@ -36,3 +36,5 @@
 
     - Debuging runner, issue with docker socket connection - Mika&Axel
         Fixed: typo in docker-compose
+    - Created .gitattributes file for future file ending handling - Axel
+    - Created a database directory - Axel
