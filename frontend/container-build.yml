@@ -8,6 +8,8 @@ frontend-container-build:
 
   script:
 
+    - echo "frontend-container"
+
 
   rules:
     - changes:

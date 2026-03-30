@@ -1,4 +1,6 @@
 frontend-deploy:
   stages: deploy
   image:
-  script: 
+  script:
+
+    - echo "frontend-deploy" 

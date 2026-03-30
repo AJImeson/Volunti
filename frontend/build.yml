@@ -3,6 +3,8 @@ frontend-build:
   image:
   script:
 
+    - echo "frontent-build"
+
 
   rules:
     - changes:

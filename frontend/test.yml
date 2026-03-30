@@ -3,3 +3,4 @@ frontend-test:
   image:
   script:
 
+    - echo "frontend-test"
