@@ -1,5 +1,5 @@
 backend-deploy:
-  stages:
+  stages: deploy
   image:
   script:
 
