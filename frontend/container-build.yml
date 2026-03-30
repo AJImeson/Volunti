@@ -10,6 +10,5 @@ frontend-container-build:
 
 
   rules:
-
-    changes:
+    - changes:
       - frontend/**/*

@@ -8,7 +8,6 @@ backend-container-build:
 
   script:
 
-  rules:
-
-    changes:
-      - backend/**/*
+    - rules:
+      - changes:
+        - backend/**/*
