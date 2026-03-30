@@ -10,7 +10,3 @@ frontend-container-build:
 
     - echo "frontend-container"
 
-
-  rules:
-    - changes:
-      - frontend/**/*

@@ -6,6 +6,3 @@ backend-build:
     - dotnet restore
     - dotnet build --no-restore
     - dotnet test --no-build
-  rules:
-    - changes:
-      - backend/**/*

@@ -15,6 +15,3 @@ frontend-lint:
     - cd frontend
     - npm ci
     - npm run lint
-  rules:
-    - changes:
-      - frontend/**/*

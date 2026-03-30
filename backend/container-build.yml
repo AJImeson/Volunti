@@ -9,6 +9,3 @@ backend-container-build:
   script:
     - echo "backend-container"
 
-  rules:
-    - changes:
-      - backend/**/*

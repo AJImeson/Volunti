@@ -5,7 +5,3 @@ frontend-build:
 
     - echo "frontent-build"
 
-
-  rules:
-    - changes:
-      - frontend/**/*
