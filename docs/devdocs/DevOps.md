@@ -11,4 +11,12 @@
     - Lint: Check language "grammar"
     - Build: Build app/projects code
     - Test: Run through before packaging
-    - Container: Docker    
+    - Container: Docker
+    - Database: MS SQL
+
+* Pipeline Set
+
+    - Root: lint - Root
+    - Frontend: build, container-build, test, deploy - Directory 
+    - Backend: build, container-build, test, deploy - Directory
+        
