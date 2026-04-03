@@ -5,7 +5,7 @@
         - Branch from main
         - Name your branch accordingly for idea/purpose:
 
-                DevOps/pipeline for builds 
+                - DevOps/pipeline for builds 
 
     * Commits
 
@@ -22,4 +22,4 @@
     * Documentation 
 
         - Log your activity and thoughts for traceback and development
-        - Also for project viewers to acknowledge that we document properly but also keep it  
+        - Also for project viewers to acknowledge that we document properly but also keep it simple
