@@ -3,21 +3,40 @@
     * Branching
 
         - Branch from main
+        - When resuming work from previous sessions, don't forget to git pull before continuing to avoid conflicts
         - Name your branch accordingly for idea/purpose:
 
-                - DevOps/pipeline for builds 
+                - DevOps/pipeline for builds
+
+        - If conflicts appear, this worflow can solve for your specific branch:
+
+            - git checkout/switch <branch_name>
+            - git fetch origin
+            - git rebase origin/main
+            - git status <-- Review the conflicts
+            - git add <files> <-- This adds the files where the conflicts appear
+            - git rebase --continue
+            - git push --force-with-lease origin <-- Safeguard if several people are working at the same time
 
     * Commits
 
-        - English descriptive, examples: 
+        - Conventional Commits? Great for clear understanding of work flow 
+        - English descriptive, general examples: 
 
             - "Fixed typo in frontend"
-            - "ci/build:fixed volumes for docker"
+
+        - For specific changes, examples: 
+
+            - "feat/added button for frontend"
+            - "fixed/bug in Entity"
+            - "docs:DevOps/updated log for 2026-04-08"
+            - "ci:build/new build logic for backend"
+            - "cd/built deploy to portainer"
 
     * Pipelines
 
-        - In format .yml files
-        - One file for each stage in relevant directory 
+        - One file for each stage in relevant directory (Except for built in templates and lint.yml)
+        - If a pipeline fails, fix the issue according to the logs that will appear. No merging of failed pipelines (as long as it's not the pipeline that is the issue)  
 
     * Documentation 
 
