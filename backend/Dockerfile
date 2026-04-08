@@ -9,7 +9,7 @@ RUN
 # Runtime 
 FROM mcr.microsoft.com/dotnet/sdk:10 AS runtime
 WORKDIR /app
-COPY
+COPY . .
 EXPOSE 8080
-ENTRYPOINT ["dotnet", ".api"]
+ENTRYPOINT ["dotnet", ".dll"]
 
