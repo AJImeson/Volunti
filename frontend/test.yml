@@ -1,6 +1,8 @@
 frontend-test:
   stage: test
-  image:
+  image: node:20
   script:
-
+    - cd frontend
+    - npm ci
+    - npm run test
     - echo "frontend-test"
