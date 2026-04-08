@@ -39,6 +39,10 @@
     - Created .gitattributes file for future file ending handling - Axel
     - Created a database directory - Axel
 
+* 2026-04-04
+
+    - Sorted and structured Jira for more readability - Mika
+
 * 2026-04-07
 
     - Created variable for password in repo - Mika
