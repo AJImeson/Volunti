@@ -38,3 +38,16 @@
         Fixed: typo in docker-compose
     - Created .gitattributes file for future file ending handling - Axel
     - Created a database directory - Axel
+
+* 2026-04-07
+
+    - Created variable for password in repo - Mika
+    - Pipeline mapping for .gitlab-ci.yml - Mika
+
+* 2026-04-08
+
+    - Updated CONTRIBUTING.md for more clarity - Axel
+    - Added security stage for built in GitLab testing - Axel
+
+
+
