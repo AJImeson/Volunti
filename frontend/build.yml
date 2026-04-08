@@ -1,7 +1,12 @@
 frontend-build:
   stage: build
-  image:
+  image: node:20
   script:
-
-    - echo "frontent-build"
+    - cd frontend
+    - npm ci
+    - npm run build
+    - echo "frontent-build completed successfully"
+  artifacts:
+    paths:
+      - frontend/dist
 
