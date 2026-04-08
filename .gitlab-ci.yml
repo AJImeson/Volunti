@@ -4,14 +4,13 @@ stages:
   - lint
   - build
   - test
+  - security
   - container-build
   - deploy
-
 
 default:
   tags:
     - lab-vm # runner på VM från skolan
-
 
 include:
 
@@ -26,3 +25,9 @@ include:
   - local: 'frontend/deploy.yml'
   - template: Security/SAST.gitlab-ci.yml
   - template: Jobs/Secret-Detection.gitlab-ci.yml
+
+sast:
+  stage: security
+
+secret_detection:
+  stage: security
