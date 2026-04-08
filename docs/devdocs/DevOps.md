@@ -14,9 +14,10 @@
     - Container: Docker
     - Database: MS SQL
 
-* Pipeline Set
+* Pipeline/Stages Set
 
     - Root: lint - Root
+    - .gitlab-ci: security (For built in)
     - Frontend: build, container-build, test, deploy - Directory 
     - Backend: build, container-build, test, deploy - Directory
         
