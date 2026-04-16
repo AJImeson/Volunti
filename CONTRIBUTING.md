@@ -2,11 +2,14 @@
 
     * Branching
 
-        - Branch from main
+        - Two branches in the repo: main and Develop
+        - Main works as production, this is where completed finished work will be pushed to from Develop.
+        - Branch from Develop - Feature branches, own workspace 
         - When resuming work from previous sessions, don't forget to git pull before continuing to avoid conflicts
         - Name your branch accordingly for idea/purpose:
 
-                - DevOps/pipeline for builds
+                - DevOps/pipeline for builds skeleton
+                - DevOps_test/building test for database
 
         - If conflicts appear, this worflow can solve for your specific branch:
 
