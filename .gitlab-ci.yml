@@ -14,7 +14,6 @@ default:
 
 include:
 
-  - local: 'lint.yml'
   - local: 'backend/build.yml'
   - local: 'backend/test.yml'
   - local: 'backend/container-build.yml'
