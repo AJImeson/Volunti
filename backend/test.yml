@@ -1,5 +1,15 @@
 backend-test:
   stage: test
-  image: mcr.microsoft.com/dotnet/sdk:8.0
+  image: mcr.microsoft.com/dotnet/sdk:10.0
+  services:
+    - name: mcr.microsoft.com/mssql/server:2022-latest
+      alias: db
+      variables:
+        ACCEPT_EULA: "Y"
+        MSSQL_SA_PASSWORD: $SA_PASSWORD
+  variables:
+    ConnectionStrings_DefaultConnection: "Server=db;Database=BurgundyDb;User=sa;Password=$SA_PASSWORD;TrustServerCertificate=True"
   script:
-    - dotnet test src/Backend/Backend.sln
+    - cd backend
+    - dotnet restore
+    - dotnet test --configuration Release
