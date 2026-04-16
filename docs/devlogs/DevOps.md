@@ -53,5 +53,10 @@
     - Updated CONTRIBUTING.md for more clarity - Axel
     - Added security stage for built in GitLab testing - Axel
 
+* 2026-04-16
+
+    - Decided to skip the lintin pipeline and designt a pre commit linting test instead - Axel & Mika
+
+
 
 
