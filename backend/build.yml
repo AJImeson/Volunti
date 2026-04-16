@@ -5,5 +5,8 @@ backend-build:
     - cd backend
     - dotnet restore
     - dotnet build --no-restore --configuration Release
+    - dotnet publish --no-build --configuration Release --output ./publish
   artifacts:
-    # ??
+    paths:
+      - backend/publish/
+    expire_in: 1 hour
