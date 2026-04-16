@@ -56,7 +56,7 @@
 * 2026-04-16
 
     - Decided to skip the lintin pipeline and designt a pre commit linting test instead - Axel & Mika
-
+    - Built test and container-build for backend - Mika & Axel
 
 
 
