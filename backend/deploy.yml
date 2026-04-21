@@ -1,7 +1,9 @@
 backend-deploy:
   stage: deploy
-  image: alpine:latest
+  image: python:3.10-alpine
   script:
+    - pip install requests
+    - python deploy.py
     - cd backend/Burgundy.Api 
     - apk add --no-cache curl
     - curl -X Post 'https://portainer.doe25.swarm.chas-lab.dev/api/stacks/webhooks/23dc294f-b377-456a-9214-60067c3a6883'
