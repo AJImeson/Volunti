@@ -1,6 +1,8 @@
 backend-deploy:
   stage: deploy
-  image:
+  image: alpine:latest
   script:
+    - cd backend 
+    - apk add --no-cache curl
+    - curl -X Post 'https://portainer.doe25.swarm.chas-lab.dev/api/stacks/webhooks/23dc294f-b377-456a-9214-60067c3a6883'
 
-    - echo "backend-deploy"
