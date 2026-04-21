@@ -5,4 +5,4 @@ frontend-deploy:
   script:
     - apk add --no-cache curl
     - sleep 10
-    - curl -f "http://doe25.swarm.chas-lab.dev:3000" || exit 1
+    - curl -f "http://doe25.swarm.chas-lab.dev:3090" || exit 1
