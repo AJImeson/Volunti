@@ -4,6 +4,8 @@ services:
     environment:
       - ConnectionStrings__DefaultConnection=Server=mssql;Database=Burgundy;User Id=${SA_PASSWORD};TrustServerCertificate=True
       - ASPNETCORE_HTTP_PORTS=8080
+    ports:
+      - "9080:8080"
     networks:
       - traefik-public
       - internal
@@ -22,6 +24,8 @@ services:
 
   frontend:
     image: ${CI_REGISTRY_IMAGE}/frontend:${IMAGE_TAG}
+    ports:
+      - "3000:80"
     networks:
       - traefik-public
     deploy:
