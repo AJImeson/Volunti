@@ -1,17 +1,33 @@
 # Environment
 
 .env
+.env.*
+!.env.example
 
-#.NET Build
+#.NET Build & Publish
 
 bin/
 obj/
+publish/
+appsettings.Development.json
 
 # IDE / Editor
 
 .vs/
 .idea/
+*.user
+*.suo
+*.sln.docstates
+
+# Frontend / Node
+
+node_modules/
+dist/
+.eslintcache
 
 # Logs
 
-*.log 
+*.log
+.DS_Store
+Thumbs.db
+
