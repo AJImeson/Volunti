@@ -1,6 +1,7 @@
 frontend-deploy:
   stage: deploy
-  image:
+  image: curlimages/curl:latest
+  needs: ["backend-deploy"]
   script:
-
-    - echo "frontend-deploy" 
+    - sleep 10
+    - curl -f -k https://samba-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG.doe25.swarm.chas-lab.dev || exit 1
