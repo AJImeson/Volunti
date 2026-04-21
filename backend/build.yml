@@ -5,11 +5,8 @@ backend-build:
     - cd backend/Burgundy.Api
     - dotnet restore
     - dotnet build --no-restore --configuration Release
-<<<<<<< HEAD
     - dotnet publish --no-build --configuration Release --output ../../publish
-=======
     - dotnet publish --no-build --configuration Release --output ../publish
->>>>>>> 15daec6 (ci/cd: Fixing build problem in backend)
   artifacts:
     paths:
       - backend/publish/
