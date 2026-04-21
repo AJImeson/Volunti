@@ -1,6 +1,27 @@
 services:
-  api:
-    image: ${CI_REGISTRY_IMAGE}:${IMAGE_TAG}
+  backend:
+    image: ${CI_REGISTRY_IMAGE}/backend:${IMAGE_TAG}
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=mssql;Database=Burgundy;User Id=${SA_PASSWORD};TrustServerCertificate=True
+      - ASPNETCORE_HTTP_PORTS=8080
+    networks:
+      - traefik-public
+      - internal
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.constraint-label=traefik-public"
+        - "traefik.swarm.network=traefik-public"
+        - "traefik.http.routers.${STACK_NAME}-backend-http.rule=Host(`${STACK_NAME}.doe25.swarm.chas-lab.dev`)"
+        - "traefik.http.routers.${STACK_NAME}-backend-http.entrypoints=https"
+        - "traefik.http.routers.${STACK_NAME}-https.tls=true"
+        - "traefik.http.routers.${STACK_NAME}-https.tls.certresolver=le"
+        - "traefik.http.services.${STACK_NAME}.loadbalancer.server.port=8000"
+
+  frontend:
+    image: ${CI_REGISTRY_IMAGE}/frontend:${IMAGE_TAG}
     networks:
       - traefik-public
     deploy:
@@ -10,36 +31,11 @@ services:
         - "traefik.enable=true"
         - "traefik.constraint-label=traefik-public"
         - "traefik.swarm.network=traefik-public"
-
-        - "traefik.http.routers.${STACK_NAME}-http.rule=Host(`${STACK_NAME}.doe25.swarm.chas-lab.dev`)"
-        - "traefik.http.routers.${STACK_NAME}-http.entrypoints=http"
-        - "traefik.http.routers.${STACK_NAME}-http.middlewares=https-redirect"
-
-        - "traefik.http.routers.${STACK_NAME}-https.rule=Host(`${STACK_NAME}.doe25.swarm.chas-lab.dev`)"
-        - "traefik.http.routers.${STACK_NAME}-https.entrypoints=https"
-        - "traefik.http.routers.${STACK_NAME}-https.tls=true"
-        - "traefik.http.routers.${STACK_NAME}-https.tls.certresolver=le"
-
-        - "traefik.http.services.${STACK_NAME}.loadbalancer.server.port=8000"
-
-
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    depends_on:
-      - mssql
-    environment:
-      - ConnectionStrings__DefaultConnection=SserveR=mssql;Database=Burgundy;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True
-    ports:
-      - "9080:8080"
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:80"
+        - "traefik.http.routers.${STACK_NAME}-frontend-https.rule=Host(`${STACK_NAME}.doe25.swarm.chas-lab.dev`)"
+        - "traefik.http.routers.${STACK_NAME}-frontend-https.entrypoints=https"
+        - "traefik.http.routers.${STACK_NAME}-frontend-https.tls=true"
+        - "traefik.http.routers.${STACK_NAME}-frontend-https.tls.certresolver=le"
+        - "traefik.http.routers.${STACK_NAME}-frontend,loadbalancer.server.port=80"
 
   mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -47,8 +43,8 @@ services:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=${SA_PASSWORD}
       - MSSQL_PID=Developer
-    ports:
-      - "1433:1433"
+    networks:
+      - internal
     volumes:
       - sqldata:/var/opt/mssql
 
@@ -58,3 +54,4 @@ volumes:
 networks:
   traefik-public:
     external: true
+  internal:
