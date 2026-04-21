@@ -2,7 +2,6 @@ frontend-test:
   stage: test
   image: node:20
   script:
-    - cd frontend
+    - cd frontend/Burgundy.Web
     - npm ci
-    - npm run test
-    - echo "frontend-test"
+    - npm run test -- --run
