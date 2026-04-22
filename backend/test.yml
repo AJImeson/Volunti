@@ -19,7 +19,7 @@ backend-container-test:
   image: docker:latest
   rules:
     - exists:
-      - backend/Dockerfile
+        - backend/Dockerfile
   variables:
     IMAGE_TAG: $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHORT_SHA
     CONTAINER_NAME: test-backend-$CI_JOB_ID
@@ -28,17 +28,9 @@ backend-container-test:
     - docker pull $IMAGE_TAG
     - docker run -d --name $CONTAINER_NAME -P $IMAGE_TAG
     - HOST_PORT=$(docker port $CONTAINER_NAME 8080/tcp | head -1 | cut -d: -f2)
-    - |
-      for time in $(seq 1 30); do 
-        if curl -s http://localhost:{HOST_PORT}/ >/dev/null 2>&1; then
-          echo "Backend responding after: ${time} seconds" 
-          docker stop test-container
-          exit 0
-        fi
-        sleep 2
-      done
-      echo "Backend: Container test failure"
-      docker logs $CONTAINER_NAME
-      exit 1
+    - for time in $(seq 1 30); do curl -s http://localhost:${HOST_PORT}/ >/dev/null 2>&1; then echo "Backend responding after: ${time} seconds" && exit 0; sleep 2; done
+    - echo "Backend: Container test failure"
+    - docker logs $CONTAINER_NAME
+    - exit 1
   after_script:
     - docker rm -f $CONTAINER_NAME || true
