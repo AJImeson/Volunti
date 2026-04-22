@@ -1,5 +1,5 @@
 backend-test:
-  stage: test
+  stage: test-build
   image: mcr.microsoft.com/dotnet/sdk:10.0
   services:
     - name: mcr.microsoft.com/mssql/server:2022-latest

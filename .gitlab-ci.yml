@@ -2,8 +2,9 @@
 stages:
 
   - build
+  - test-build
   - container-build
-  - test
+  - test-container
   - security
   - deploy
 

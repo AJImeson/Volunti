@@ -1,5 +1,5 @@
 frontend-test:
-  stage: test
+  stage: test-build
   image: node:20
   script:
     - cd frontend/Volunti.Web
