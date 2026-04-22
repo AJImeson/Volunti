@@ -1,11 +1,10 @@
 
 stages:
 
-  - lint
   - build
+  - container-build
   - test
   - security
-  - container-build
   - deploy
 
 default:
