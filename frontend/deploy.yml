@@ -12,7 +12,7 @@ frontend-deploy:
     on_stop: stop_review
 
 stop_review:
-  stage: deploy
+  stage: cleanup
   script:
     - python delete.py
   environment:
