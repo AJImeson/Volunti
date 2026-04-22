@@ -18,7 +18,7 @@ frontend-container-test:
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $IMAGE_TAG
-    - docker run -d --name $CONTAINER_NAME -p $IMAGE_TAG
+    - docker run -d --name $CONTAINER_NAME $IMAGE_TAG
     - sleep 5
     - docker ps --filter name=$CONTAINER_NAME --filter status=running --format '{{.Names}}' | grep $CONTAINER_NAME
     
