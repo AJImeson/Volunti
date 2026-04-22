@@ -2,6 +2,6 @@ frontend-test:
   stage: test
   image: node:20
   script:
-    - cd frontend
+    - cd frontend/Volunti.Web
     - npm ci
     - npm run test -- --run
