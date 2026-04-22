@@ -2,7 +2,7 @@ backend-deploy:
   stage: deploy
   image: python:3.10-alpine
   variables:
-    STACK_NAME: "$CI_PROJECT_NAMESPACE_SLUG-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG"
+    STACK_NAME: "volunti-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG"
   script:
     - pip install requests
     - python deploy.py 
