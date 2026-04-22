@@ -6,7 +6,7 @@ frontend-deploy:
     STACK_NAME: "$CI_PROJECT_NAMESPACE_SLUG-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG"
   script:
     - apk add --no-cache curl
-    - sleep 20
+    - sleep 10
     - curl -fk "http://${STACK_NAME}.doe25.swarm.chas-lab.dev" || exit 1
   environment:
     name: review/$CI_COMMIT_REF_SLUG
