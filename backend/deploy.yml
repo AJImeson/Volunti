@@ -4,3 +4,17 @@ backend-deploy:
   script:
     - pip install requests
     - python deploy.py 
+  environment:
+    name: review/$CI_COMMIT_REF_SLUG
+    url: https://$CI_PROJECT_NAMESPACE_SLUG-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG.doe25.swarm.chas-lab.dev/docs
+    on_stop: stop_review
+
+stop_review:
+  stage: deploy
+  script:
+    - python delete.py
+  environment:
+    name: review/$CI_COMMIT_REF_SLUG
+    action: stop
+  when: manual
+  allow_failure: true
