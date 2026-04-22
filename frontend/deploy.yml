@@ -8,7 +8,7 @@ frontend-deploy:
     - curl -fk "http://${STACK_NAME}.doe25.swarm.chas-lab.dev" || exit 1
   environment:
     name: review/$CI_COMMIT_REF_SLUG
-    url: https://$CI_PROJECT_NAMESPACE_SLUG-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG.doe25.swarm.chas-lab.dev
+    url: https://${STACK_NAME}.doe25.swarm.chas-lab.dev
     on_stop: stop_review
 
 stop_review:
