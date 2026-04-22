@@ -2,7 +2,7 @@ services:
   backend:
     image: ${CI_REGISTRY_IMAGE}/backend:${IMAGE_TAG}
     environment:
-      - ConnectionStrings__DefaultConnection=Server=mssql;Database=Burgundy;User Id=${SA_PASSWORD};TrustServerCertificate=True
+      - ConnectionStrings__DefaultConnection=Server=mssql;Database=Burgundy;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True
       - ASPNETCORE_HTTP_PORTS=8080
     networks:
       - traefik-public
