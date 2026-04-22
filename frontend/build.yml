@@ -2,7 +2,7 @@ frontend-build:
   stage: build
   image: node:20
   script:
-    - cd frontend/Burgundy.Web
+    - cd frontend
     - npm ci
     - npm run build
     - echo "frontent-build completed successfully"
