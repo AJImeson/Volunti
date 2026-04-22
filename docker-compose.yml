@@ -22,8 +22,6 @@ services:
 
   frontend:
     image: ${CI_REGISTRY_IMAGE}/frontend:${IMAGE_TAG}
-    ports:
-      - "3090:80"
     networks:
       - traefik-public
     deploy:
@@ -49,6 +47,10 @@ services:
       - internal
     volumes:
       - sqldata:/var/opt/mssql
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager # specific constraint to ensure the database runs on a manager node
 
 volumes:
   sqldata: {}
@@ -57,3 +59,4 @@ networks:
   traefik-public:
     external: true
   internal:
+    driver: overlay # for communication between services in the swarm
