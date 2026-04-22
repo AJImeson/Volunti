@@ -15,7 +15,9 @@ frontend-deploy:
 
 stop_review:
   stage: cleanup
+  image: python:3.10-slim
   script:
+    - pip install requests
     - python delete.py
   environment:
     name: review/$CI_COMMIT_REF_SLUG
