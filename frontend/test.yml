@@ -5,3 +5,32 @@ frontend-test:
     - cd frontend/Volunti.Web
     - npm ci
     - npm run test -- --run
+
+frontend-container-test:
+  stage: test-container
+  image: docker:latest
+  rules:
+    - exists:
+      - frontend/Dockerfile
+  variables:
+    IMAGE_TAG: $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHORT_SHA
+    CONTAINER_NAME: test-frontend-$CI_JOB_ID
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $IMAGE_TAG
+    - docker run -d --name $CONTAINER_NAME -P $IMAGE_TAG
+    - HOST_PORT=$(docker port $CONTAINER_NAME 80/tcp | head -1 | cut -d: -f2
+    - |
+      for time in $(seq 1 30); do
+        if curl -sf http://localhost:${HOST_PORT}/ >/dev/null 2>&1; then
+          echo "Frontend: Running after ${time} seconds"
+          docker stop test-frontend
+          exit 0
+        fi
+        sleep 5
+      done
+      echo "Frontend: Container test failed"
+      docker logs $CONTAINER_NAME
+      exit 1
+  after_script:
+    - docker rm -f $CONTAINER_NAME || true
