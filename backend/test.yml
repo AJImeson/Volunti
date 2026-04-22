@@ -10,6 +10,6 @@ backend-test:
   variables:
     ConnectionStrings_DefaultConnection: "Server=db;Database=BurgundyDb;User=sa;Password=$SA_PASSWORD;TrustServerCertificate=True"
   script:
-    - cd backend/Burgundy.Api
+    - cd backend/Volunti
     - dotnet restore
     - dotnet test --configuration Release

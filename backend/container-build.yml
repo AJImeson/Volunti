@@ -5,6 +5,6 @@ backend-container-build:
     IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build -f backend/Dockerfile -t $IMAGE_TAG -t $CI_REGISTRY_IMAGE/backend:latest backend/Burgundy.Api
+    - docker build -f backend/Dockerfile -t $IMAGE_TAG -t $CI_REGISTRY_IMAGE/backend:latest backend/Volunti
     - docker push $IMAGE_TAG
     - docker push $CI_REGISTRY_IMAGE:latest
