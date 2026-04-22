@@ -8,6 +8,6 @@ frontend-build:
     - echo "frontent-build completed successfully"
   artifacts:
     paths:
-      - frontend/Burgundy.Web/dist/
+      - frontend/Volunti.Web/dist/
     expire_in: 1 hour 
 
