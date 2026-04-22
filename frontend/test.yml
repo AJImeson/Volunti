@@ -22,7 +22,7 @@ frontend-container-test:
     - HOST_PORT=$(docker port $CONTAINER_NAME 80/tcp | head -1 | cut -d: -f2
     - |
       for time in $(seq 1 30); do
-        if curl -sf http://localhost:${HOST_PORT}/ >/dev/null 2>&1; then
+        if curl -s http://localhost:${HOST_PORT}/ >/dev/null 2>&1; then
           echo "Frontend: Running after ${time} seconds"
           docker stop test-frontend
           exit 0

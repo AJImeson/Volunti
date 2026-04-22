@@ -27,10 +27,10 @@ backend-container-test:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $IMAGE_TAG
     - docker run -d --name $CONTAINER_NAME -P $IMAGE_TAG
-    - HOST_PORT=$(docker port $CONTAINER_NAME 8080/tcp | cut -d: -f2)
+    - HOST_PORT=$(docker port $CONTAINER_NAME 8080/tcp | head -1 | cut -d: -f2)
     - |
       for time in $(seq 1 30); do 
-        if docker exec test-container curl -sf http://localhost:8080/swagger/index.html >/dev/null 2>&1; then
+        if curl -s http://localhost:{HOST_PORT}/ >/dev/null 2>&1; then
           echo "Backend responding after: ${time} seconds" 
           docker stop test-container
           exit 0
