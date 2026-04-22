@@ -28,6 +28,7 @@ backend-container-test:
     - docker pull $IMAGE_TAG
     - docker run -d --name $CONTAINER_NAME $IMAGE_TAG
     - sleep 5
+    - docker logs $CONTAINER_NAME
     - docker ps --filter name=$CONTAINER_NAME --filter status=running --format '{.Names}}' | grep $CONTAINER_NAME
   after_script:
     - docker rm -f $CONTAINER_NAME || true
