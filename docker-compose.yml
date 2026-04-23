@@ -37,24 +37,30 @@ services:
         - "traefik.http.routers.${STACK_NAME}-frontend-https.tls.certresolver=le"
         - "traefik.http.services.${STACK_NAME}-frontend.loadbalancer.server.port=80"
 
-  mssql-init:
-    image: busybox:latest
-    user: root
-    volumes:
-      - sqldata:/var/opt/mssql
-    command: chown -R 10001:0 /var/opt/mssql
-    networks:
-      - internal
-    deploy:
-      restart_policy:
-        condition: on-failure
-        max_attempts: 1
-      placement:
-        constraints:
-          - node.role == manager # Ensure this runs on a manager node to initialize the volume permissions
+  # mssql-init:
+  #   image: busybox:latest
+  #   user: root
+  #   volumes:
+  #     - sqldata:/var/opt/mssql
+  #   command: chown -R 10001:0 /var/opt/mssql
+  #   networks:
+  #     - internal
+  #   deploy:
+  #     restart_policy:
+  #       condition: on-failure
+  #       max_attempts: 1
+  #     placement:
+  #       constraints:
+  #         - node.role == manager # Ensure this runs on a manager node to initialize the volume permissions
   
   mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
+    user: root
+    entrypoint: > 
+      /bin/bash -c "
+      chown -R mssql:0 /var/opt/mssql &&
+      exec su mssql -s /bin/bash -c /opt/mssql/bin/sqlservr
+      "
     environment:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=${SA_PASSWORD}
@@ -63,8 +69,8 @@ services:
       - internal
     volumes:
       - sqldata:/var/opt/mssql
-    depends_on:
-      - mssql-init
+    # depends_on:
+    #   - mssql-init
     deploy:
       placement:
         constraints:
