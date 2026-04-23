@@ -63,7 +63,7 @@ services:
       "
     environment:
       - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=BurGundy_2025!.NET-Ops
+      - MSSQL_SA_PASSWORD='${SA_PASSWORD}'
       - MSSQL_PID=Developer
     networks:
       - internal
