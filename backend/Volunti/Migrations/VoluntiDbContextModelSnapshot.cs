@@ -231,38 +231,6 @@ namespace Volunti.Migrations
                     b.ToTable("Organizations");
                 });
 
-            modelBuilder.Entity("Volunti.Models.PasswordResetToken", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("TokenHash")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime?>("UsedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("PasswordResetTokens");
-                });
-
             modelBuilder.Entity("Volunti.Models.Role", b =>
                 {
                     b.Property<int>("Id")
@@ -279,6 +247,23 @@ namespace Volunti.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            RoleType = "Volunteer"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            RoleType = "Organization"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            RoleType = "Admin"
+                        });
                 });
 
             modelBuilder.Entity("Volunti.Models.User", b =>
@@ -545,17 +530,6 @@ namespace Volunti.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Volunti.Models.PasswordResetToken", b =>
-                {
-                    b.HasOne("Volunti.Models.User", "User")
-                        .WithMany("PasswordResetTokens")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Volunti.Models.User", b =>
                 {
                     b.HasOne("Volunti.Models.Role", "Role")
@@ -622,11 +596,6 @@ namespace Volunti.Migrations
                     b.Navigation("Users");
 
                     b.Navigation("Volunteers");
-                });
-
-            modelBuilder.Entity("Volunti.Models.User", b =>
-                {
-                    b.Navigation("PasswordResetTokens");
                 });
 #pragma warning restore 612, 618
         }
