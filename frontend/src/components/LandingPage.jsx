@@ -2,28 +2,42 @@ import React from 'react';
 
 export default function LandingPage({ setView }) {
   return (
-    <div style={{ textAlign: 'center', maxWidth: '700px', margin: '0 auto' }}>
+    <div className="landing-wrapper">
       
-      <div className="hero-text">
-        <h1 className="hero-line-large">Volontärarbete</h1>
-        <h1 className="hero-line-large">på dina villkor.</h1>
+      {/* BAKGRUNDEN*/}
+      <div className="shape-top"></div>
+      <div className="shape-bottom"></div>
+
+      <div className="landing-content">
+        
+        {/* ÖVRE HALVAN: Loggan */}
+        <div className="landing-logo-container">
+          <h1 className="landing-logo-black">VOLUNTI</h1>
+        </div>
+
+        {/* UNDRE HALVAN: Text och knappar */}
+        <div className="landing-bottom-content">
+          
+          <div className="text-wrapper">
+            <h2 style={{ fontSize: '2.2rem', fontWeight: 'bold', marginBottom: '0.5rem', lineHeight: 1.2 }}>
+              Hitta uppdrag nära dig
+            </h2>
+            <p style={{ fontSize: '1.3rem', opacity: 0.9 }}>
+              Små insatser. Stor skillnad.
+            </p>
+          </div>
+
+          <div className="btn-wrapper">
+            <button className="btn-outline-white" onClick={() => setView('login')}>
+              Logga in
+            </button>
+            <button className="btn-solid-white" onClick={() => setView('register')}>
+              Registrera dig
+            </button>
+          </div>
+
+        </div>
       </div>
-      
-      <p className="description-text">
-        Volunti sammanför engagerade individer med meningsfulla uppdrag. 
-        Oavsett om du vill bidra med tid eller hitta förstärkning till din organisation, 
-        så börjar resan här.
-      </p>
-      
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem' }}>
-        <button className="btn-primary" onClick={() => setView('register')}>
-          Börja som volontär
-        </button>
-        <button className="btn-secondary" onClick={() => setView('register')}>
-          För organisationer
-        </button>
-      </div>
-      
     </div>
   );
 }

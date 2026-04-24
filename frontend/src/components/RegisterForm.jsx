@@ -1,64 +1,71 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-export default function RegisterForm() {
-  const [role, setRole] = useState('volunteer');
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
-
-  const updateField = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleRegistration = (e) => {
-
-    e.preventDefault();
-
-    const payload = { ...formData, role };
-    console.log("Registreringsdata klar för backend:", payload);
-  };
-
+export default function RegisterPage({ setView }) {
   return (
-    <div className="form-card">
-      <h2 style={{ marginBottom: '0.5rem' }}>Skapa ett konto</h2>
-      <p style={{ color: '#6b7280', marginBottom: '2rem' }}>Välj din roll i Volunti-communityt.</p>
+    <div className="auth-wrapper">
       
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
-        <button 
-          type="button"
-          onClick={() => setRole('volunteer')}
-          className={role === 'volunteer' ? 'btn-primary' : 'btn-secondary'}
-          style={{ flex: 1 }}
-        >
-          Volontär
-        </button>
-        <button 
-          type="button"
-          onClick={() => setRole('organization')}
-          className={role === 'organization' ? 'btn-primary' : 'btn-secondary'}
-          style={{ flex: 1 }}
-        >
-          Organisation
+      {/* 1. Toppmeny */}
+      <div className="auth-top-nav">
+        <h1 className="auth-logo">VOLUNTI</h1>
+        <button className="btn-nav-login" onClick={() => setView('login')}>
+          Logga in
         </button>
       </div>
 
-      <form onSubmit={handleRegistration} className="form-group">
-        <div>
-          <label className="input-label">
-            {role === 'volunteer' ? 'Fullständigt namn' : 'Organisationens namn'}
-          </label>
-          <input name="name" className="text-input" onChange={updateField} required />
+      {/* 2. Header */}
+      <div className="auth-header">
+        <div className="stepper">
+          <div className="step-dot active"></div>
+          <div className="step-line"></div>
+          <div className="step-dot"></div>
+          <div className="step-line"></div>
+          <div className="step-dot"></div>
+          <div className="step-line"></div>
+          <div className="step-dot"></div>
         </div>
-        <div>
-          <label className="input-label">E-postadress</label>
-          <input type="email" name="email" className="text-input" onChange={updateField} required />
+        <p className="auth-step-text">
+          Steg 1 av 4
+        </p>
+        <h2 className="auth-title">
+          Skapa ditt konto
+        </h2>
+        <p className="auth-subtitle">
+          Fyll i dina uppgifter för att komma igång.
+        </p>
+      </div>
+
+      {/* 3. Vita Form rutan */}
+      <div className="bottom-sheet-card auth-form-container">
+        
+        <input type="text" className="text-input" placeholder="Förnamn *" />
+        <input type="text" className="text-input" placeholder="Efternamn *" />
+        <input type="email" className="text-input" placeholder="Mejl *" />
+        <input type="email" className="text-input" placeholder="Bekräfta mejladress *" />
+
+        {/* Telefonnummer sektionen */}
+        <div className="phone-section">
+          <label className="phone-label">Telefonnummer *</label>
+          <div className="phone-input-group">
+            <div className="phone-prefix">
+              🇸🇪 +46
+            </div>
+            <input type="tel" className="text-input" style={{ flex: 1 }} />
+          </div>
         </div>
-        <div>
-          <label className="input-label">Lösenord</label>
-          <input type="password" name="password" className="text-input" onChange={updateField} required />
+
+        <input type="password" className="text-input" placeholder="Lösenord *" />
+
+        {/* Knapp raden i RegisterPage */}
+        <div className="input-row" style={{ marginTop: '0.5rem' }}>
+          <button className="btn-outline-blue" onClick={() => setView('landing')}>
+            Föregående
+          </button>
+          <button className="btn-primary" onClick={() => console.log('Gå till steg 2!')}>
+            Nästa
+          </button>
         </div>
-        <button type="submit" className="btn-primary" style={{ marginTop: '1rem' }}>
-          Slutför registrering
-        </button>
-      </form>
+
+      </div>
     </div>
   );
 }

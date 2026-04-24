@@ -1,125 +1,539 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+:root {
+  --primary-blue: #2A43A6;
+  --bg-white: #ffffff;
+  --text-dark: #1a1a1a;
+  --text-light: #ffffff;
+  --gray-light: #f9fafb;
+  --gray-border: #d1d5db;
+  --gray-text: #4b5563;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-dark);
+  background-color: var(--gray-light);
+}
+
 .app-container {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #1a1a1a;
   min-height: 100vh;
-  background-color: #f9fafb;
+  min-height: 100dvh;
+  background-color: var(--primary-blue);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
-.app-header {
+/* ==========================================================================
+   LANDING PAGE 
+   ========================================================================== */
+
+.landing-wrapper {
+  position: relative;
+  min-height: 100vh;
+  background-color: var(--bg-white);
+  overflow: hidden;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+}
+
+.shape-top {
+  position: absolute;
+  top: -10vh;
+  right: -20vw;
+  width: 70vmin;
+  height: 70vmin;
+  background-color: var(--primary-blue);
+  border-radius: 50%;
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+.shape-bottom {
+  position: absolute;
+  bottom: -10vh;
+  left: -35vw;
+  width: max(130vmin, 150vw);
+  height: max(130vmin, 150vw);
+  background-color: var(--primary-blue);
+  border-radius: 50%;
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+.landing-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 100vh;
+}
+
+.landing-logo-container {
+  flex: 1;
+  display: flex;
   align-items: center;
-  padding: 1rem 2rem;
-  background-color: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.logo {
-  font-size: 1.5rem;
-  font-weight: 800;
-  cursor: pointer;
-  color: #800020;
-  letter-spacing: -0.5px;
-}
-
-.main-container {
-  padding: 4rem 2rem;
-  display: flex;
   justify-content: center;
-  align-items: flex-start;
+  padding: 2rem;
+}
+
+.landing-logo-black {
+  font-size: clamp(3rem, 10vw, 6rem);
+  font-weight: 900;
+  color: #000000;
+  letter-spacing: -2px;
+  margin: 0;
+}
+
+.landing-bottom-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 2rem 2rem clamp(2rem, 8vh, 6rem) 2rem;
+  color: var(--text-light);
   text-align: center;
 }
 
-.form-card {
-  background-color: #ffffff;
-  padding: 2.5rem;
-  border-radius: 12px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+.text-wrapper {
+  max-width: 500px;
+  margin-bottom: clamp(1rem, 4vh, 3rem);
+}
+
+.btn-wrapper {
   width: 100%;
-  max-width: 450px;
+  max-width: 400px;
 }
 
-.form-card h2 {
-  color: #1a1a1a;
-  font-weight: 700;
+/* ==========================================================================
+   SKÄRMANPASSNINGAR (Media Queries)
+   ========================================================================== */
+
+@media (min-width: 600px) and (max-width: 1024px) {
+  .shape-top {
+    top: -10vh;
+    right: -15vw;
+    width: 50vmin;
+    height: 50vmin;
+  }
+  
+  .shape-bottom {
+    bottom: -40vh;
+    left: -35vw;
+    width: max(110vmin, 130vw);
+    height: max(110vmin, 130vw);
+  }
+
+  .text-wrapper {
+    margin-bottom: 10vh;
+  }
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
+@media (min-width: 1025px) {
+  .landing-wrapper {
+    background-color: #ffffff !important;
+  }
+
+  .shape-top {
+    top: -15vh;
+    right: -10vw;
+    width: 45vmin;
+    height: 45vmin;
+  }
+
+  .shape-bottom {
+    bottom: -45vh;
+    left: -25vw;
+    width: 120vmin;
+    height: 120vmin;
+  }
+
+  .landing-bottom-content {
+    padding-bottom: 12vh;
+  }
+
+  .text-wrapper {
+    margin-bottom: 5vh;
+    max-width: 600px;
+  }
 }
 
-.input-label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 0.25rem;
+@media (min-width: 2300px) {
+  .shape-top {
+    top: -15vh;
+    right: -5vw;
+    width: 45vmin;
+    height: 45vmin;
+  }
+
+  .shape-bottom {
+    bottom: -45vh;
+    left: -15vw;
+    width: 120vmin;
+    height: 120vmin;
+  }
+
+  .landing-bottom-content {
+    padding-bottom: 12vh;
+  }
+
+  .text-wrapper {
+    margin-bottom: 5vh;
+    max-width: 600px;
+  }
+}
+
+@media (min-width: 4000px) {
+  .shape-top {
+    top: -15vh;
+    right: -5vw;
+    width: 45vmin;
+    height: 45vmin;
+  }
+
+  .shape-bottom {
+    bottom: -45vh;
+    left: -10vw;
+    width: 120vmin;
+    height: 120vmin;
+  }
+
+  .landing-bottom-content {
+    padding-bottom: 12vh;
+  }
+
+  .text-wrapper {
+    margin-bottom: 5vh;
+    max-width: 600px;
+  }
+}
+
+@media (max-height: 600px) and (min-width: 600px) {
+  .shape-bottom {
+    bottom: -30vh;
+    left: -20vw;
+    width: 120vw;
+    height: 120vw;
+  }
+  .landing-bottom-content {
+    padding-bottom: 2vh;
+  }
+}
+
+@media (min-width: 768px) {
+  .bottom-sheet-card {
+    flex-grow: 0 !important;
+    height: auto !important;
+    width: 90% !important;
+    max-width: 750px !important;
+    padding: 3.5rem 3rem !important;
+    border-radius: 30px !important;
+    margin-bottom: 4rem !important;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+  }
+
+  .auth-title {
+    font-size: 3rem;
+  }
+}
+
+/* ==========================================================================
+   2. REGISTRERING OCH FORMULÄR 
+   ========================================================================== */
+
+.bottom-sheet-card {
+  background-color: var(--bg-white);
+  border-radius: 40px 40px 0 0;
+  padding: 2.5rem 2rem;
+  flex-grow: 1;
+  box-shadow: 0 -10px 20px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .text-input {
   width: 100%;
-  padding: 0.8rem;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--primary-blue);
   font-size: 1rem;
-  transition: border-color 0.2s;
+  color: var(--text-dark);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: var(--bg-white);
 }
 
 .text-input:focus {
   outline: none;
-  border-color: #800020;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 2px rgba(42, 67, 166, 0.2);
+}
+
+/* ==========================================================================
+   3. KNAPPSYSTEM 
+   ========================================================================== */
+
+.btn-solid-white {
+  width: 100%;
+  padding: 1.2rem;
+  background-color: var(--bg-white);
+  color: var(--primary-blue);
+  border: none;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.btn-outline-white {
+  width: 100%;
+  padding: 1.2rem;
+  background-color: transparent;
+  color: var(--text-light);
+  border: 1px solid var(--text-light);
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
 }
 
 .btn-primary {
-  padding: 0.8rem 1.5rem;
-  background-color: #800020;
-  color: #ffffff;
+  padding: 1rem;
+  background-color: var(--primary-blue);
+  color: var(--text-light);
   border: none;
-  border-radius: 6px;
+  border-radius: 12px;
+  font-weight: bold;
+  width: 100%;
   cursor: pointer;
-  font-weight: 600;
   transition: opacity 0.2s;
 }
 
-.btn-secondary {
-  padding: 0.8rem 1.5rem;
+.btn-primary:hover { opacity: 0.9; }
+
+.btn-outline-blue {
+  padding: 1rem;
   background-color: transparent;
-  color: #800020;
-  border: 2px solid #800020;
-  border-radius: 6px;
+  color: var(--primary-blue);
+  border: 1px solid var(--primary-blue);
+  border-radius: 12px;
+  font-weight: bold;
+  width: 100%;
   cursor: pointer;
-  font-weight: 600;
 }
 
-.btn-ghost {
-  background: none;
-  border: none;
-  color: #4b5563;
-  cursor: pointer;
-  font-weight: 500;
+.btn-outline-blue:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-.hero-text {
+/* ==========================================================================
+   AUTH-SIDOR (Registrera & Logga in)
+   ========================================================================== */
+
+.auth-wrapper {
+  flex: 1;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: var(--primary-blue);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: env(safe-area-inset-top);
+}
+
+.auth-top-nav {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4rem 2rem 2rem 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.auth-logo {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #000000;
+  margin: 0;
+  letter-spacing: -1px;
+}
+
+.btn-nav-login {
+  background: transparent;
+  color: var(--text-light);
+  border: 1px solid var(--text-light);
+  padding: 0.6rem 1.5rem;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-nav-login:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.auth-header {
+  text-align: center;
+  color: var(--text-light);
+  padding: 0 2rem 2.5rem 2rem;
+  max-width: 600px;
+  width: 100%;
+}
+
+.stepper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.step-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.step-dot.active {
+  background-color: var(--text-light);
+}
+
+.step-line {
+  width: 30px;
+  height: 2px;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.input-row {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.phone-input-group {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.phone-prefix {
+  width: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-white);
+  border: 1px solid var(--primary-blue);
+  border-radius: 8px;
+  font-weight: bold;
+  color: var(--text-dark);
+  font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   AUTH-SIDOR (Texter och Form-container)
+   ========================================================================== */
+
+.auth-step-text {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+.auth-title {
+  font-size: 2.5rem;
+  margin: 0 0 0.5rem 0;
+  font-weight: bold;
+}
+
+.auth-subtitle {
+  margin: 0;
+  font-size: 1.05rem;
+  opacity: 0.9;
+}
+
+.auth-form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  text-align: left;
+}
+
+.phone-section {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  color: #800020;
-  margin-bottom: 2.5rem;
 }
 
-.hero-line-large {
-  font-size: 3.5rem;
-  font-weight: 800;
-  line-height: 1.1;
-  color: #800020;
-  margin: 0;
+.phone-label {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--primary-blue);
 }
 
-.description-text {
-  font-size: 1.25rem;
-  color: #4b5563;
-  line-height: 1.6;
-  max-width: 600px;
-  margin: 0 auto 3rem auto;
+/* ==========================================================================
+   KOMPRIMERING FÖR SMÅ & KORTA SKÄRMAR 
+   ========================================================================== */
+
+@media (max-width: 767px), (max-height: 850px) {
+  .auth-top-nav { padding: 3rem 1.5rem 1rem 1.5rem; }
+  
+  .auth-header { 
+    padding: 0 1.5rem 1rem 1.5rem; 
+    text-align: left;
+  }
+  
+  .stepper { 
+    margin-bottom: 1rem; 
+    justify-content: flex-start;
+  }
+  
+  .auth-title { font-size: 2rem; }
+  
+  .bottom-sheet-card { padding: 1.5rem; }
+  .auth-form-container { gap: 0.75rem; } 
+  
+  .text-input { padding: 0.8rem 1rem; }
+  .phone-prefix { width: 80px; font-size: 0.9rem; } 
+}
+
+/* ==========================================================================
+   LÅNGA MOBILER (T.ex. iPhone Pro Max, Galaxy Fold)
+   ========================================================================== */
+
+@media (max-width: 767px) and (min-height: 800px) {
+  .auth-header {
+    margin-top: 2vh;
+    padding-bottom: 2rem;
+  }
+  
+  .auth-form-container {
+    gap: 1rem;
+  }
+
+  .bottom-sheet-card {
+    flex-grow: 0;
+    margin-top: auto;
+    width: 100%;
+    margin-bottom: 0;
+    border-radius: 40px 40px 0 0;
+    box-shadow: 0 -10px 20px rgba(0,0,0,0.1);
+    padding-bottom: 3rem;
+  }
 }
