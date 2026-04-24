@@ -23,5 +23,7 @@ namespace Volunti.Models
 
         public int RoleId { get; set; }
         public Role Role { get; set; }
+
+        public List<PasswordResetToken> PasswordResetTokens { get; set; } = new();
     }
 }

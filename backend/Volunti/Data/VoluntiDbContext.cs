@@ -20,6 +20,7 @@ namespace Volunti.Data
         public DbSet<VolunteerInterest> VolunteerInterests { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -79,7 +80,14 @@ namespace Volunti.Data
                 .OnDelete(DeleteBehavior.NoAction);
 
 
-            
+            modelBuilder.Entity<PasswordResetToken>()
+                .HasOne(p => p.User)
+                .WithMany(u => u.PasswordResetTokens)
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+
+
         }
     }
 }
