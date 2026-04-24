@@ -1,12 +1,8 @@
-using System; 
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace api.Models
+namespace api.Dtos.Job
 {
-  public class Job
-  {
+    public class JobDto
+    {
     public Guid JobId { get; set; }
 
     public string Title { get; set; } = string.Empty; 
@@ -27,8 +23,6 @@ namespace api.Models
     
     public Guid? OrganizationId {get; set; }
 
-    public Organization? Organization {get; set; }
 
-
-  }
+    }
 }
