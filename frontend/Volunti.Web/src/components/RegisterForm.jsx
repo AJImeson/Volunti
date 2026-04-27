@@ -1,17 +1,28 @@
 import React, { useState } from 'react';
 
 export default function RegisterPage({ setView }) {
+  
+  /* ==========================================================================
+     STATE OCH MINNE
+     ========================================================================== */
+     
+  // Håller koll på vilket steg i formuläret användaren är på just nu
   const [currentStep, setCurrentStep] = useState(1);
+  
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  // 1. Minne för Hela formuläret
+  
+  // Det stora minnet som samlar in all data användaren fyller i under alla steg
   const [formData, setFormData] = useState({
     firstName: '', lastName: '', email: '', confirmEmail: '', phone: '', password: '',
     kommun: '', korkort: '',
     categories: [], availability: [], distance: 5, distanceAny: false,
-    // --- NYTT FÖR STEG 4 ---
-    notificationLevel: 'Rekommenderat', // Standardvalet
+    notificationLevel: 'Rekommenderat',
     emailNotification: ''
   });
+
+  /* ==========================================================================
+     FUNKTIONER FÖR ATT HANTERA DATA OCH NAVIGERING
+     ========================================================================== */
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -21,6 +32,8 @@ export default function RegisterPage({ setView }) {
     });
   };
 
+  // Funktion för knappar där man kan välja flera alternativ samtidigt (som i Steg 3)
+  // Om värdet redan finns i listan tas det bort, annars läggs det till
   const toggleSelection = (field, value) => {
     setFormData((prev) => {
       const currentList = prev[field];
@@ -32,15 +45,16 @@ export default function RegisterPage({ setView }) {
     });
   };
 
+  // Funktion för att gå vidare till nästa steg. Om vi är på sista steget skickas datan.
   const handleNext = () => {
     if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     } else {
       console.log('Formuläret är KLART! Datan skickas till backend:', formData);
-      // setView('success') eller fetch() här!
     }
   };
 
+  // Funktion för att backa. Om vi är på första steget skickas användaren tillbaka till startsidan.
   const handlePrev = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
@@ -49,7 +63,7 @@ export default function RegisterPage({ setView }) {
     }
   };
 
-  // En liten hjälpfunktion för att rita ut snygga SVG-ikoner i Steg 4
+  // Hjälpfunktion för att hämta rätt ikon-kod i Steg 4 
   const renderIcon = (name) => {
     switch(name) {
       case 'bag': return <svg className="feature-icon" viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="14" rx="2"/><path d="M8 7v-2a4 4 0 0 1 8 0v2"/></svg>;
@@ -61,15 +75,23 @@ export default function RegisterPage({ setView }) {
     }
   };
 
+  /* ==========================================================================
+     SIDANS VISUELLA STRUKTUR
+     ========================================================================== */
+
   return (
     <div className="auth-wrapper">
       
+      {/* --- TOPPMENY --- */}
       <div className="auth-top-nav">
         <h1 className="auth-logo">VOLUNTI</h1>
         <button className="btn-nav-login" onClick={() => setView('login')}>Logga in</button>
       </div>
 
+      {/* --- HEADER OCH STEGINDIKATOR --- */}
       <div className="auth-header">
+        
+        {/* Prickarna som visar hur långt man kommit */}
         <div className="stepper">
           <div className={`step-dot ${currentStep >= 1 ? 'active' : ''}`}></div>
           <div className="step-line"></div>
@@ -82,6 +104,7 @@ export default function RegisterPage({ setView }) {
         
         <p className="auth-step-text">Steg {currentStep} av 4</p>
         
+        {/* Rubriker för de olika stegen */}
         <h2 className="auth-title">
           {currentStep === 1 && "Skapa ditt konto"}
           {currentStep === 2 && "Berätta lite om dig"}
@@ -89,6 +112,7 @@ export default function RegisterPage({ setView }) {
           {currentStep === 4 && "Hur vill du bli notifierad?"}
         </h2>
         
+        {/* Underrubrik som bara visas på specifika steg för att spara plats */}
         {(currentStep === 1 || currentStep === 3) && (
           <p className="auth-subtitle">Fyll i dina uppgifter för att komma igång.</p>
         )}
@@ -97,15 +121,19 @@ export default function RegisterPage({ setView }) {
         )}
       </div>
 
+      {/* --- HUVUDCONTAINER FÖR SJÄLVA FORMULÄRET --- */}
       <div className="bottom-sheet-card auth-form-container">
         
-        {/* === STEG 1 === */}
+        {/* ==========================================================================
+            STEG 1: PERSONUPPGIFTER
+            ========================================================================== */}
         {currentStep === 1 && (
           <>
             <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} className="text-input" placeholder="Förnamn *" />
             <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} className="text-input" placeholder="Efternamn *" />
             <input type="email" name="email" value={formData.email} onChange={handleChange} className="text-input" placeholder="Mejl *" />
             <input type="email" name="confirmEmail" value={formData.confirmEmail} onChange={handleChange} className="text-input" placeholder="Bekräfta mejladress *" />
+            
             <div className="phone-section">
               <label className="phone-label">Telefonnummer *</label>
               <div className="phone-input-group">
@@ -113,14 +141,17 @@ export default function RegisterPage({ setView }) {
                 <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="text-input" style={{ flex: 1 }} />
               </div>
             </div>
+            
             <input type="password" name="password" value={formData.password} onChange={handleChange} className="text-input" placeholder="Lösenord *" />
           </>
         )}
 
-        {/* === STEG 2 === */}
+        {/* ==========================================================================
+            STEG 2: KOMMUN OCH KÖRKORT
+            ========================================================================== */}
         {currentStep === 2 && (
           <>
-            {/* NYA SNYGGA DROPDOWNEN */}
+            {/* Dropdown meny för att välja kommun */}
             <div className="custom-dropdown-container">
               <div 
                 className={`select-input ${isDropdownOpen ? 'open' : ''}`}
@@ -140,7 +171,6 @@ export default function RegisterPage({ setView }) {
                       key={city}
                       className="custom-dropdown-item"
                       onClick={() => {
-                        // Spara valet och stäng menyn
                         setFormData({ ...formData, kommun: city });
                         setIsDropdownOpen(false);
                       }}
@@ -161,14 +191,18 @@ export default function RegisterPage({ setView }) {
                 </label>
               ))}
             </div>
+            
             <h3 className="form-section-title" style={{ marginTop: '1.5rem' }}>Har du något intyg?*</h3>
             <button className="action-link-btn">+ Ladda upp</button>
+            
             <h3 className="form-section-title" style={{ marginTop: '1.5rem' }}>Har du några rekommendationer?</h3>
             <button className="action-link-btn">+ Lägg till</button>
           </>
         )}
 
-        {/* === STEG 3 === */}
+        {/* ==========================================================================
+            STEG 3: UPPDRAG OCH TILLGÄNGLIGHET
+            ========================================================================== */}
         {currentStep === 3 && (
           <>
             <div className="chip-group">
@@ -178,6 +212,7 @@ export default function RegisterPage({ setView }) {
                 </button>
               ))}
             </div>
+            
             <h3 className="form-section-title">När är du tillgänglig?</h3>
             <div className="chip-group">
               {["Vardag", "Kvällar", "Helger", "Engångsuppdrag", "Återkommande"].map(time => (
@@ -186,6 +221,7 @@ export default function RegisterPage({ setView }) {
                 </button>
               ))}
             </div>
+            
             <div className="range-container">
               <div className="range-header">
                 <h3 className="range-title">Avstånd</h3>
@@ -193,6 +229,7 @@ export default function RegisterPage({ setView }) {
               </div>
               <input type="range" name="distance" min="1" max="50" value={formData.distance} onChange={handleChange} className="range-input" disabled={formData.distanceAny} />
             </div>
+            
             <label className="checkbox-row">
               <input type="checkbox" name="distanceAny" checked={formData.distanceAny} onChange={handleChange} />
               <span>Det spelar ingen roll</span>
@@ -200,10 +237,12 @@ export default function RegisterPage({ setView }) {
           </>
         )}
 
-        {/* === STEG 4: NOTIFIKATIONER === */}
+        {/* ==========================================================================
+            STEG 4: NOTIFIKATIONSINSTÄLLNINGAR
+            ========================================================================== */}
         {currentStep === 4 && (
           <>
-            {/* Rekommenderat Kort */}
+            {/* Rekommenderat nivå */}
             <div className="notification-section">
               <span className="notification-label">Rekommenderat</span>
               <div className={`notification-card ${formData.notificationLevel === 'Rekommenderat' ? 'active' : ''}`} onClick={() => setFormData({...formData, notificationLevel: 'Rekommenderat'})}>
@@ -222,7 +261,7 @@ export default function RegisterPage({ setView }) {
               </div>
             </div>
 
-            {/* Minimalt Kort */}
+            {/* Minimal nivå */}
             <div className="notification-section">
               <span className="notification-label">Minimalt</span>
               <div className={`notification-card ${formData.notificationLevel === 'Minimalt' ? 'active' : ''}`} onClick={() => setFormData({...formData, notificationLevel: 'Minimalt'})}>
@@ -240,7 +279,7 @@ export default function RegisterPage({ setView }) {
               </div>
             </div>
 
-            {/* Allt Kort */}
+            {/* Allt nivå */}
             <div className="notification-section">
               <span className="notification-label">Allt</span>
               <div className={`notification-card ${formData.notificationLevel === 'Allt' ? 'active' : ''}`} onClick={() => setFormData({...formData, notificationLevel: 'Allt'})}>
@@ -274,7 +313,9 @@ export default function RegisterPage({ setView }) {
           </>
         )}
 
-        {/* --- KNAPPAR --- */}
+        {/* ==========================================================================
+            NAVIGERINGSKNAPPAR LÄNGST NER
+            ========================================================================== */}
         <div className="input-row" style={{ marginTop: '2rem' }}>
           <button className="btn-outline-blue" onClick={handlePrev}>
             Föregående
