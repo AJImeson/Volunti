@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using api.Dtos.Organization;
-using api.Models;
+using Volunti.Dtos.Organization;
+using Volunti.Models;
 
-namespace api.Mappers
+namespace Volunti.Mappers
 {
     public static class OrganizationMappers
     {
-        public static OrgDto ToOrgDto(this api.Models.Organization org)
+        public static OrgDto ToOrgDto(this Volunti.Models.Organization org)
         {
             return new OrgDto
             {

@@ -1,9 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Volunti.Models;
+
 
 namespace Volunti.Data
 {
-    public class VoluntiDbContext : DbContext
+    public class VoluntiDbContext : IdentityDbContext<AppUser>
     {
         public VoluntiDbContext(DbContextOptions<VoluntiDbContext> options)
             : base(options)
@@ -20,10 +23,19 @@ namespace Volunti.Data
         public DbSet<VolunteerInterest> VolunteerInterests { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            List<IdentityRole> roles = new List<IdentityRole>
+            {
+                new IdentityRole { Id = "11111111-1111-1111-1111-111111111111", ConcurrencyStamp = "1", Name = "Admin",        NormalizedName = "ADMIN" },
+                new IdentityRole { Id = "22222222-2222-2222-2222-222222222222", ConcurrencyStamp = "2", Name = "Volunteer",    NormalizedName = "VOLUNTEER" },
+                new IdentityRole { Id = "33333333-3333-3333-3333-333333333333", ConcurrencyStamp = "3", Name = "Organization", NormalizedName = "ORGANIZATION" }
+            };
+            modelBuilder.Entity<IdentityRole>().HasData(roles);
 
             modelBuilder.Entity<Message>()
                 .HasOne(m => m.Sender)
@@ -79,7 +91,12 @@ namespace Volunti.Data
                 .OnDelete(DeleteBehavior.NoAction);
 
 
-            
+            modelBuilder.Entity<PasswordResetToken>()
+                .HasOne(p => p.User)
+                .WithMany()
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
         }
     }
 }

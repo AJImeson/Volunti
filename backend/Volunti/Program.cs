@@ -1,16 +1,15 @@
-using api.Data;
-using api.Dtos.Organization;
-using api.Mappers;
+using Volunti.Data;
+using Volunti.Dtos.Organization;
+using Volunti.Mappers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
-using api.Models;
+using Volunti.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using api.Dtos.Account.User;
-using api.Interfaces;
-using api.Service;
-using api.Dtos.User;
+using Volunti.Interfaces;
+using Volunti.Service;
+using Volunti.Dtos.User;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,7 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContext<VoluntiDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
@@ -31,7 +30,7 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequiredLength = 12;
 })
-.AddEntityFrameworkStores<ApplicationDbContext>();
+.AddEntityFrameworkStores<VoluntiDbContext>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -74,33 +73,33 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/organizations", async (ApplicationDbContext db) =>
+app.MapGet("/organizations", async (VoluntiDbContext db) =>
 {
     var orgs = await db.Organizations.ToListAsync();
     var orgDtos = orgs.Select(o => o.ToOrgDto()).ToList();
     return Results.Ok(orgDtos);
 });
 
-app.MapGet("/organizations/{id}", async (Guid id, ApplicationDbContext db) =>
+app.MapGet("/organizations/{id}", async (Guid id, VoluntiDbContext db) =>
 {
     var org = await db.Organizations.FindAsync(id);
     return org is null ? Results.NotFound() : Results.Ok(org.ToOrgDto());
 }).WithName("GetOrgById");
 
-app.MapGet("/jobs", async (ApplicationDbContext db) =>
+app.MapGet("/jobs", async (VoluntiDbContext db) =>
 {
     var jobs = await db.Jobs.ToListAsync();
     var jobDtos = jobs.Select(j => j.ToJobDto()).ToList();
     return Results.Ok(jobDtos);
 });
 
-app.MapGet("/jobs/{id}", async (Guid id, ApplicationDbContext db) =>
+app.MapGet("/jobs/{id}", async (Guid id, VoluntiDbContext db) =>
 {
     var job = await db.Jobs.FindAsync(id);
     return job is null ? Results.NotFound() : Results.Ok(job.ToJobDto());
 });
 
-app.MapPost("/organizations", async (CreateOrgDto orgDto, ApplicationDbContext db) =>
+app.MapPost("/organizations", async (CreateOrgDto orgDto, VoluntiDbContext db) =>
 {
     var newOrg = orgDto.ToOrgFromCreateDTO();
     db.Organizations.Add(newOrg);

@@ -1,6 +1,6 @@
 
 
-namespace api.Dtos.User
+namespace Volunti.Dtos.User
 {
     public class NewUserDto
     {

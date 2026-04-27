@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using api.Dtos.Job;
+using Volunti.Dtos.Job;
 
-namespace api.Mappers
+namespace Volunti.Mappers
 {
     public static class JobMapper
     {
-        public static JobDto ToJobDto(this api.Models.Job job)
+        public static JobDto ToJobDto(this Volunti.Models.Job job)
         {
             return new JobDto
             {

@@ -1,5 +1,5 @@
 
-namespace api.Dtos.Organization 
+namespace Volunti.Dtos.Organization 
 {
     public class OrgDto
     {

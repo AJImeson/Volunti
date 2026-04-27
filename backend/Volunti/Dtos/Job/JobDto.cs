@@ -1,27 +1,27 @@
 
-namespace api.Dtos.Job
+namespace Volunti.Dtos.Job
 {
     public class JobDto
     {
-    public Guid JobId { get; set; }
+        public Guid JobId { get; set; }
 
-    public string Title { get; set; } = string.Empty; 
+        public string Title { get; set; } = string.Empty;
 
-    public string? Description { get; set; }
-    public string? Category { get; set; }  // Change to Enum later
-    public DateTime StartTime { get; set; }
-    public DateTime EndTime { get; set; }
-    public string? Adress { get; set; }
+        public string? Description { get; set; }
+        public string? Category { get; set; }  // Change to Enum later
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public string? Adress { get; set; }
 
-    public string? City { get; set; }
+        public string? City { get; set; }
 
-    public bool IsUrgent { get; set; }
+        public bool IsUrgent { get; set; }
 
-    public string? Status { get; set; } // Change to Enum later
+        public string? Status { get; set; } // Change to Enum later
 
-    public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
-    
-    public Guid? OrganizationId {get; set; }
+        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
+
+        public Guid? OrganizationId { get; set; }
 
 
     }

@@ -1,6 +1,6 @@
-using api.Models;
+using Volunti.Models;
 
-namespace api.Interfaces
+namespace Volunti.Interfaces
 {
   public interface ITokenService
   {

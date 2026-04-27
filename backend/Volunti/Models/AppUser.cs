@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 
-namespace api.Models
+namespace Volunti.Models
 {
     public class AppUser : IdentityUser 
     {

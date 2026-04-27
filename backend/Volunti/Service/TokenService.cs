@@ -1,11 +1,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using api.Interfaces;
-using api.Models;
+using Volunti.Interfaces;
+using Volunti.Models;
 using Microsoft.IdentityModel.Tokens;
 
-namespace api.Service
+namespace Volunti.Service
 {
 
     public class TokenService : ITokenService
