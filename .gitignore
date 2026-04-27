@@ -34,4 +34,4 @@ Thumbs.db
 /backend/Volunti/appsettings.json
 
 # Local AI context file - stays on disk but never committed
-CLAUDE_CONTEXT.md
+CC_Context.md
