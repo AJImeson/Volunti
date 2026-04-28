@@ -1,33 +1,86 @@
 services:
-
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    depends_on:
-      - mssql
+    image: ${CI_REGISTRY_IMAGE}/backend:${IMAGE_TAG}
     environment:
-      - ConnectionStrings__DefaultConnection=SserveR=mssql;Database=Burgundy;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True
-    ports:
-      - "9080:8080"
+      - ConnectionStrings__DefaultConnection=Server=mssql;Database=Burgundy;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True
+      - ASPNETCORE_HTTP_PORTS=8080
+    networks:
+      - traefik-public
+      - internal
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.constraint-label=traefik-public"
+        - "traefik.swarm.network=traefik-public"
+        - "traefik.http.routers.${STACK_NAME}-backend-https.rule=Host(`api.${STACK_NAME}.doe25.swarm.chas-lab.dev`)"
+        - "traefik.http.routers.${STACK_NAME}-backend-https.entrypoints=https"
+        - "traefik.http.routers.${STACK_NAME}-backend-https.tls=true"
+        - "traefik.http.routers.${STACK_NAME}-backend-https.tls.certresolver=le"
+        - "traefik.http.services.${STACK_NAME}-backend.loadbalancer.server.port=8080"
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:80"
+    image: ${CI_REGISTRY_IMAGE}/frontend:${IMAGE_TAG}
+    networks:
+      - traefik-public
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.constraint-label=traefik-public"
+        - "traefik.swarm.network=traefik-public"
+        - "traefik.http.routers.${STACK_NAME}-frontend-https.rule=Host(`${PUBLIC_HOST}.doe25.swarm.chas-lab.dev`)"
+        - "traefik.http.routers.${STACK_NAME}-frontend-https.entrypoints=https"
+        - "traefik.http.routers.${STACK_NAME}-frontend-https.tls=true"
+        - "traefik.http.routers.${STACK_NAME}-frontend-https.tls.certresolver=le"
+        - "traefik.http.services.${STACK_NAME}-frontend.loadbalancer.server.port=80"
 
+  # mssql-init:
+  #   image: busybox:latest
+  #   user: root
+  #   volumes:
+  #     - sqldata:/var/opt/mssql
+  #   command: chown -R 10001:0 /var/opt/mssql
+  #   networks:
+  #     - internal
+  #   deploy:
+  #     restart_policy:
+  #       condition: on-failure
+  #       max_attempts: 1
+  #     placement:
+  #       constraints:
+  #         - node.role == manager # Ensure this runs on a manager node to initialize the volume permissions
+  
   mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
+    user: root
+    entrypoint: > 
+      /bin/bash -c "
+      chown -R mssql:0 /var/opt/mssql &&
+      exec su mssql -s /bin/bash -c /opt/mssql/bin/sqlservr
+      "
     environment:
       - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=${SA_PASSWORD}
+      - MSSQL_SA_PASSWORD='${SA_PASSWORD}'
       - MSSQL_PID=Developer
-    ports:
-      - "1433:1433"
+    networks:
+      - internal
     volumes:
       - sqldata:/var/opt/mssql
+    # depends_on:
+    #   - mssql-init
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager # specific constraint to ensure the database runs on a manager node
 
 volumes:
   sqldata: {}
+
+networks:
+  traefik-public:
+    external: true
+  internal:
+    driver: overlay # for communication between services in the swarm

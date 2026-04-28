@@ -7,7 +7,14 @@
 
 # Frontend
 
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+
 # Config
 
-* .yml text
-* .md text
+*.yml text
+*.md text

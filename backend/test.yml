@@ -1,5 +1,5 @@
 backend-test:
-  stage: test
+  stage: test-build
   image: mcr.microsoft.com/dotnet/sdk:10.0
   services:
     - name: mcr.microsoft.com/mssql/server:2022-latest
@@ -10,6 +10,20 @@ backend-test:
   variables:
     ConnectionStrings_DefaultConnection: "Server=db;Database=BurgundyDb;User=sa;Password=$SA_PASSWORD;TrustServerCertificate=True"
   script:
-    - cd backend
+    - cd backend/Volunti
     - dotnet restore
     - dotnet test --configuration Release
+
+backend-container-test:
+  stage: test-container
+  image: docker:latest
+  rules:
+    - exists:
+        - backend/Dockerfile
+  variables:
+    IMAGE_TAG: $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHORT_SHA
+    CONTAINER_NAME: test-backend-$CI_JOB_ID
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $IMAGE_TAG
+    - docker inspect $IMAGE_TAG

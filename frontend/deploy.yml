@@ -1,6 +1,37 @@
 frontend-deploy:
   stage: deploy
-  image:
+  image: alpine:latest
+  needs: ["backend-deploy"]
+  variables:
+    STACK_NAME: "volunti-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG"
+    PUBLIC_HOST: "volunti-$CI_COMMIT_REF_SLUG"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      variables:
+        PUBLIC_HOST: "volunti"
+        STACK_NAME: "volunti-$CI_DEFAULT_BRANCH"
+    - if: '$CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH'
+      variables:
+        PUBLIC_HOST: "volunti-$CI_COMMIT_REF_SLUG"
+        STACK_NAME: "volunti-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG"
   script:
+    - apk add --no-cache curl
+    - python deploy.py
+    - sleep 20
+    - curl -fk "https://${PUBLIC_HOST}.doe25.swarm.chas-lab.dev" || exit 1
+  environment:
+    name: review/$CI_COMMIT_REF_SLUG
+    url: https://${PUBLIC_HOST}.doe25.swarm.chas-lab.dev
+    on_stop: stop_review
 
-    - echo "frontend-deploy" 
+stop_review:
+  stage: cleanup
+  image: python:3.10-slim
+  script:
+    - pip install requests
+    - python delete.py
+  environment:
+    name: review/$CI_COMMIT_REF_SLUG
+    action: stop
+  when: manual
+  allow_failure: true
