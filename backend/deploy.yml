@@ -8,7 +8,7 @@ backend-deploy:
     - python deploy.py 
   environment:
     name: review/$CI_COMMIT_REF_SLUG
-    url: https://${STACK_NAME}.doe25.swarm.chas-lab.dev/docs
+    url: https://${PUBLIC_HOST}.doe25.swarm.chas-lab.dev/docs
     on_stop: stop_review
 
 stop_review:
