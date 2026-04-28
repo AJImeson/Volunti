@@ -9,10 +9,16 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 PORTAINER_URL = os.getenv("PORTAINER_URL")
 API_KEY = os.getenv("PORTAINER_TOKEN")
 STACK_NAME = f"volunti-{os.getenv('CI_PROJECT_NAME')}-{os.getenv('CI_COMMIT_REF_SLUG')}"
-ENDPOINT_ID = 8
-# Load the compose-file
-COMPOSE_FILE = "docker-compose.yml" 
 
+# For treafik showing project name in URL
+_ref = os.getenv("CI_COMMIT_REF_SLUG", "")
+_default = os.getenv("CI_DEFAULT_BRANCH", "main")
+PUBLIC_HOST = "volunti" if _ref == _default else f"volunti-{_ref}"
+
+ENDPOINT_ID = 8
+
+# Load the compose-file
+COMPOSE_FILE = "docker-compose.yml"
 
 if not PORTAINER_URL or not API_KEY:
     print("Error: PORTAINER_URL and PORTAINER_API_TOKEN environment variables must be set.")
@@ -69,6 +75,7 @@ def deploy_stack(endpoint_id, swarm_id):
     compose_content = compose_content.replace("${CI_REGISTRY_IMAGE}", image_path)
     compose_content = compose_content.replace("${IMAGE_TAG}", image_tag)
     compose_content = compose_content.replace("${STACK_NAME}", STACK_NAME)
+    compose_content = compose_content.replace("${PUBLIC_HOST}", PUBLIC_HOST)
     compose_content = compose_content.replace("${PROJECT_SLUG}", project_slug)
     print(f"DEBUG: Image line is: {[line for line in compose_content.splitlines() if 'image:' in line]}")
 
