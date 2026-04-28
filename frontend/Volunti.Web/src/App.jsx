@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 import LandingPage from './components/LandingPage';
 import RegisterForm from './components/RegisterForm';
-import Profile from '../Volunti.Web/src/components/Profile';
+import Profile from './components/Profile';
 import SetupStep from './components/SetupStep'; 
 
 export default function App() {
