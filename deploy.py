@@ -11,6 +11,7 @@ API_KEY = os.getenv("PORTAINER_TOKEN")
 STACK_NAME = f"volunti-{os.getenv('CI_PROJECT_NAME')}-{os.getenv('CI_COMMIT_REF_SLUG')}"
 
 # For treafik showing project name in URL
+_ref = os.getenv("CI_COMMIT_REF_SLUG") 
 _default = os.getenv("CI_DEFAULT_BRANCH", "main")
 PUBLIC_HOST = "volunti" if _ref == _default else f"volunti-{_ref}"
 

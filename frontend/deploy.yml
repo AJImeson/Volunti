@@ -4,7 +4,7 @@ frontend-deploy:
   needs: ["backend-deploy"]
   variables:
     STACK_NAME: "volunti-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG"
-    PUBLIC_HOST: "volunti-$CI_COMMIT_REF_SLUG"
+    PUBLIC_HOST: "volunti"
   script:
     - apk add --no-cache curl
     - sleep 20
