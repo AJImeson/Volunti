@@ -6,14 +6,14 @@ using Volunti.Models;
 
 namespace Volunti.Data
 {
-    public class VoluntiDbContext : IdentityDbContext<AppUser>
+    public class VoluntiDbContext : IdentityDbContext<AppUser, Role, int>
     {
         public VoluntiDbContext(DbContextOptions<VoluntiDbContext> options)
             : base(options)
         {
         }
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<AppUser> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Volunteer> Volunteers { get; set; }
         public DbSet<Organization> Organizations { get; set; }
@@ -51,10 +51,10 @@ namespace Volunti.Data
                 .OnDelete(DeleteBehavior.NoAction);
 
 
-            modelBuilder.Entity<User>()
+            modelBuilder.Entity<AppUser>()
                 .HasOne(u => u.Role)
                 .WithMany(r => r.Users)
-                .HasForeignKey(u => u.RoleId)
+                .HasForeignKey(u => u.Role)
                 .OnDelete(DeleteBehavior.NoAction);
 
 
