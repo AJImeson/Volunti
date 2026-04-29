@@ -15,7 +15,7 @@ namespace Volunti.Models
     public string? Category { get; set; }  // Change to Enum later
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
-    public string? Adress { get; set; }
+    public string? Address { get; set; }
 
     public string? City { get; set; }
 
@@ -25,7 +25,7 @@ namespace Volunti.Models
 
     public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
     
-    public Guid? OrganizationId {get; set; }
+    public int? OrganizationId { get; set; }
 
     public Organization? Organization {get; set; }
 

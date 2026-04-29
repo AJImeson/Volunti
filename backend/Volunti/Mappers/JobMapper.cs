@@ -18,7 +18,7 @@ namespace Volunti.Mappers
                 Category = job.Category,
                 StartTime = job.StartTime,
                 EndTime = job.EndTime,
-                Adress = job.Adress,
+                Address = job.Address,
                 City = job.City,
                 IsUrgent = job.IsUrgent,
                 Status = job.Status,

@@ -10,7 +10,6 @@ namespace Volunti.Models
         public string RoleType { get; set; }
 
 
-        public List<AppUser> Users { get; set; }
         public List<Volunteer> Volunteers { get; set; }
         public List<Organization> Organizations { get; set; }
     }

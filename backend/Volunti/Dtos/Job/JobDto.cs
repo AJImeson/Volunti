@@ -11,7 +11,7 @@ namespace Volunti.Dtos.Job
         public string? Category { get; set; }  // Change to Enum later
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
-        public string? Adress { get; set; }
+        public string? Address { get; set; }
 
         public string? City { get; set; }
 
@@ -21,7 +21,7 @@ namespace Volunti.Dtos.Job
 
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 
-        public Guid? OrganizationId { get; set; }
+        public int? OrganizationId { get; set; }
 
 
     }

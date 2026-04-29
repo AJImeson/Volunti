@@ -59,13 +59,6 @@ namespace Volunti.Data
                 .OnDelete(DeleteBehavior.NoAction);
 
 
-            modelBuilder.Entity<AppUser>()
-                .HasOne(u => u.Role)
-                .WithMany(r => r.Users)
-                .HasForeignKey(u => u.RoleId)
-                .OnDelete(DeleteBehavior.NoAction);
-
-
             modelBuilder.Entity<Organization>()
                 .HasOne(o => o.User)
                 .WithMany()

@@ -43,7 +43,7 @@ namespace Volunti.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetRoleClaims", (string)null);
+                    b.ToTable("RoleClaims", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
@@ -67,7 +67,7 @@ namespace Volunti.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserClaims", (string)null);
+                    b.ToTable("UserClaims", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
@@ -88,7 +88,7 @@ namespace Volunti.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserLogins", (string)null);
+                    b.ToTable("UserLogins", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
@@ -103,7 +103,7 @@ namespace Volunti.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetUserRoles", (string)null);
+                    b.ToTable("UserRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
@@ -122,7 +122,7 @@ namespace Volunti.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("AspNetUserTokens", (string)null);
+                    b.ToTable("UserTokens", (string)null);
                 });
 
             modelBuilder.Entity("VolunteerVolunteerInterest", b =>
@@ -206,9 +206,6 @@ namespace Volunti.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -229,9 +226,7 @@ namespace Volunti.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Volunti.Models.Job", b =>
@@ -242,7 +237,7 @@ namespace Volunti.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("JobId"));
 
-                    b.Property<string>("Adress")
+                    b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Category")
@@ -263,8 +258,8 @@ namespace Volunti.Migrations
                     b.Property<bool>("IsUrgent")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("OrganizationId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("OrganizationId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
@@ -348,9 +343,11 @@ namespace Volunti.Migrations
 
             modelBuilder.Entity("Volunti.Models.Organization", b =>
                 {
-                    b.Property<Guid>("OrganizationId")
+                    b.Property<int>("OrganizationId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrganizationId"));
 
                     b.Property<string>("City")
                         .HasColumnType("nvarchar(max)");
@@ -367,7 +364,7 @@ namespace Volunti.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProfilImageUrl")
+                    b.Property<string>("ProfileImageUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("RoleId")
@@ -457,7 +454,7 @@ namespace Volunti.Migrations
                         .HasDatabaseName("RoleNameIndex")
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
-                    b.ToTable("AspNetRoles", (string)null);
+                    b.ToTable("Roles", (string)null);
 
                     b.HasData(
                         new
@@ -484,50 +481,6 @@ namespace Volunti.Migrations
                             NormalizedName = "ORGANIZATION",
                             RoleType = "Organization"
                         });
-                });
-
-            modelBuilder.Entity("Volunti.Models.User", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(254)
-                        .HasColumnType("nvarchar(254)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("Volunti.Models.Volunteer", b =>
@@ -741,17 +694,6 @@ namespace Volunti.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Volunti.Models.AppUser", b =>
-                {
-                    b.HasOne("Volunti.Models.Role", "Role")
-                        .WithMany("Users")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Role");
-                });
-
             modelBuilder.Entity("Volunti.Models.Job", b =>
                 {
                     b.HasOne("Volunti.Models.Organization", "Organization")
@@ -763,13 +705,13 @@ namespace Volunti.Migrations
 
             modelBuilder.Entity("Volunti.Models.Message", b =>
                 {
-                    b.HasOne("Volunti.Models.User", "Receiver")
+                    b.HasOne("Volunti.Models.AppUser", "Receiver")
                         .WithMany()
                         .HasForeignKey("ReceiverId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Volunti.Models.User", "Sender")
+                    b.HasOne("Volunti.Models.AppUser", "Sender")
                         .WithMany()
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -782,7 +724,7 @@ namespace Volunti.Migrations
 
             modelBuilder.Entity("Volunti.Models.Notification", b =>
                 {
-                    b.HasOne("Volunti.Models.User", "User")
+                    b.HasOne("Volunti.Models.AppUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -816,24 +758,13 @@ namespace Volunti.Migrations
                         .WithMany("PasswordResetTokens")
                         .HasForeignKey("AppUserId");
 
-                    b.HasOne("Volunti.Models.User", "User")
+                    b.HasOne("Volunti.Models.AppUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Volunti.Models.User", b =>
-                {
-                    b.HasOne("Volunti.Models.Role", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("Volunti.Models.Volunteer", b =>
@@ -844,7 +775,7 @@ namespace Volunti.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Volunti.Models.User", "User")
+                    b.HasOne("Volunti.Models.AppUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -887,8 +818,6 @@ namespace Volunti.Migrations
             modelBuilder.Entity("Volunti.Models.Role", b =>
                 {
                     b.Navigation("Organizations");
-
-                    b.Navigation("Users");
 
                     b.Navigation("Volunteers");
                 });

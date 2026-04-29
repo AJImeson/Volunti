@@ -15,7 +15,7 @@ namespace Volunti.Endpoints
                 return Results.Ok(orgs.Select(o => o.ToOrgDto()));
             });
 
-            app.MapGet("/organizations/{id}", async (Guid id, VoluntiDbContext db) =>
+            app.MapGet("/organizations/{id}", async (int id, VoluntiDbContext db) =>
             {
                 var org = await db.Organizations.FindAsync(id);
                 return org is null ? Results.NotFound() : Results.Ok(org.ToOrgDto());
