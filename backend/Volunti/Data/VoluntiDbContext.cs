@@ -66,9 +66,9 @@ namespace Volunti.Data
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Organization>()
-                .HasOne(o => o.Role)
-                .WithMany(r => r.Organizations)
-                .HasForeignKey(o => o.RoleId)
+                .HasOne(o => o.User)
+                .WithOne(r => r.Organization)
+                .HasForeignKey<Organization>(o => o.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
 
@@ -78,11 +78,17 @@ namespace Volunti.Data
                 .HasForeignKey(v => v.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            //modelBuilder.Entity<Volunteer>()
+            //    .HasOne(v => v.User)
+            //    .WithOne(r => r.Volunteer)
+            //    .HasForeignKey(v => v.RoleId)
+            //    .OnDelete(DeleteBehavior.NoAction);
+
             modelBuilder.Entity<Volunteer>()
-                .HasOne(v => v.Role)
-                .WithMany(r => r.Volunteers)
-                .HasForeignKey(v => v.RoleId)
-                .OnDelete(DeleteBehavior.NoAction);
+            .HasOne(v => v.User)
+            .WithOne(u => u.Volunteer)
+            .HasForeignKey<Volunteer>(v => v.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
 
 
             modelBuilder.Entity<Notification>()
