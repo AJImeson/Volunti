@@ -3,7 +3,7 @@ namespace Volunti.Dtos.Job
 {
     public class JobDto
     {
-        public Guid JobId { get; set; }
+        public int JobId { get; set; }
 
         public string Title { get; set; } = string.Empty;
 

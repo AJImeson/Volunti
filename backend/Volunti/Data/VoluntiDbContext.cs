@@ -13,8 +13,6 @@ namespace Volunti.Data
         {
         }
 
-        public DbSet<AppUser> Users { get; set; }
-        public DbSet<Role> Roles { get; set; }
         public DbSet<Volunteer> Volunteers { get; set; }
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<Job> Jobs { get; set; }
@@ -23,19 +21,29 @@ namespace Volunti.Data
         public DbSet<VolunteerInterest> VolunteerInterests { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Notification> Notifications { get; set; }
-        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }  
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            List<IdentityRole> roles = new List<IdentityRole>
+            modelBuilder.Entity<AppUser>().ToTable("Users");
+            modelBuilder.Entity<Role>().ToTable("Roles");
+            modelBuilder.Entity<IdentityUserRole<int>>().ToTable("UserRoles");
+            modelBuilder.Entity<IdentityUserClaim<int>>().ToTable("UserClaims");
+            modelBuilder.Entity<IdentityUserLogin<int>>().ToTable("UserLogins");
+            modelBuilder.Entity<IdentityRoleClaim<int>>().ToTable("RoleClaims");
+            modelBuilder.Entity<IdentityUserToken<int>>().ToTable("UserTokens");
+
+            List<Role> roles = new List<Role>
             {
-                new IdentityRole { Id = "11111111-1111-1111-1111-111111111111", ConcurrencyStamp = "1", Name = "Admin",        NormalizedName = "ADMIN" },
-                new IdentityRole { Id = "22222222-2222-2222-2222-222222222222", ConcurrencyStamp = "2", Name = "Volunteer",    NormalizedName = "VOLUNTEER" },
-                new IdentityRole { Id = "33333333-3333-3333-3333-333333333333", ConcurrencyStamp = "3", Name = "Organization", NormalizedName = "ORGANIZATION" }
+                new Role { Id = 11111, ConcurrencyStamp = "1", Name = "Admin",        NormalizedName = "ADMIN",        RoleType = "Admin" },
+                new Role { Id = 22222, ConcurrencyStamp = "2", Name = "Volunteer",    NormalizedName = "VOLUNTEER",    RoleType = "Volunteer" },
+                new Role { Id = 33333, ConcurrencyStamp = "3", Name = "Organization", NormalizedName = "ORGANIZATION", RoleType = "Organization" }
             };
-            modelBuilder.Entity<IdentityRole>().HasData(roles);
+
+
+            modelBuilder.Entity<Role>().HasData(roles);
 
             modelBuilder.Entity<Message>()
                 .HasOne(m => m.Sender)
@@ -54,7 +62,7 @@ namespace Volunti.Data
             modelBuilder.Entity<AppUser>()
                 .HasOne(u => u.Role)
                 .WithMany(r => r.Users)
-                .HasForeignKey(u => u.Role)
+                .HasForeignKey(u => u.RoleId)
                 .OnDelete(DeleteBehavior.NoAction);
 
 
@@ -95,7 +103,7 @@ namespace Volunti.Data
                 .HasOne(p => p.User)
                 .WithMany()
                 .HasForeignKey(p => p.UserId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.NoAction);       
 
         }
     }

@@ -14,10 +14,10 @@ namespace Volunti.Models
 
         public int SenderId { get; set; }
         [ForeignKey(nameof(SenderId))]
-        public User Sender { get; set; }
+        public AppUser Sender { get; set; }
 
         public int ReceiverId { get; set; }
         [ForeignKey(nameof(ReceiverId))]
-        public User Receiver { get; set; }
+        public AppUser Receiver { get; set; }
     }
 }

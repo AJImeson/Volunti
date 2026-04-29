@@ -7,7 +7,7 @@ namespace Volunti.Models
 {
   public class Job
   {
-    public Guid JobId { get; set; }
+    public int JobId { get; set; }
 
     public string Title { get; set; } = string.Empty; 
 
