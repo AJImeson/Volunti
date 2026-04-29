@@ -1,12 +1,13 @@
 
 stages:
 
-  - lint
   - build
-  - test
-  - security
+  - test-build
   - container-build
+  - test-container
+  - security
   - deploy
+  - cleanup
 
 default:
   tags:
