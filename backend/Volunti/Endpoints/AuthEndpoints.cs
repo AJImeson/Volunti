@@ -13,30 +13,78 @@ namespace Volunti.Endpoints
     {
         public static void RegisterEndpoints(WebApplication app)
         {
-            app.MapPost("/register", async (RegisterDto registerDto, UserManager<AppUser> userManager, ITokenService tokenService) =>
+            app.MapPost("/register/volunteer", async (
+                RegisterVolunteerDto dto,
+                UserManager<AppUser> userManager,
+                ITokenService tokenService,
+                VoluntiDbContext db) =>
             {
                 try
                 {
-                    var allowedRoles = new[] { "Volunteer", "Organization" };
-                    if (!allowedRoles.Contains(registerDto.Role))
-                        return Results.BadRequest("Invalid role");
+                    var appUser = new AppUser { UserName = dto.Email, Email = dto.Email };
 
-                    var appUser = new AppUser
-                    {
-                        UserName = registerDto.Email,
-                        Email = registerDto.Email
-                    };
-
-                    var createdUser = await userManager.CreateAsync(appUser, registerDto.Password!);
+                    var createdUser = await userManager.CreateAsync(appUser, dto.Password!);
                     if (!createdUser.Succeeded)
-                    {
-                        Console.WriteLine(string.Join(", ", createdUser.Errors.Select(e => e.Description)));
-                        return Results.BadRequest("Registration failed");
-                    }
+                        return Results.BadRequest(createdUser.Errors.Select(e => e.Description));
 
-                    var roleResult = await userManager.AddToRoleAsync(appUser, registerDto.Role!);
+                    var roleResult = await userManager.AddToRoleAsync(appUser, "Volunteer");
                     if (!roleResult.Succeeded)
                         return Results.Problem(string.Join(", ", roleResult.Errors.Select(e => e.Description)), statusCode: 500);
+
+                    db.Volunteers.Add(new Volunteer
+                    {
+                        UserId = appUser.Id,
+                        FirstName = dto.FirstName!,
+                        LastName = dto.LastName!,
+                        DateOfBirth = dto.DateOfBirth ?? default,
+                        Bio = dto.Bio ?? string.Empty,
+                        ProfileImageUrl = dto.ProfileImageUrl ?? string.Empty,
+                        IsVerified = false
+                    });
+                    await db.SaveChangesAsync();
+
+                    return Results.Ok(new NewUserDto
+                    {
+                        UserName = appUser.UserName!,
+                        Email = appUser.Email!,
+                        Token = tokenService.CreateToken(appUser)
+                    });
+                }
+                catch (Exception e)
+                {
+                    return Results.Problem(e.Message, statusCode: 500);
+                }
+            });
+
+            app.MapPost("/register/organization", async (
+                RegisterOrganizationDto dto,
+                UserManager<AppUser> userManager,
+                ITokenService tokenService,
+                VoluntiDbContext db) =>
+            {
+                try
+                {
+                    var appUser = new AppUser { UserName = dto.Email, Email = dto.Email };
+
+                    var createdUser = await userManager.CreateAsync(appUser, dto.Password!);
+                    if (!createdUser.Succeeded)
+                        return Results.BadRequest(createdUser.Errors.Select(e => e.Description));
+
+                    var roleResult = await userManager.AddToRoleAsync(appUser, "OrgAdmin");
+                    if (!roleResult.Succeeded)
+                        return Results.Problem(string.Join(", ", roleResult.Errors.Select(e => e.Description)), statusCode: 500);
+
+                    db.Organizations.Add(new Organization
+                    {
+                        UserId = appUser.Id,
+                        OrgName = dto.OrgName!,
+                        OrgNummer = dto.OrgNummer!,
+                        Description = dto.Description ?? string.Empty,
+                        City = dto.City ?? string.Empty,
+                        ProfileImageUrl = dto.ProfileImageUrl ?? string.Empty,
+                        Website = dto.Website ?? string.Empty
+                    });
+                    await db.SaveChangesAsync();
 
                     return Results.Ok(new NewUserDto
                     {

@@ -21,7 +21,8 @@ namespace Volunti.Data
         public DbSet<VolunteerInterest> VolunteerInterests { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Notification> Notifications { get; set; }
-        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }  
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+        public DbSet<OrganizationMember> OrganizationMembers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -39,7 +40,8 @@ namespace Volunti.Data
             {
                 new Role { Id = 11111, ConcurrencyStamp = "1", Name = "Admin",        NormalizedName = "ADMIN",        RoleType = "Admin" },
                 new Role { Id = 22222, ConcurrencyStamp = "2", Name = "Volunteer",    NormalizedName = "VOLUNTEER",    RoleType = "Volunteer" },
-                new Role { Id = 33333, ConcurrencyStamp = "3", Name = "Organization", NormalizedName = "ORGANIZATION", RoleType = "Organization" }
+                new Role { Id = 33333, ConcurrencyStamp = "3", Name = "OrgAdmin", NormalizedName = "ORGADMIN", RoleType = "OrgAdmin" },
+                new Role { Id = 44444, ConcurrencyStamp = "4", Name = "OrgUser",  NormalizedName = "ORGUSER",  RoleType = "OrgUser" }
             };
 
 
@@ -84,7 +86,19 @@ namespace Volunti.Data
                 .HasOne(p => p.User)
                 .WithMany()
                 .HasForeignKey(p => p.UserId)
-                .OnDelete(DeleteBehavior.NoAction);       
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<OrganizationMember>()
+                .HasOne(m => m.User)
+                .WithOne(u => u.OrganizationMember)
+                .HasForeignKey<OrganizationMember>(m => m.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<OrganizationMember>()
+                .HasOne(m => m.Organization)
+                .WithMany(o => o.Members)
+                .HasForeignKey(m => m.OrganizationId)
+                .OnDelete(DeleteBehavior.NoAction);
 
         }
     }

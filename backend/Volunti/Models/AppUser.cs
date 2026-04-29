@@ -8,8 +8,8 @@ namespace Volunti.Models
         public bool IsActive { get; set; } = true;
         public List<PasswordResetToken> PasswordResetTokens { get; set; } = new();
 
-        public Volunteer Volunteer { get; set; }
-
+        public Volunteer? Volunteer { get; set; }
         public Organization? Organization { get; set; }
+        public OrganizationMember? OrganizationMember { get; set; }
     }
 }

@@ -18,6 +18,7 @@ namespace Volunti.Models
     public string Website { get; set; }
 
     public List<Job> Jobs { get; set; } = new List<Job>();
+    public List<OrganizationMember> Members { get; set; } = new List<OrganizationMember>();
 
     public int UserId { get; set; }
     public AppUser User { get; set; }
