@@ -1,0 +1,11 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "email": "test@volunti.se",
+      "password": "Test123!",
+      "firstName": "Jonte",
+      "lastName": "Wenell"
+    }
+  ]
+}
