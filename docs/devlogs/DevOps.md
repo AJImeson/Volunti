@@ -76,5 +76,11 @@
     - Removed the mock data and replaced with code from developers in both frontend and backend for integrating and testing - Axel & Mika
     - Sucesfully deployed the frontend stack to a working URL - Mika
 
+* 2026-04-28
 
+    - 
+
+* 2026-04-30
+
+    - Fixing workflow rules for .gitlab-ci.yml, several deployments per branch occured - Axel
 
