@@ -58,13 +58,13 @@ services:
     user: root
     entrypoint: > 
       /bin/bash -c "
-      chown -R mssql:0 /var/opt/mssql &&
+      chown -r mssql:0 /var/opt/mssql &&
       exec su mssql -s /bin/bash -c /opt/mssql/bin/sqlservr
       "
     environment:
-        ACCEPT_EULA: "Y"
-        MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
-        MSSQL_PID: Developer
+        accept_eula: "y"
+        mssql_sa_password: ${mssql_sa_password}
+        mssql_pid: developer
     networks:
       - internal
     volumes:
@@ -80,9 +80,9 @@ services:
   db-ui:
     image: adminer:latest
     ports:
-      - "8080:8080" # Detta gör att du når den på http://din-ip:8080
+      - "8080:8080" # detta gör att du når den på http://din-ip:8080
     networks:
-      - internal # Använd samma nätverksnamn som din mssql-tjänst har
+      - internal # använd samma nätverksnamn som din mssql-tjänst har
     deploy:
       replicas: 1
       placement:
@@ -92,12 +92,9 @@ networks:
   internal:
     external: true
     name: volunti-burgundy-develop_internal
+  traefik-public:
+    external: true
 
 volumes:
   sqldata: {}
 
-networks:
-  traefik-public:
-    external: true
-  internal:
-    driver: overlay # for communication between services in the swarm
