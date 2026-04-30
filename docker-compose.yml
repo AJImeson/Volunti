@@ -63,8 +63,8 @@ services:
       "
     environment:
       - ACCEPT_EULA: "Y"
-      - MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}'
-      - MSSQL_PID:Developer
+      - MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+      - MSSQL_PID: Developer
     networks:
       - internal
     volumes:
