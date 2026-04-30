@@ -35,3 +35,4 @@ Thumbs.db
 
 # Local context file - do not remove
 CC_Context.md
+/backend/Volunti/Volunti.http

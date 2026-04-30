@@ -58,5 +58,29 @@
     - Decided to skip the lintin pipeline and designt a pre commit linting test instead - Axel & Mika
     - Built test and container-build for backend - Mika & Axel
 
+* 2026-04-20
 
+    - Started skeleton for two separate branches:
+        feature/DevOps-Portainer | For testing and deploying to Portainer
+        feature/DevOps-Testing | Future Kubernetes working branch 
+                                                                        /Axel & Mika
+
+* 2026-04-21
+
+    - Started creating variables and mapping for pipelines in Portainer branch - Axel & Mika
+    - Created mock-data for both frontend and backend for testing and integrating - Axel 
+    - Stack is succesfully deployed but can't see frontend (React) on purposed URL (404 not found error) - Axel & Mika
+
+* 2026-04-22
+
+    - Removed the mock data and replaced with code from developers in both frontend and backend for integrating and testing - Axel & Mika
+    - Sucesfully deployed the frontend stack to a working URL - Mika
+
+* 2026-04-28
+
+    - 
+
+* 2026-04-30
+
+    - Fixing workflow rules for .gitlab-ci.yml, several deployments per branch occured - Axel
 
