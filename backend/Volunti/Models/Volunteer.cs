@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Volunti.Models
 {
@@ -26,7 +28,7 @@ namespace Volunti.Models
         //public int RoleId { get; set; }
         //public Role Role { get; set; }
 
-        
+
         public List<VolunteerInterest> VolunteerInterests { get; set; }
         public List<VolunteerSkill> VolunteerSkills { get; set; }
     }
