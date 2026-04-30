@@ -6,14 +6,18 @@ export default function LoginForm({ setView }) {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+
     if (!email || !password) {
       setErrorMsg("Vänligen fyll i både mejl och lösenord.");
       return;
     }
-    console.log("Inloggningsförsök skickat för:", email);
+
+    setIsLoading(true);
+    setErrorMsg("");
   };
 
   const handleLogoClick = () => {
@@ -55,7 +59,6 @@ export default function LoginForm({ setView }) {
 
   return (
     <div className="login-wrapper">
-      {/* TOPPMENY */}
       <div className="login-top-nav">
         <h1 className="login-logo" onClick={handleLogoClick}>
           VOLUNTI
@@ -68,7 +71,6 @@ export default function LoginForm({ setView }) {
         </button>
       </div>
 
-      {/* HEADER */}
       <div className="login-header">
         <h2 className="login-title">
           Hitta uppdrag
@@ -78,7 +80,6 @@ export default function LoginForm({ setView }) {
         <p className="login-subtitle">Små insatser. Stor skillnad.</p>
       </div>
 
-      {/* LOGIN-KORT */}
       <div className="login-card">
         <h2 className="login-card-title">Logga in</h2>
 
@@ -94,6 +95,7 @@ export default function LoginForm({ setView }) {
               setEmail(e.target.value);
               if (errorMsg) setErrorMsg("");
             }}
+            disabled={isLoading}
           />
 
           <div className="password-wrapper">
@@ -106,6 +108,7 @@ export default function LoginForm({ setView }) {
                 setPassword(e.target.value);
                 if (errorMsg) setErrorMsg("");
               }}
+              disabled={isLoading}
             />
             <button
               type="button"
@@ -120,8 +123,12 @@ export default function LoginForm({ setView }) {
             Glömt lösenordet?
           </button>
 
-          <button type="submit" className="btn-primary login-submit-btn">
-            Logga in
+          <button
+            type="submit"
+            className="btn-primary login-submit-btn"
+            disabled={isLoading}
+          >
+            {isLoading ? "Loggar in..." : "Logga in"}
           </button>
         </form>
       </div>
