@@ -63,7 +63,6 @@ export default function RegisterPage({ setView }) {
     if (errorMsg) setErrorMsg("");
   };
 
-  // DEN NYA SMARTA KÖRKORTSLOGIKEN
   const handleKorkortToggle = (typ) => {
     setFormData((prev) => {
       let currentList = [...prev.korkort];
@@ -81,10 +80,9 @@ export default function RegisterPage({ setView }) {
         // Om den redan var ikryssad, ta bort den
         currentList = currentList.filter((item) => item !== typ);
       } else {
-        // Lägg till den
         currentList.push(typ);
 
-        // AUTOMAGIN: Om man klickar i C, lägg automatiskt till B i bakgrunden (om den inte redan finns)
+        //Om man klickar i C, lägg automatiskt till B i bakgrunden (om den inte redan finns)
         if (typ === "C" && !currentList.includes("B")) currentList.push("B");
         // Samma för A och AM
         if (typ === "A" && !currentList.includes("AM")) currentList.push("AM");
@@ -97,21 +95,21 @@ export default function RegisterPage({ setView }) {
     if (fieldErrors.korkort) setFieldErrors({ ...fieldErrors, korkort: false });
   };
 
-  // Kollar vilka knappar som ska låsas (gråas ut)
+  // Kollar vilka knappar som ska gråas ut
   const isKorkortDisabled = (typ) => {
     const { korkort } = formData;
 
-    // B är låst (och ifylld) om C är ifyllt
+    // B är låst om C är ifyllt
     if (typ === "B" && korkort.includes("C")) return true;
 
-    // AM är låst (och ifylld) om A är ifyllt
+    // AM är låst om A är ifyllt
     if (typ === "AM" && korkort.includes("A")) return true;
 
     // Om något annat än Nej är ifyllt, lås Nej-knappen
     if (typ === "Nej" && korkort.length > 0 && !korkort.includes("Nej"))
       return true;
 
-    // Om Nej är ifyllt, lås alla andra knappar
+    // Om Nej är ifyllt lås alla andra knappar
     if (typ !== "Nej" && korkort.includes("Nej")) return true;
 
     return false;
@@ -325,7 +323,7 @@ export default function RegisterPage({ setView }) {
   };
 
   /* ==========================================================================
-     SIDANS VISUELLA STRUKTUR (HTML)
+     SIDANS VISUELLA STRUKTUR
      ========================================================================== */
 
   return (
@@ -550,7 +548,6 @@ export default function RegisterPage({ setView }) {
                       name="korkort"
                       value={typ}
                       onChange={() => handleKorkortToggle(typ)}
-                      // Knappen är ifylld om den finns i vårt minne (vilket den automatiskt gör när man väljer en högre behörighet!)
                       checked={formData.korkort.includes(typ)}
                       disabled={disabled}
                     />

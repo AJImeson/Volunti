@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./LoginForm.css";
+import { loginUser, saveSession } from "../../services/authService";
 
 export default function LoginForm({ setView }) {
   const [email, setEmail] = useState("");
@@ -18,6 +19,17 @@ export default function LoginForm({ setView }) {
 
     setIsLoading(true);
     setErrorMsg("");
+
+    try {
+      const user = await loginUser(email, password);
+      saveSession(user);
+      console.log("Inloggad som:", user);
+      setView("missions");
+    } catch (error) {
+      setErrorMsg(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleLogoClick = () => {
