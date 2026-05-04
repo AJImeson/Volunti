@@ -6,7 +6,7 @@ backend-test:
       alias: db
       variables:
         ACCEPT_EULA: "Y"
-        MSSQL_SA_PASSWORD: $SA_PASSWORD
+        MSSQL_SA_PASSWORD: $MSSQL_SA_PASSWORD
   variables:
     ConnectionStrings_DefaultConnection: "Server=db;Database=BurgundyDb;User=sa;Password=$SA_PASSWORD;TrustServerCertificate=True"
   script:
