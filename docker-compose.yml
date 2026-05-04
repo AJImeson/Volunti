@@ -55,12 +55,6 @@ services:
   
   mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    user: root
-    entrypoint: > 
-      /bin/bash -c "
-      chown -R mssql:0 /var/opt/mssql &&
-      exec su mssql -s /bin/bash -c /opt/mssql/bin/sqlservr
-      "
     environment:
         ACCEPT_EULA: "Y"
         MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
@@ -68,7 +62,8 @@ services:
     networks:
       - internal
     volumes:
-      - sqldata:/var/opt/mssql
+      - sqldata:/var/opt/mssql/data
+      - sqllog:/var/opt/mssql/log
     # depends_on:
     #   - mssql-init
     deploy:
@@ -78,6 +73,7 @@ services:
 
 volumes:
   sqldata: {}
+  sqllog: {}
 
 networks:
   traefik-public:
