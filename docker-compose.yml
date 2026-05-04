@@ -56,12 +56,13 @@ services:
   mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
     user: root
-    entrypoint: 
+    command: 
      - bash 
      - -c
      - |
         chown -R 10001:0 /var/opt/mssql/data &&
-        exec /opt/mssql/bin/permissions_check.sh &&
+        /opt/mssql/bin/permissions_check.sh &&
+        /opt/mssql/bin/sqlservr
     
     environment:
         ACCEPT_EULA: "Y"
