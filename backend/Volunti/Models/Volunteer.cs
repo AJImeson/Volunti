@@ -38,6 +38,10 @@ namespace Volunti.Models
         [Required]
         public int? MaxDistanceKm { get; set; } // distance in km
 
+        public string? NotificationPreference { get; set; } // (Rekommenderat/Minimalt/Allt)
+
+        public bool EmailNotifications {  get; set; } // (Ja/Nej)
+
 
         [Required]
         public int UserId { get; set; }

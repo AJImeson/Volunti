@@ -44,6 +44,8 @@ namespace Volunti.Endpoints
                         DriverLicense = dto.DriverLicense!,
                         Availability = dto.Availability!, // Garanterat inte null eftersom det är obligatoriskt
                         MaxDistanceKm = dto.MaxDistanceKm!,
+                        NotificationPreference = dto.NotificationPreference!,
+                        EmailNotifications = dto.EmailNotifications!,
                         IsVerified = false
                     });
                     await db.SaveChangesAsync();

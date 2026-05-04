@@ -16,7 +16,7 @@ namespace Volunti.Dtos.User
         public string? PhoneNumber { get; set; }
 
         [Required]
-        public string? Muncipilaity { get; set; } //Kommun
+        public string? Muncipilaity { get; set; } 
 
         [Required]
         public string? DriverLicense { get; set; }
@@ -25,9 +25,13 @@ namespace Volunti.Dtos.User
         public string? ProfileImageUrl { get; set; }
 
         [Required]
-        public string? Availability { get; set; } // Vardag, Kvällar, Helger etc.
+        public string? Availability { get; set; } 
         [Required]
-        public int? MaxDistanceKm { get; set; } // distance in km
+        public int? MaxDistanceKm { get; set; }
+
+        public string? NotificationPreference { get; set; } 
+
+        public bool EmailNotifications { get; set; } 
 
 
         // Listan med intressenamn från formuläret, t.ex. "Skola", "Miljö" - vi skapar VolunteerInterest-objekt i endpointen
