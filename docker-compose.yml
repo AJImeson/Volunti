@@ -60,7 +60,7 @@ services:
      - bash 
      - -c
      - |
-        chown -R 10001:0 /var/opt/mssql/data &&
+        chown -R 10001:0 /var/opt/mssql/data /var/opt/mssql/log &&
         /opt/mssql/bin/permissions_check.sh &&
         /opt/mssql/bin/sqlservr
     
