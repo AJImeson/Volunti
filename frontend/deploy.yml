@@ -10,6 +10,10 @@ frontend-deploy:
       variables:
         PUBLIC_HOST: "volunti"
         STACK_NAME: "volunti-$CI_DEFAULT_BRANCH"
+    - if: '$CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH'
+      variables:
+        PUBLIC_HOST: "volunti-$CI_COMMIT_REF_SLUG"
+        STACK_NAME: "volunti-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG"
   script:
     - apk add --no-cache curl
     - sleep 20
