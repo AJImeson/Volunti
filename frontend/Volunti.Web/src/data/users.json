@@ -2,8 +2,8 @@
   "users": [
     {
       "id": 1,
-      "email": "test@volunti.se",
-      "password": "Test123!",
+      "email": "test@1",
+      "password": "test",
       "firstName": "Jonte",
       "lastName": "Wenell"
     }
