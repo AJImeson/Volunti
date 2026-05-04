@@ -23,5 +23,14 @@ namespace Volunti.Dtos.User
         public DateTime? DateOfBirth { get; set; }
         public string? Bio { get; set; }
         public string? ProfileImageUrl { get; set; }
+
+        [Required]
+        public string? Availability { get; set; } // Vardag, Kvällar, Helger etc.
+        [Required]
+        public int? MaxDistanceKm { get; set; } // distance in km
+
+
+        // Listan med intressenamn från formuläret, t.ex. "Skola", "Miljö" - vi skapar VolunteerInterest-objekt i endpointen
+        public List<string>? Interests { get; set; }
     }
 }

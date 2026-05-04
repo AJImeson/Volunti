@@ -42,6 +42,8 @@ namespace Volunti.Endpoints
                         PhoneNumber = dto.PhoneNumber!,
                         Muncipilaity = dto.Muncipilaity!,
                         DriverLicense = dto.DriverLicense!,
+                        Availability = dto.Availability!, // Garanterat inte null eftersom det är obligatoriskt
+                        MaxDistanceKm = dto.MaxDistanceKm!,
                         IsVerified = false
                     });
                     await db.SaveChangesAsync();

@@ -33,6 +33,11 @@ namespace Volunti.Models
         public DateTime AvailableFrom { get; set; }
         public DateTime AvailableTo { get; set; }
 
+        [Required]
+        public string? Availability { get; set; } // Vardag, Kvällar, Helger etc.
+        [Required]
+        public int? MaxDistanceKm { get; set; } // distance in km
+
 
         [Required]
         public int UserId { get; set; }
@@ -44,5 +49,8 @@ namespace Volunti.Models
 
         public List<VolunteerInterest> VolunteerInterests { get; set; }
         public List<VolunteerSkill> VolunteerSkills { get; set; }
+
+      
+       
     }
 }
