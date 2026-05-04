@@ -39,6 +39,9 @@ namespace Volunti.Endpoints
                         DateOfBirth = dto.DateOfBirth ?? default,
                         Bio = dto.Bio ?? string.Empty,
                         ProfileImageUrl = dto.ProfileImageUrl ?? string.Empty,
+                        PhoneNumber = dto.PhoneNumber!,
+                        Muncipilaity = dto.Muncipilaity!,
+                        DriverLicense = dto.DriverLicense!,
                         IsVerified = false
                     });
                     await db.SaveChangesAsync();

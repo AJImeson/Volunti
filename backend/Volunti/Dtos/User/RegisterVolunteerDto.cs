@@ -14,6 +14,12 @@ namespace Volunti.Dtos.User
         public string? LastName { get; set; }
         [Required]
         public string? PhoneNumber { get; set; }
+
+        [Required]
+        public string? Muncipilaity { get; set; } //Kommun
+
+        [Required]
+        public string? DriverLicense { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public string? Bio { get; set; }
         public string? ProfileImageUrl { get; set; }

@@ -7,14 +7,27 @@ namespace Volunti.Models
     public class Volunteer
     {
         public int Id { get; set; }
+
         [Required, MaxLength(50)]
         public string FirstName { get; set; }
+        
         [Required, MaxLength(50)]
         public string LastName { get; set; }
+        
         public DateTime DateOfBirth { get; set; }
+        
         [MaxLength(500)]
         public string Bio { get; set; }
-        [MaxLength(255)]
+
+        [Required, MaxLength(255)]
+        public string PhoneNumber { get; set; }
+
+        [Required]
+        public string? Muncipilaity { get; set; } //Kommun
+
+        [Required]
+        public string? DriverLicense { get; set; }   
+
         public string ProfileImageUrl { get; set; }
         public bool IsVerified { get; set; }
         public DateTime AvailableFrom { get; set; }
