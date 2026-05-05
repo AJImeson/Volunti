@@ -62,9 +62,9 @@ services:
       exec su mssql -s /bin/bash -c /opt/mssql/bin/sqlservr
       "
     environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD='${MSSQL_SA_PASSWORD}'
-      - MSSQL_PID=Developer
+        ACCEPT_EULA: "Y"
+        MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+        MSSQL_PID: Developer
     networks:
       - internal
     volumes:
