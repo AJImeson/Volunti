@@ -18,6 +18,28 @@ export default function LoginForm({ setView }) {
 
     setIsLoading(true);
     setErrorMsg("");
+
+    try {
+      const response = await fetch("https://localhost:7007/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: email, password }),
+      });
+
+      if (!response.ok) {
+        setErrorMsg("Felaktigt mejl eller lösenord.");
+        return;
+      }
+
+      const data = await response.json();
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userName", data.userName);
+      setView("profile");
+    } catch {
+      setErrorMsg("Kunde inte ansluta till servern. Försök igen.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleLogoClick = () => {

@@ -31,3 +31,8 @@ dist/
 .DS_Store
 Thumbs.db
 
+/backend/Volunti/appsettings.json
+
+# Local context file - do not remove
+CC_Context.md
+/backend/Volunti/Volunti.http
