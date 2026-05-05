@@ -75,9 +75,27 @@ services:
       placement:
         constraints:
           - node.role == manager # specific constraint to ensure the database runs on a manager node
-
-volumes:
-  sqldata: {}
+  
+  adminer:
+    image: adminer:latest
+    networks:
+      - traefik-public
+      - internal
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - "traefik.enable=true"
+        - "traefik.constraint-label=traefik-public"
+        - "traefik.swarm.network=traefik-public"
+        # Här sätter vi en unik URL för Adminer, t.ex. db.dinstack...
+        - "traefik.http.routers.${STACK_NAME}-adminer-https.rule=Host(`db.${STACK_NAME}.doe25.swarm.chas-lab.dev`)"
+        - "traefik.http.routers.${STACK_NAME}-adminer-https.entrypoints=https"
+        - "traefik.http.routers.${STACK_NAME}-adminer-https.tls=true"
+        - "traefik.http.routers.${STACK_NAME}-adminer-https.tls.certresolver=le"
+        - "traefik.http.services.${STACK_NAME}-adminer.loadbalancer.server.port=8080"
+    volumes:
+      sqldata: {}
 
 networks:
   traefik-public:
