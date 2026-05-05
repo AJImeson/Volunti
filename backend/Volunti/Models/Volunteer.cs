@@ -48,7 +48,7 @@ namespace Volunti.Models
         public AppUser User { get; set; }
 
         //public int RoleId { get; set; }
-        //public Role Role { get; set; }
+        //public Role Role { get; set; }cd ..
 
 
         public List<VolunteerInterest> VolunteerInterests { get; set; }
