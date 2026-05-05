@@ -94,8 +94,8 @@ services:
         - "traefik.http.routers.${STACK_NAME}-adminer-https.tls=true"
         - "traefik.http.routers.${STACK_NAME}-adminer-https.tls.certresolver=le"
         - "traefik.http.services.${STACK_NAME}-adminer.loadbalancer.server.port=8080"
-    volumes:
-      sqldata: {}
+volumes:
+  sqldata: {}
 
 networks:
   traefik-public:
