@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./LoginForm.css";
+import { loginUser, saveSession } from "../../services/authService";
 
 export default function LoginForm({ setView }) {
   const [email, setEmail] = useState("");
@@ -20,23 +21,12 @@ export default function LoginForm({ setView }) {
     setErrorMsg("");
 
     try {
-      const response = await fetch("https://localhost:7007/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: email, password }),
-      });
-
-      if (!response.ok) {
-        setErrorMsg("Felaktigt mejl eller lösenord.");
-        return;
-      }
-
-      const data = await response.json();
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("userName", data.userName);
-      setView("profile");
-    } catch {
-      setErrorMsg("Kunde inte ansluta till servern. Försök igen.");
+      const user = await loginUser(email, password);
+      saveSession(user);
+      console.log("Inloggad som:", user);
+      setView("missions");
+    } catch (error) {
+      setErrorMsg(error.message);
     } finally {
       setIsLoading(false);
     }

@@ -4,6 +4,7 @@ import LandingPage from "./components/LandingPage";
 import RegisterForm from "./components/RegisterForm";
 import Profile from "./components/Profile";
 import LoginForm from "./components/login/LoginForm";
+import MissionsPage from "./components/missions/MissionsPage";
 
 export default function App() {
   const [currentView, setCurrentView] = useState("landing");
@@ -17,6 +18,8 @@ export default function App() {
       {currentView === "register" && <RegisterForm setView={setCurrentView} />}
 
       {currentView === "profile" && <Profile setView={setCurrentView} />}
+
+      {currentView === "missions" && <MissionsPage setView={setCurrentView} />}
     </div>
   );
 }
