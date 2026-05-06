@@ -1,0 +1,12 @@
+apiversion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mssql-data
+  namespace: volunti
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resourses:
+    requests:
+      storage: 5Gi
