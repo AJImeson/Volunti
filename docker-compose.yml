@@ -55,12 +55,6 @@ services:
   
   mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    user: root
-    entrypoint: > 
-      /bin/bash -c "
-      chown -R mssql:0 /var/opt/mssql &&
-      exec su mssql -s /bin/bash -c /opt/mssql/bin/sqlservr
-      "
     environment:
         ACCEPT_EULA: "Y"
         MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
