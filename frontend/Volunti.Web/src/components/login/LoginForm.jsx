@@ -34,7 +34,7 @@ export default function LoginForm({ setView }) {
 
   const handleLogoClick = () => {
     if (typeof setView === "function") {
-      setView("landing");
+      setView("marketing");
     }
   };
 

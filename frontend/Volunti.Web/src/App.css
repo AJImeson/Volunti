@@ -963,3 +963,774 @@ body {
 .btn-wrapper {
   animation: fadeInUp 1s ease-out 1.1s backwards;
 }
+
+/* ==========================================================================
+   MARKETING PAGE
+   ========================================================================== */
+
+.marketing-page {
+  font-family: "Inter", sans-serif;
+  color: #1a1a1a;
+  background: #fff;
+}
+
+/* ---- Navbar ---- */
+
+.marketing-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 2rem;
+  background: var(--primary-blue);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+.marketing-nav-logo {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #000000;
+  letter-spacing: -1px;
+}
+
+.marketing-nav-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.marketing-nav-links a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.marketing-nav-links a:hover {
+  color: #fff;
+}
+
+.marketing-nav-login {
+  background: #ffffff;
+  color: var(--primary-blue);
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.4rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.marketing-nav-login:hover {
+  background: #e8edff;
+  transform: translateY(-1px);
+}
+
+/* ---- Hero ---- */
+
+.marketing-hero {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, #1a2f7a 100%);
+  color: #fff;
+  min-height: 88vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 2rem 5rem;
+  padding-top: calc(6rem + 72px);
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+
+.marketing-hero-content {
+  max-width: 700px;
+  position: relative;
+  z-index: 1;
+}
+
+.marketing-hero-title {
+  font-size: clamp(2.6rem, 6vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1.08;
+  margin: 0 0 1.5rem;
+  letter-spacing: -0.025em;
+}
+
+.marketing-hero-subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  opacity: 0.85;
+  line-height: 1.65;
+  max-width: 520px;
+  margin: 0 auto 2.5rem;
+}
+
+.marketing-hero-cta {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.marketing-btn-primary {
+  background: #fff;
+  color: var(--primary-blue);
+  border: none;
+  border-radius: 10px;
+  padding: 0.9rem 2rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.marketing-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.22);
+}
+
+.marketing-btn-outline {
+  background: transparent;
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  border-radius: 10px;
+  padding: 0.9rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.marketing-btn-outline:hover {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Lava lamp floating animations */
+@keyframes floatA {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  45%       { transform: translateY(-40px) scale(1.06); }
+  75%       { transform: translateY(-18px) scale(0.97); }
+}
+
+@keyframes floatB {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  40%       { transform: translateY(35px) scale(1.04); }
+  70%       { transform: translateY(12px) scale(0.98); }
+}
+
+/* Third ball: freer X+Y movement */
+@keyframes floatC {
+  0%   { transform: translate(0px,   0px) scale(1); }
+  20%  { transform: translate(25px, -30px) scale(1.07); }
+  45%  { transform: translate(-15px, -50px) scale(0.94); }
+  65%  { transform: translate(30px,  -22px) scale(1.04); }
+  85%  { transform: translate(-8px,  -10px) scale(0.98); }
+  100% { transform: translate(0px,    0px) scale(1); }
+}
+
+.hero-shape {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Ball 1 — same blue hue as landing page balls (#2a43a6), shifted lighter so it shows on dark hero */
+.hero-shape-1 {
+  width: 500px;
+  height: 500px;
+  top: -150px;
+  right: -150px;
+  background: var(--primary-blue);
+  animation: floatA 7s ease-in-out infinite;
+}
+
+/* Ball 2 — existing white-transparent style */
+.hero-shape-2 {
+  width: 350px;
+  height: 350px;
+  bottom: -100px;
+  left: -100px;
+  background: rgba(0, 0, 0, 0.28);
+  animation: floatB 9s ease-in-out infinite;
+}
+
+/* Ball 3 — freer movement, mid-size */
+.hero-shape-3 {
+  width: 220px;
+  height: 220px;
+  top: 38%;
+  left: 12%;
+  background: rgba(255, 255, 255, 0.13);
+  animation: floatC 11s ease-in-out infinite;
+}
+
+/* ---- Shared section layout ---- */
+
+.marketing-section-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.marketing-section-title {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800;
+  color: #1a1a1a;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.marketing-section-subtitle {
+  font-size: 1.1rem;
+  color: #4b5563;
+  margin: 0 0 3rem;
+}
+
+/* ---- Features ---- */
+
+.marketing-features {
+  padding: 5.5rem 2rem;
+  background: #f9fafb;
+}
+
+.marketing-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  text-align: left;
+}
+
+.marketing-feature-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.marketing-feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+  margin-bottom: 1.1rem;
+  display: flex;
+  align-items: center;
+}
+
+.feature-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 0.5rem;
+}
+
+.feature-desc {
+  font-size: 0.95rem;
+  color: #4b5563;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ---- How it works ---- */
+
+.marketing-how {
+  padding: 5.5rem 2rem;
+  background: #fff;
+}
+
+.marketing-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2.5rem;
+  margin-top: 3rem;
+  text-align: left;
+}
+
+.marketing-step {
+  position: relative;
+}
+
+.step-number {
+  display: block;
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: #e8edff;
+  line-height: 1;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.step-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 0.5rem;
+}
+
+.step-desc {
+  font-size: 0.95rem;
+  color: #4b5563;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ---- Community section ---- */
+
+.marketing-community {
+  padding: 5.5rem 2rem;
+  background: #f9fafb;
+}
+
+.community-posts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  text-align: left;
+}
+
+.community-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.community-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
+}
+
+.community-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.community-org-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+
+.community-org-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.community-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.community-card-desc {
+  font-size: 0.9rem;
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.community-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.community-tag {
+  background: #e8edff;
+  color: var(--primary-blue);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+}
+
+.community-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.82rem;
+  color: #6b7280;
+  border-top: 1px solid #f3f4f6;
+  padding-top: 0.75rem;
+  margin-top: auto;
+}
+
+.community-more-text {
+  margin-top: 2rem;
+  font-size: 1rem;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* ---- Feed Preview ---- */
+
+.marketing-feed-preview {
+  padding: 5.5rem 2rem;
+  background: #fff;
+}
+
+.feed-preview-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: start;
+}
+
+.feed-preview-desc {
+  font-size: 1.05rem;
+  color: #4b5563;
+  line-height: 1.7;
+  margin: 0.75rem 0 1.5rem;
+}
+
+.feed-preview-bullets {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.feed-preview-bullets li {
+  font-size: 0.95rem;
+  color: #374151;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.feed-preview-bullets li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--primary-blue);
+  font-weight: 700;
+}
+
+.feed-preview-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.feed-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.feed-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.feed-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.feed-author-meta {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.feed-author-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.feed-time {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.feed-type-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: #e8edff;
+  color: var(--primary-blue);
+  padding: 0.2rem 0.55rem;
+  border-radius: 20px;
+}
+
+.feed-card-text {
+  font-size: 0.88rem;
+  color: #374151;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.feed-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.feed-plats {
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+.feed-likes {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.82rem;
+  color: #6b7280;
+}
+
+@media (max-width: 767px) {
+  .feed-preview-inner {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .marketing-feed-preview {
+    padding: 3.5rem 1.25rem;
+  }
+}
+
+/* ---- Stories ---- */
+
+.marketing-stories {
+  padding: 5.5rem 2rem;
+  background: #fff;
+}
+
+.stories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  text-align: left;
+}
+
+.story-card {
+  background: #f9fafb;
+  border-radius: 16px;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border: 1px solid #f0f0f0;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.story-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+}
+
+.story-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.story-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.story-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.story-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.story-time {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.story-mission-tag {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.25rem 0.7rem;
+  border-radius: 20px;
+  align-self: flex-start;
+}
+
+.story-text {
+  font-size: 0.95rem;
+  color: #374151;
+  line-height: 1.7;
+  margin: 0;
+  font-style: italic;
+}
+
+.story-actions {
+  display: flex;
+  gap: 1.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e5e7eb;
+  margin-top: auto;
+}
+
+.story-action {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+@media (max-width: 767px) {
+  .marketing-stories {
+    padding: 3.5rem 1.25rem;
+  }
+}
+
+/* ---- CTA ---- */
+
+.marketing-cta {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, #1a2f7a 100%);
+  padding: 5.5rem 2rem;
+  text-align: center;
+  color: #fff;
+}
+
+.marketing-cta-inner {
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+.marketing-cta-title {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800;
+  margin: 0 0 1rem;
+  letter-spacing: -0.02em;
+}
+
+.marketing-cta-subtitle {
+  font-size: 1.1rem;
+  opacity: 0.85;
+  margin: 0 0 2.5rem;
+  line-height: 1.6;
+}
+
+/* ---- Footer ---- */
+
+.marketing-footer {
+  background: #0f1f5a;
+  color: rgba(255, 255, 255, 0.65);
+  padding: 2.5rem 2rem;
+  text-align: center;
+}
+
+.marketing-footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.marketing-footer-logo {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -1px;
+}
+
+.marketing-footer-tagline {
+  font-size: 0.9rem;
+  margin: 0.5rem 0 0;
+}
+
+.marketing-footer-copy {
+  font-size: 0.8rem;
+  margin: 0.4rem 0 0;
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 767px) {
+  .marketing-nav {
+    padding: 1rem 1.25rem;
+  }
+
+  .marketing-nav-links {
+    display: none;
+  }
+
+  .marketing-hero {
+    padding: 4rem 1.5rem 3.5rem;
+    min-height: 80vh;
+  }
+
+  .marketing-features,
+  .marketing-how,
+  .marketing-community,
+  .marketing-cta {
+    padding: 3.5rem 1.25rem;
+  }
+
+  .marketing-section-subtitle {
+    margin-bottom: 2rem;
+  }
+
+  .hero-shape-3 {
+    display: none;
+  }
+}
