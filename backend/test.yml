@@ -8,7 +8,7 @@ backend-test:
         ACCEPT_EULA: "Y"
         MSSQL_SA_PASSWORD: $MSSQL_SA_PASSWORD
   variables:
-    ConnectionStrings_DefaultConnection: "Server=db;Database=BurgundyDb;User=sa;Password=$SA_PASSWORD;TrustServerCertificate=True"
+    ConnectionStrings_DefaultConnection: "Server=db;Database=BurgundyDb;User=sa;Password=$MSSQL_SA_PASSWORD;TrustServerCertificate=True"
   script:
     - cd backend/Volunti
     - dotnet restore
