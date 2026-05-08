@@ -17,7 +17,7 @@ namespace Volunti.Mappers
                 OrgName = org.OrgName,
                 OrgNumber = org.OrgNumber,
                 Description = org.Description,
-                City = org.City,
+                City = org.Muncipilaity,
                 ProfileImageUrl = org.ProfileImageUrl,
                 Website = org.Website
             };
@@ -30,7 +30,7 @@ namespace Volunti.Mappers
                 OrgName = orgDto.OrgName,
                 OrgNumber = orgDto.OrgNumber,
                 Description = orgDto.Description,
-                City = orgDto.City,
+                Muncipilaity = orgDto.City,
                 ProfileImageUrl = orgDto.ProfileImageUrl,
                 Website = orgDto.Website
             };

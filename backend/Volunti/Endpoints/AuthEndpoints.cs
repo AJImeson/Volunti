@@ -14,10 +14,10 @@ namespace Volunti.Endpoints
         public static void RegisterEndpoints(WebApplication app)
         {
             app.MapPost("/register/volunteer", async (
-                RegisterVolunteerDto dto,
-                UserManager<AppUser> userManager,
-                ITokenService tokenService,
-                VoluntiDbContext db) =>
+     RegisterVolunteerDto dto,
+     UserManager<AppUser> userManager,
+     ITokenService tokenService,
+     VoluntiDbContext db) =>
             {
                 try
                 {
@@ -31,7 +31,33 @@ namespace Volunti.Endpoints
                     if (!roleResult.Succeeded)
                         return Results.Problem(string.Join(", ", roleResult.Errors.Select(e => e.Description)), statusCode: 500);
 
-                    db.Volunteers.Add(new Volunteer
+                   
+                    var interests = new List<VolunteerInterest>();
+                    if (dto.Interests != null && dto.Interests.Any())
+                    {
+                        foreach (var interestName in dto.Interests)
+                        {
+                            var existing = await db.VolunteerInterests
+                                .FirstOrDefaultAsync(i => i.Title == interestName);
+
+                            if (existing != null)
+                            {
+                                interests.Add(existing);
+                            }
+                            else
+                            {
+                                var newInterest = new VolunteerInterest
+                                {
+                                    Title = interestName,
+                                    Description = interestName 
+                                };
+                                db.VolunteerInterests.Add(newInterest);
+                                interests.Add(newInterest);
+                            }
+                        }
+                    }
+
+                    var volunteer = new Volunteer
                     {
                         UserId = appUser.Id,
                         FirstName = dto.FirstName!,
@@ -42,12 +68,15 @@ namespace Volunti.Endpoints
                         PhoneNumber = dto.PhoneNumber!,
                         Muncipilaity = dto.Muncipilaity!,
                         DriverLicense = dto.DriverLicense!,
-                        Availability = dto.Availability!, // Garanterat inte null eftersom det är obligatoriskt
-                        MaxDistanceKm = dto.MaxDistanceKm!,
+                        Availability = dto.Availability!,
+                        MaxDistanceKm = dto.MaxDistanceKm,
                         NotificationPreference = dto.NotificationPreference!,
-                        EmailNotifications = dto.EmailNotifications!,
-                        IsVerified = false
-                    });
+                        EmailNotifications = dto.EmailNotifications,
+                        IsVerified = false,
+                        VolunteerInterests = interests
+                    };
+
+                    db.Volunteers.Add(volunteer);
                     await db.SaveChangesAsync();
 
                     return Results.Ok(new NewUserDto
@@ -84,12 +113,18 @@ namespace Volunti.Endpoints
                     db.Organizations.Add(new Organization
                     {
                         UserId = appUser.Id,
+                        CompanyName = dto.CompanyName!,
                         OrgName = dto.OrgName!,
-                        OrgNumber = dto.OrgNumber!,
+                        ContactName = dto.ContactName!,
+                        OrgNumber = dto.OrgNumber ?? string.Empty,
                         Description = dto.Description ?? string.Empty,
-                        City = dto.City ?? string.Empty,
+                        Muncipilaity = dto.Muncipilaity!,
                         ProfileImageUrl = dto.ProfileImageUrl ?? string.Empty,
-                        Website = dto.Website ?? string.Empty
+                        Website = dto.Website ?? string.Empty,
+                        RequiresDocumentation = dto.RequiresDocumentation,
+                        NotificationPreference = dto.NotificationPreference ?? "Rekommenderat",
+                        EmailNotifications = dto.EmailNotifications,
+                        Categories = dto.Categories != null ? string.Join(",", dto.Categories) : string.Empty
                     });
                     await db.SaveChangesAsync();
 

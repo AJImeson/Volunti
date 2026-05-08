@@ -26,7 +26,7 @@ namespace Volunti.Dtos.User
 
         [Required]
         public string? Availability { get; set; } 
-        [Required]
+      
         public int? MaxDistanceKm { get; set; }
 
         public string? NotificationPreference { get; set; } 

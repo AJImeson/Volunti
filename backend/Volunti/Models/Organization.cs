@@ -1,30 +1,30 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Volunti.Models
 {
-  public class Organization
-  {
-    public int OrganizationId { get; set; }
-    public string OrgName { get; set; } 
-    public string OrgNumber { get; set; } 
-    public string Description { get; set; } 
-    public string City { get; set; }
+    public class Organization
+    {
+        public int OrganizationId { get; set; }
 
-    public string ProfileImageUrl { get; set; }
+        public string CompanyName { get; set; }
+        public string OrgName { get; set; }
+        public string ContactName { get; set; }
+        public string OrgNumber { get; set; }
+        public string Description { get; set; }
+        public string Muncipilaity { get; set; }
+        public string ProfileImageUrl { get; set; }
+        public string Website { get; set; }
 
-    public string Website { get; set; }
+        public bool RequiresDocumentation { get; set; }
+        public string? NotificationPreference { get; set; }
+        public bool EmailNotifications { get; set; }
 
-    public List<Job> Jobs { get; set; } = new List<Job>();
-    public List<OrganizationMember> Members { get; set; } = new List<OrganizationMember>();
+        public string Categories { get; set; } = string.Empty;
 
-    public int UserId { get; set; }
-    public AppUser User { get; set; }
+        public List<Job> Jobs { get; set; } = new List<Job>();
+        public List<OrganizationMember> Members { get; set; } = new List<OrganizationMember>();
 
-    //public int RoleId { get; set; }
-    //public Role Role { get; set; }
-
-  }
+        public int UserId { get; set; }
+        public AppUser User { get; set; }
+    }
 }
