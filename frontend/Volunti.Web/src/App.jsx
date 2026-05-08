@@ -5,9 +5,13 @@ import RegisterForm from "./components/RegisterForm";
 import Profile from "./components/Profile";
 import LoginForm from "./components/login/LoginForm";
 import MissionsPage from "./components/missions/MissionsPage";
+import OrgRegister1 from "./components/OrgRegister/OrgRegister1";
+import OrgRegister2 from "./components/OrgRegister/OrgRegister2";
+import OrgRegister3 from "./components/OrgRegister/OrgRegister3";
+import OrgRegister4 from "./components/OrgRegister/OrgRegister4";
 
 export default function App() {
-  const [currentView, setCurrentView] = useState("landing");
+  const [currentView, setCurrentView] = useState("orgRegister1");
 
   return (
     <div className="app-container">
@@ -20,6 +24,14 @@ export default function App() {
       {currentView === "profile" && <Profile setView={setCurrentView} />}
 
       {currentView === "missions" && <MissionsPage setView={setCurrentView} />}
+
+      {currentView === "orgRegister1" && <OrgRegister1 setView={setCurrentView} />}
+
+      {currentView === "orgRegister2" && <OrgRegister2 setView={setCurrentView} />}
+
+      {currentView === "orgRegister3" && <OrgRegister3 setView={setCurrentView} />}
+
+      {currentView === "orgRegister4" && <OrgRegister4 setView={setCurrentView} />}
     </div>
   );
 }
