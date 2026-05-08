@@ -56,9 +56,9 @@ builder.Services.AddAuthorization();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
-        policy.WithOrigins("http://localhost:5173")
-              .AllowAnyHeader()
-              .AllowAnyMethod());
+        policy.AllowAnyOrigin() // OBS: Endast för utveckling, ändra till specifik URL i produktion
+              .WithHeaders("Content-Type", "Authorization")
+              .WithMethods("GET", "POST", "PUT", "DELETE"));
 });
 
 builder.Services.AddScoped<ITokenService, TokenService>();
