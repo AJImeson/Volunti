@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import axios from 'axios'
+import { saveSession } from '../services/authService';
 
 export default function RegisterPage({ setView }) {
   /* ==========================================================================
@@ -216,16 +218,37 @@ export default function RegisterPage({ setView }) {
     return true;
   };
 
-  const handleNext = () => {
-    if (!validateStep()) return;
+  const handleNext = async () => {
+  if (!validateStep()) return;
 
-    if (currentStep < 4) {
-      setCurrentStep(currentStep + 1);
-      window.scrollTo(0, 0);
-    } else {
-      console.log("Formuläret är KLART! Datan skickas till backend:", formData);
+  if (currentStep < 4) {
+    setCurrentStep(currentStep + 1);
+    window.scrollTo(0, 0);
+  } else {
+    try {
+      const response = await axios.post('https://localhost:7007/register/volunteer', {
+        email: formData.email,
+        password: formData.password,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phoneNumber: formData.phone,
+        muncipilaity: formData.kommun,
+        driverLicense: formData.korkort.join(', '),
+        availability: formData.availability.join(', '),
+        maxDistanceKm: formData.distanceAny ? null : formData.distance,
+        notificationPreference: formData.notificationLevel,
+        emailNotifications: formData.emailNotification === 'Ja',
+        interests: formData.categories,
+        bio: '',
+        profileImageUrl: ''
+      });
+      saveSession(response.data);
+      setView('missions');
+    } catch (error) {
+      setErrorMsg('Något gick fel vid registreringen. Försök igen.');
     }
-  };
+  }
+};
 
   const handlePrev = () => {
     setErrorMsg("");
