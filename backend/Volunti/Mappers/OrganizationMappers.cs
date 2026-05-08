@@ -15,7 +15,7 @@ namespace Volunti.Mappers
             {
                 OrganizationId = org.OrganizationId,
                 OrgName = org.OrgName,
-                OrgNummer = org.OrgNummer,
+                OrgNumber = org.OrgNumber,
                 Description = org.Description,
                 City = org.City,
                 ProfileImageUrl = org.ProfileImageUrl,
@@ -28,7 +28,7 @@ namespace Volunti.Mappers
             return new Organization
             {
                 OrgName = orgDto.OrgName,
-                OrgNummer = orgDto.OrgNummer,
+                OrgNumber = orgDto.OrgNumber,
                 Description = orgDto.Description,
                 City = orgDto.City,
                 ProfileImageUrl = orgDto.ProfileImageUrl,

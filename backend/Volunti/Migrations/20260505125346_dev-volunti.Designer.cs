@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volunti.Data;
 
@@ -11,9 +12,11 @@ using Volunti.Data;
 namespace Volunti.Migrations
 {
     [DbContext(typeof(VoluntiDbContext))]
-    partial class VoluntiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260505125346_dev-volunti")]
+    partial class devvolunti
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -265,7 +268,6 @@ namespace Volunti.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
@@ -362,7 +364,7 @@ namespace Volunti.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OrgNumber")
+                    b.Property<string>("OrgNummer")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

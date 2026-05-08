@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Volunti.Data;
 using Volunti.Mappers;
+using Volunti.Models;
+using Volunti.DTOs;
 
 namespace Volunti.Endpoints
 {
@@ -19,6 +21,71 @@ namespace Volunti.Endpoints
                 var job = await db.Jobs.FindAsync(id);
                 return job is null ? Results.NotFound() : Results.Ok(job.ToJobDto());
             });
+
+
+            // Endpoint för att skapa ett nytt jobb
+            app.MapPost("/jobs", async (CreateJobDto dto, VoluntiDbContext db, HttpContext http) =>
+            {
+                if (dto.StartTime >= dto.EndTime)
+                    return Results.BadRequest("Endtime måste vara efter StartTime.");
+
+                var userIdClaim = http.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+
+                if (userIdClaim == null)
+                    return Results.Unauthorized();
+
+                if (!int.TryParse(userIdClaim, out var userId))
+                    return Results.Unauthorized();
+
+                var isAdmin = http.User.IsInRole("Admin");
+
+                Organization? organization;
+
+                if (isAdmin)
+                {
+                    if (dto.OrganizationId == null)
+                        return Results.BadRequest("OrganisationId krävs för Admin.");
+
+                    organization = await db.Organizations
+                    .FirstOrDefaultAsync(o => o.OrganizationId == dto.OrganizationId);
+
+                    if (organization == null)
+                        return Results.BadRequest("Ogiltigt OrganisationId.");
+                }
+
+                else
+                {
+                    organization = await db.Organizations.FirstOrDefaultAsync(o => o.UserId == userId);
+
+                    if (organization == null)
+                        return Results.BadRequest("Användaren har ingen organisation");
+                }
+
+                var job = new Job
+                {
+                    Title = dto.Title,
+                    Description = dto.Description,
+                    Category = dto.Category,
+                    StartTime = dto.StartTime,
+                    EndTime = dto.EndTime,
+                    Address = dto.Address,
+                    City = dto.City,
+                    IsUrgent = dto.IsUrgent,
+                    OrganizationId = organization.OrganizationId,
+
+                    CreatedOn = DateTime.UtcNow,
+                    Status = JobStatus.Open
+                };
+
+                db.Jobs.Add(job);
+                await db.SaveChangesAsync();
+                return Results.Created($"/jobs/{job.JobId}", job.ToJobDto());
+
+
+            })
+            .RequireAuthorization();
+
         }
     }
 }
