@@ -63,6 +63,8 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 
+Console.WriteLine(Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(64)));
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
