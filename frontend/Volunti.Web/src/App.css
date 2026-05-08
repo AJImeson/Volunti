@@ -995,6 +995,8 @@ body {
   font-weight: 900;
   color: #000000;
   letter-spacing: -1px;
+  cursor: pointer;
+  user-select: none;
 }
 
 .marketing-nav-links {
@@ -1002,15 +1004,19 @@ body {
   gap: 2rem;
 }
 
-.marketing-nav-links a {
+.marketing-nav-link {
+  background: none;
+  border: none;
   color: rgba(255, 255, 255, 0.8);
-  text-decoration: none;
   font-size: 0.95rem;
   font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
   transition: color 0.2s;
 }
 
-.marketing-nav-links a:hover {
+.marketing-nav-link:hover {
   color: #fff;
 }
 
@@ -1677,30 +1683,463 @@ body {
 .marketing-footer {
   background: #0f1f5a;
   color: rgba(255, 255, 255, 0.65);
-  padding: 2.5rem 2rem;
-  text-align: center;
+  padding: 3rem 2rem 2rem;
 }
 
 .marketing-footer-inner {
   max-width: 1100px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .marketing-footer-logo {
   font-size: 1.25rem;
-  font-weight: 800;
-  color: #fff;
+  font-weight: 900;
+  color: #000000;
   letter-spacing: -1px;
 }
 
 .marketing-footer-tagline {
   font-size: 0.9rem;
-  margin: 0.5rem 0 0;
+  margin: 0.25rem 0 0;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.marketing-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  justify-content: center;
+}
+
+.marketing-footer-link {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.marketing-footer-link:hover {
+  color: #fff;
 }
 
 .marketing-footer-copy {
   font-size: 0.8rem;
-  margin: 0.4rem 0 0;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.about-story {
+  max-width: 680px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  text-align: left;
+  font-size: 1.05rem;
+  color: #374151;
+  line-height: 1.75;
+}
+
+.impact-stats-section {
+  padding: 5rem 2rem;
+  background: #f9fafb;
+}
+
+.impact-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem;
+}
+
+.impact-stat-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.impact-stat-value {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--primary-blue);
+  letter-spacing: -0.03em;
+}
+
+.impact-stat-label {
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.impact-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+  text-align: left;
+}
+
+.impact-bar-row {
+  display: grid;
+  grid-template-columns: 140px 1fr 80px;
+  align-items: center;
+  gap: 1rem;
+}
+
+.impact-bar-label {
+  font-size: 0.9rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+.impact-bar-track {
+  background: #e5e7eb;
+  border-radius: 4px;
+  height: 10px;
+  overflow: hidden;
+}
+
+.impact-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.impact-bar-hours {
+  font-size: 0.8rem;
+  color: #6b7280;
+  text-align: right;
+}
+
+.impact-quote-section {
+  padding: 5rem 2rem;
+  background: var(--primary-blue);
+  text-align: center;
+}
+
+.impact-quote {
+  font-size: clamp(1.1rem, 3vw, 1.5rem);
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 680px;
+  margin: 0 auto 1.25rem;
+  line-height: 1.65;
+}
+
+.impact-quote-author {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+.faq-section {
+  padding: 4rem 2rem 5rem;
+  background: #fff;
+}
+
+.faq-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.faq-item {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.faq-question {
+  width: 100%;
+  background: none;
+  border: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  gap: 1rem;
+}
+
+.faq-chevron {
+  flex-shrink: 0;
+  color: #6b7280;
+  transition: transform 0.2s;
+}
+
+.faq-item-open .faq-chevron {
+  transform: rotate(180deg);
+}
+
+.faq-answer {
+  font-size: 0.95rem;
+  color: #4b5563;
+  line-height: 1.7;
+  padding: 0 0 1.25rem;
+  margin: 0;
+}
+
+.privacy-content-section {
+  padding: 4rem 2rem 5rem;
+  background: #fff;
+}
+
+.privacy-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.privacy-intro {
+  font-size: 1.05rem;
+  color: #374151;
+  line-height: 1.75;
+  margin: 0 0 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.privacy-section-block {
+  padding: 2rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.privacy-section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 0.75rem;
+}
+
+.privacy-section-text {
+  font-size: 0.95rem;
+  color: #4b5563;
+  line-height: 1.75;
+  margin: 0;
+}
+
+@media (max-width: 767px) {
+  .impact-bar-row {
+    grid-template-columns: 100px 1fr 70px;
+    gap: 0.5rem;
+  }
+
+  .impact-stats-section,
+  .impact-quote-section,
+  .faq-section,
+  .privacy-content-section {
+    padding: 3rem 1.25rem;
+  }
+}
+
+.org-hero {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, #1a2f7a 100%);
+  color: #fff;
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(5rem + 72px) 2rem 5rem;
+  text-align: center;
+}
+
+.org-hero-content {
+  max-width: 700px;
+  position: relative;
+  z-index: 1;
+}
+
+.org-hero-label {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.35rem 1rem;
+  border-radius: 20px;
+  margin-bottom: 1.25rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.org-trusted {
+  padding: 5rem 2rem;
+  background: #f9fafb;
+}
+
+.org-trusted-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 2.5rem;
+}
+
+.org-trusted-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.org-trusted-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.org-trusted-name {
+  font-size: 0.82rem;
+  color: #4b5563;
+  font-weight: 500;
+  text-align: center;
+}
+
+.find-missions-header {
+  background: #f9fafb;
+  padding: calc(3.5rem + 72px) 2rem 3rem;
+  text-align: center;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.find-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.filter-pill {
+  background: #fff;
+  border: 1.5px solid #d1d5db;
+  color: #4b5563;
+  border-radius: 20px;
+  padding: 0.45rem 1.1rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.filter-pill:hover {
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+}
+
+.filter-pill-active {
+  background: var(--primary-blue);
+  border-color: var(--primary-blue);
+  color: #fff;
+}
+
+.find-missions-grid-section {
+  padding: 3.5rem 2rem 5rem;
+  background: #fff;
+}
+
+.find-missions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.find-mission-card {
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.find-mission-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.09);
+}
+
+.find-mission-btn {
+  margin-top: auto;
+  background: var(--primary-blue);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.find-mission-btn:hover {
+  background: #1a2f7a;
+}
+
+.find-missions-cta-banner {
+  margin-top: 3rem;
+  background: #f0f4ff;
+  border: 1.5px solid #c7d4ff;
+  border-radius: 16px;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.find-missions-cta-text {
+  font-size: 1rem;
+  color: #374151;
+  margin: 0;
+  flex: 1;
+  min-width: 200px;
+}
+
+@media (max-width: 767px) {
+  .org-hero {
+    padding: calc(3.5rem + 72px) 1.5rem 3rem;
+    min-height: auto;
+  }
+
+  .find-missions-header {
+    padding: calc(2.5rem + 72px) 1.25rem 2rem;
+  }
+
+  .find-missions-grid-section {
+    padding: 2.5rem 1.25rem 3.5rem;
+  }
+
+  .find-missions-cta-banner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .org-trusted {
+    padding: 3.5rem 1.25rem;
+  }
 }
 
 /* ---- Responsive ---- */
@@ -1710,6 +2149,7 @@ body {
     padding: 1rem 1.25rem;
   }
 
+  .marketing-nav-links,
   .marketing-nav-links {
     display: none;
   }

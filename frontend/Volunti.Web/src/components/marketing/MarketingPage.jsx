@@ -20,7 +20,7 @@ export default function MarketingPage({ setView }) {
       <FeedPreviewSection />
       <StoriesSection />
       <CtaSection setView={setView} />
-      <MarketingFooter />
+      <MarketingFooter setView={setView} />
     </div>
   );
 }
