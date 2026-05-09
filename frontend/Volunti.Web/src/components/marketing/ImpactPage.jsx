@@ -92,7 +92,7 @@ export default function ImpactPage({ setView }) {
         <div className="marketing-cta-inner">
           <h2 className="marketing-cta-title">Bidra till nästa siffra</h2>
           <p className="marketing-cta-subtitle">Gå med och gör din insats till en del av statistiken.</p>
-          <button className="marketing-btn-primary" onClick={() => setView("register")}>
+          <button className="marketing-btn-primary" onClick={() => setView("landing")}>
             Kom igång gratis
           </button>
         </div>

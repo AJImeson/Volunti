@@ -66,7 +66,7 @@ export default function AboutPage({ setView }) {
         <div className="marketing-cta-inner">
           <h2 className="marketing-cta-title">Bli en del av communityt</h2>
           <p className="marketing-cta-subtitle">Gå med tusentals volontärer som redan gör skillnad varje dag.</p>
-          <button className="marketing-btn-primary" onClick={() => setView("register")}>
+          <button className="marketing-btn-primary" onClick={() => setView("landing")}>
             Kom igång gratis
           </button>
         </div>

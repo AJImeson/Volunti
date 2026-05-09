@@ -10,7 +10,7 @@ export default function CtaSection({ setView }) {
         </p>
         <button
           className="marketing-btn-primary"
-          onClick={() => setView("register")}
+          onClick={() => setView("landing")}
         >
           Skapa konto gratis
         </button>

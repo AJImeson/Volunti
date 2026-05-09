@@ -88,10 +88,10 @@ export default function OrganizationsPage({ setView }) {
             Volunti kopplar ihop er organisation med engagerade människor som vill göra skillnad. Gratis, enkelt och effektivt.
           </p>
           <div className="marketing-hero-cta">
-            <button className="marketing-btn-primary" onClick={() => setView("register")}>
+            <button className="marketing-btn-primary" onClick={() => setView("landing")}>
               Registrera din organisation
             </button>
-            <button className="marketing-btn-outline" onClick={() => setView("login")}>
+            <button className="marketing-btn-outline" onClick={() => setView("landing")}>
               Logga in
             </button>
           </div>
@@ -156,7 +156,7 @@ export default function OrganizationsPage({ setView }) {
           <p className="marketing-cta-subtitle">
             Registrera er organisation gratis och nå tusentals engagerade volontärer.
           </p>
-          <button className="marketing-btn-primary" onClick={() => setView("register")}>
+          <button className="marketing-btn-primary" onClick={() => setView("landing")}>
             Kom igång gratis
           </button>
         </div>

@@ -15,10 +15,10 @@ export default function HeroSection({ setView }) {
           Hitta uppdrag, engagera dig och gör avtryck i ditt lokalsamhälle.
         </p>
         <div className="marketing-hero-cta">
-          <button className="marketing-btn-primary" onClick={() => setView("register")}>
+          <button className="marketing-btn-primary" onClick={() => setView("landing")}>
             Kom igång gratis
           </button>
-          <button className="marketing-btn-outline" onClick={() => setView("login")}>
+          <button className="marketing-btn-outline" onClick={() => setView("landing")}>
             Logga in
           </button>
         </div>

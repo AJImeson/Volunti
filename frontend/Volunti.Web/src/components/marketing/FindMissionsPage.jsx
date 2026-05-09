@@ -61,7 +61,7 @@ export default function FindMissionsPage({ setView }) {
         <div className="marketing-section-inner" style={{ textAlign: "left" }}>
           <div className="find-missions-grid">
             {filtered.map((m) => (
-              <MissionCard key={m.id} mission={m} onApply={() => setView("login")} />
+              <MissionCard key={m.id} mission={m} onApply={() => setView("landing")} />
             ))}
           </div>
 
@@ -69,7 +69,7 @@ export default function FindMissionsPage({ setView }) {
             <p className="find-missions-cta-text">
               Skapa ett gratis konto för att se alla uppdrag och anmäla dig med ett klick.
             </p>
-            <button className="marketing-btn-primary" onClick={() => setView("register")}>
+            <button className="marketing-btn-primary" onClick={() => setView("landing")}>
               Skapa konto gratis
             </button>
           </div>

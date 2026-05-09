@@ -85,7 +85,7 @@ export default function FaqPage({ setView }) {
         <div className="marketing-cta-inner">
           <h2 className="marketing-cta-title">Redo att komma igång?</h2>
           <p className="marketing-cta-subtitle">Skapa ett konto gratis och hitta ditt första uppdrag idag.</p>
-          <button className="marketing-btn-primary" onClick={() => setView("register")}>
+          <button className="marketing-btn-primary" onClick={() => setView("landing")}>
             Skapa konto
           </button>
         </div>
