@@ -1,43 +1,33 @@
-import usersData from "../data/users.json";
+import axios from 'axios';
+
+// TODO: PRODUKTION - Byt ut hårdkodad URL mot miljövariabel innan deploy
+// HUR: 1) Skapa .env.development och .env.production i projektets rot
+//      2) Lägg in VITE_API_URL=https://localhost:7007 (dev) respektive riktig backend-URL (prod)
+//      3) Ändra raden nedan till: const API_URL = import.meta.env.VITE_API_URL;
+//      4) Lägg till .env.local och .env.*.local i .gitignore
+
+
+
+const API_URL = 'https://localhost:7007';
 
 export const loginUser = async (email, password) => {
-  await new Promise((resolve) => setTimeout(resolve, 500));
-
-  const user = usersData.users.find(
-    (u) =>
-      u.email.toLowerCase() === email.toLowerCase() && u.password === password,
-  );
-
-  if (!user) {
-    // Vi tittar om mejlen finns i listan men att lösenordet var fel
-    const emailExists = usersData.users.some(
-      (u) => u.email.toLowerCase() === email.toLowerCase(),
-    );
-
-    if (emailExists) {
-      throw new Error("Fel lösenord. Försök igen.");
-    } else {
-      throw new Error("Hittar inget konto med den e-postadressen.");
-    }
-  }
-
-  // Vi skickar tillbaka all information om användaren men vi plockar bort lösenordet för säkerhets skull
-  const { password: _, ...userWithoutPassword } = user;
-  return userWithoutPassword;
+  const response = await axios.post(`${API_URL}/login`, {
+    username: email,
+    password: password
+  });
+  saveSession(response.data);
+  return response.data;
 };
 
-// Vi sparar användaren tillfälligt så att man slipper logga in igen om man uppdaterar sidan
 export const saveSession = (user) => {
   sessionStorage.setItem("currentUser", JSON.stringify(user));
 };
 
-// Vi hämtar den sparade användaren om den finns
 export const getSession = () => {
   const stored = sessionStorage.getItem("currentUser");
   return stored ? JSON.parse(stored) : null;
 };
 
-// Vi tar bort den sparade användaren när man loggar ut
 export const clearSession = () => {
   sessionStorage.removeItem("currentUser");
 };

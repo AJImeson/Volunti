@@ -1,17 +1,25 @@
 import React, { useState } from 'react';
+import { loginUser } from '../../services/authService';
 
-export default function LoginForm() {
+export default function LoginForm({ setView }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("Inloggningsförsök skickat för:", email);
+    try {
+      await loginUser(email, password);
+      setView('profile');
+    } catch (err) {
+      setError('Fel e-post eller lösenord. Försök igen.');
+    }
   };
 
   return (
     <div className="form-card">
       <h2 style={{ marginBottom: '2rem' }}>Välkommen tillbaka</h2>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={handleLogin} className="form-group">
         <div>
           <label className="input-label">E-postadress</label>
