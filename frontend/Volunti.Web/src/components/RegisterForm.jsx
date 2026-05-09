@@ -234,7 +234,7 @@ export default function RegisterPage({ setView }) {
         firstName: formData.firstName,
         lastName: formData.lastName,
         phoneNumber: formData.phone,
-        muncipilaity: formData.kommun,
+        municipality: formData.kommun,
         driverLicense: formData.korkort.join(', '),
         availability: formData.availability.join(', '),
         maxDistanceKm: formData.distanceAny ? null : formData.distance,
