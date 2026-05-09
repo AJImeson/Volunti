@@ -21,7 +21,7 @@ namespace Volunti.Endpoints
             {
                 try
                 {
-                    var appUser = new AppUser { UserName = dto.Email, Email = dto.Email };
+                    var appUser = new AppUser { UserName = dto.Email.ToLower(), Email = dto.Email.ToLower() };
 
                     var createdUser = await userManager.CreateAsync(appUser, dto.Password!);
                     if (!createdUser.Succeeded)
@@ -100,7 +100,7 @@ namespace Volunti.Endpoints
             {
                 try
                 {
-                    var appUser = new AppUser { UserName = dto.Email, Email = dto.Email };
+                    var appUser = new AppUser { UserName = dto.Email.ToLower(), Email = dto.Email.ToLower() };
 
                     var createdUser = await userManager.CreateAsync(appUser, dto.Password!);
                     if (!createdUser.Succeeded)
@@ -143,6 +143,8 @@ namespace Volunti.Endpoints
 
             app.MapPost("/login", async (LoginDto loginDto, SignInManager<AppUser> signInManager, UserManager<AppUser> userManager, ITokenService tokenService) =>
             {
+                if (string.IsNullOrWhiteSpace(loginDto.Username) || string.IsNullOrWhiteSpace(loginDto.Password))
+                    return Results.BadRequest("Username and password are required.");
                 var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == loginDto.Username.ToLower());
                 if (user == null) return Results.Unauthorized();
 
@@ -173,8 +175,17 @@ namespace Volunti.Endpoints
                 });
                 await db.SaveChangesAsync();
 
-                // I produktion: skicka token via e-post. Returnerar token direkt för nu.
-                return Results.Ok(new { token });
+                // TODO: PRODUKTION - Skicka token via e-post istället för att returnera den i response
+                // HUR: 1) Lägg till en e-posttjänst (SendGrid, Mailgun, SMTP, etc.) i DI-containern
+                //      2) Bygg en reset-länk: $"https://volunti.se/reset-password?token={token}&email={user.Email}"
+                //      3) Skicka länken till user.Email
+                //      4) Ändra raden nedan till bara: return Results.Ok();
+                //
+                // VARFÖR: Tokenen är "biljetten" som låter någon återställa lösenordet utan att vara inloggad.
+                //         Att returnera den i response = vem som helst som vet en e-postadress kan ta över kontot.
+                //         I produktion ska tokenen ENDAST hamna i ägarens inkorg - det är så vi vet att det är
+                //         rätt person (eftersom bara de kan läsa sin egen e-post).
+                return Results.Ok(new { token }); // OBS: Endast för dev - tokenen returneras så man kan testa reset-flödet manuellt
             });
 
             app.MapPost("/auth/reset-password", async (ResetPasswordDto dto, UserManager<AppUser> userManager, VoluntiDbContext db) =>
