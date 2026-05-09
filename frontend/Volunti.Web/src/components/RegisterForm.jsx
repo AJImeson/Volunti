@@ -226,6 +226,8 @@ export default function RegisterPage({ setView }) {
     window.scrollTo(0, 0);
   } else {
     try {
+      // TODO: PRODUKTION - Använd API_URL från authService istället för hårdkodad URL
+      // HUR: Importera API_URL från '../services/authService' och använd `${API_URL}/register/volunteer`
       const response = await axios.post('https://localhost:7007/register/volunteer', {
         email: formData.email,
         password: formData.password,
