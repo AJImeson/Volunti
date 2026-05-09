@@ -29,6 +29,10 @@ builder.Services.AddIdentity<AppUser, Role>(options =>
 .AddEntityFrameworkStores<VoluntiDbContext>()
 .AddDefaultTokenProviders();
 
+// TODO: PRODUKTION - Kontrollera att JWT:SigningKey, JWT:Issuer och JWT:Audience
+//                    är satta i appsettings.Production.json eller som environment variables
+// HUR: SigningKey ska vara minst 32 tecken, slumpmässig, och ALDRIG checkas in i Git
+//      DevOps lägger den som secret i deployment-pipeline (Azure Key Vault, GitHub Secrets etc.)
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme =
@@ -53,17 +57,19 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddAuthorization();
 
+// TODO: PRODUKTION - Lås CORS till specifik frontend-domän innan deploy
+// HUR: Byt ut AllowAnyOrigin() mot .WithOrigins("https://volunti.se") (eller riktiga frontend-URL:en)
+//      AllowAnyOrigin() = vem som helst på internet kan anropa vårt API från sin webbläsare = säkerhetsrisk
+//      DevOps ansvarar för att sätta rätt domän i produktionsmiljön
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
-        policy.WithOrigins("http://localhost:5173")
-              .AllowAnyHeader()
-              .AllowAnyMethod());
+        policy.AllowAnyOrigin() // OBS: Endast för utveckling, ändra till specifik URL i produktion
+              .WithHeaders("Content-Type", "Authorization")
+              .WithMethods("GET", "POST", "PUT", "DELETE"));
 });
 
 builder.Services.AddScoped<ITokenService, TokenService>();
-
-Console.WriteLine(Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(64)));
 
 var app = builder.Build();
 
@@ -79,7 +85,9 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-
+// TODO: PRODUKTION - Säkerställ att riktigt HTTPS-certifikat finns innan deploy
+// HUR: DevOps fixar certifikat (Let's Encrypt, Azure managed cert eller liknande)
+//      Self-signed dev-cert ger varningar i webbläsaren och funkar inte mot riktig frontend
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
