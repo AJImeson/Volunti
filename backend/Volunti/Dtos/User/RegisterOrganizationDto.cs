@@ -11,7 +11,7 @@ namespace Volunti.Dtos.User
         [Required]
         public string? OrgName { get; set; }
         [Required]
-        public string? OrgNummer { get; set; }
+        public string? OrgNumber { get; set; }
         public string? Description { get; set; }
         public string? City { get; set; }
         public string? ProfileImageUrl { get; set; }

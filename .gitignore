@@ -3,7 +3,11 @@
 .env
 .env.*
 !.env.example
+.claude/
+<<<<<<< HEAD
+=======
 
+>>>>>>> feature/Devops-k3s
 #.NET Build & Publish
 
 bin/

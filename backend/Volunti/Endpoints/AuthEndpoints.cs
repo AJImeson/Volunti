@@ -85,7 +85,7 @@ namespace Volunti.Endpoints
                     {
                         UserId = appUser.Id,
                         OrgName = dto.OrgName!,
-                        OrgNummer = dto.OrgNummer!,
+                        OrgNumber = dto.OrgNumber!,
                         Description = dto.Description ?? string.Empty,
                         City = dto.City ?? string.Empty,
                         ProfileImageUrl = dto.ProfileImageUrl ?? string.Empty,

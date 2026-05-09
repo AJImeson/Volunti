@@ -63,13 +63,22 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 
+Console.WriteLine(Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(64)));
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<VoluntiDbContext>();
+    db.Database.Migrate();
+}
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+
 
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");

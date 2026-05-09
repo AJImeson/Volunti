@@ -9,7 +9,7 @@ namespace Volunti.Models
   {
     public int OrganizationId { get; set; }
     public string OrgName { get; set; } 
-    public string OrgNummer { get; set; } 
+    public string OrgNumber { get; set; } 
     public string Description { get; set; } 
     public string City { get; set; }
 
