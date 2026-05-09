@@ -17,7 +17,8 @@ namespace Volunti.Endpoints
      RegisterVolunteerDto dto,
      UserManager<AppUser> userManager,
      ITokenService tokenService,
-     VoluntiDbContext db) =>
+     VoluntiDbContext db,
+     ILogger<Program> logger) =>
             {
                 try
                 {
@@ -88,7 +89,8 @@ namespace Volunti.Endpoints
                 }
                 catch (Exception e)
                 {
-                    return Results.Problem(e.Message, statusCode: 500);
+                    logger.LogError(e, "Registration failed for {Email}", dto.Email);
+                    return Results.Problem("Registration failed. Please try again.", statusCode: 500);
                 }
             });
 
@@ -96,7 +98,8 @@ namespace Volunti.Endpoints
                 RegisterOrganizationDto dto,
                 UserManager<AppUser> userManager,
                 ITokenService tokenService,
-                VoluntiDbContext db) =>
+                VoluntiDbContext db,
+                ILogger<Program> logger) =>
             {
                 try
                 {
@@ -137,7 +140,8 @@ namespace Volunti.Endpoints
                 }
                 catch (Exception e)
                 {
-                    return Results.Problem(e.Message, statusCode: 500);
+                    logger.LogError(e, "Organization registration failed for {Email}", dto.Email);
+                    return Results.Problem("Registration failed. Please try again.", statusCode: 500);
                 }
             });
 
