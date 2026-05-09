@@ -21,7 +21,7 @@ namespace Volunti.Dtos.User
 
         public string? Description { get; set; }     // Step 2 textarea
         [Required]
-        public string? Muncipilaity { get; set; }    // Kommun 
+        public string? Municipality { get; set; }    // Kommun 
 
         public string? ProfileImageUrl { get; set; }
         public string? Website { get; set; }

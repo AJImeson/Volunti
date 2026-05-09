@@ -16,7 +16,7 @@ namespace Volunti.Dtos.User
         public string? PhoneNumber { get; set; }
 
         [Required]
-        public string? Muncipilaity { get; set; } 
+        public string? Municipality { get; set; } 
 
         [Required]
         public string? DriverLicense { get; set; }

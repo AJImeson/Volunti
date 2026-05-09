@@ -23,7 +23,7 @@ namespace Volunti.Models
         public string PhoneNumber { get; set; }
 
         [Required]
-        public string? Muncipilaity { get; set; } //Kommun
+        public string? Municipality { get; set; } //Kommun
 
         [Required]
         public string? DriverLicense { get; set; }   

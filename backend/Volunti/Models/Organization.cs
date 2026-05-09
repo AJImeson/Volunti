@@ -11,7 +11,7 @@ namespace Volunti.Models
         public string ContactName { get; set; }
         public string OrgNumber { get; set; }
         public string Description { get; set; }
-        public string Muncipilaity { get; set; }
+        public string Municipality { get; set; }
         public string ProfileImageUrl { get; set; }
         public string Website { get; set; }
 
