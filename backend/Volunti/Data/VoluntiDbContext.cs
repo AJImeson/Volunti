@@ -100,6 +100,13 @@ namespace Volunti.Data
                 .HasForeignKey(m => m.OrganizationId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            modelBuilder.Entity<Job>()
+                .Property(Job => Job.Status)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<Job>()
+                .Property(j => j.Category)
+                .HasConversion<string>();
         }
     }
 }

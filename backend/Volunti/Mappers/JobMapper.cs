@@ -15,13 +15,13 @@ namespace Volunti.Mappers
                 JobId = job.JobId,
                 Title = job.Title,
                 Description = job.Description,
-                Category = job.Category,
+                Category = job.Category.ToString(),
                 StartTime = job.StartTime,
                 EndTime = job.EndTime,
                 Address = job.Address,
                 City = job.City,
                 IsUrgent = job.IsUrgent,
-                Status = job.Status,
+                Status = job.Status.ToString(),
                 CreatedOn = job.CreatedOn,
                 OrganizationId = job.OrganizationId
             };

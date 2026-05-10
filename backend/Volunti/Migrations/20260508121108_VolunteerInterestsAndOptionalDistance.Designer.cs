@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volunti.Data;
 
@@ -11,9 +12,11 @@ using Volunti.Data;
 namespace Volunti.Migrations
 {
     [DbContext(typeof(VoluntiDbContext))]
-    partial class VoluntiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260508121108_VolunteerInterestsAndOptionalDistance")]
+    partial class VolunteerInterestsAndOptionalDistance
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -369,7 +372,7 @@ namespace Volunti.Migrations
                     b.Property<bool>("EmailNotifications")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Municipality")
+                    b.Property<string>("Muncipilaity")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -593,7 +596,7 @@ namespace Volunti.Migrations
                     b.Property<int?>("MaxDistanceKm")
                         .HasColumnType("int");
 
-                    b.Property<string>("Municipality")
+                    b.Property<string>("Muncipilaity")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
