@@ -15,10 +15,11 @@ namespace Volunti.Endpoints
         public static void RegisterEndpoints(WebApplication app)
         {
             app.MapPost("/register/volunteer", async (
-                RegisterVolunteerDto dto,
-                UserManager<AppUser> userManager,
-                ITokenService tokenService,
-                VoluntiDbContext db) =>
+     RegisterVolunteerDto dto,
+     UserManager<AppUser> userManager,
+     ITokenService tokenService,
+     VoluntiDbContext db,
+     ILogger<Program> logger) =>
             {
                 try
                 {
@@ -43,7 +44,33 @@ namespace Volunti.Endpoints
                     if (!roleResult.Succeeded)
                         return Results.Problem(string.Join(", ", roleResult.Errors.Select(e => e.Description)), statusCode: 500);
 
-                    db.Volunteers.Add(new Volunteer
+                   
+                    var interests = new List<VolunteerInterest>();
+                    if (dto.Interests != null && dto.Interests.Any())
+                    {
+                        foreach (var interestName in dto.Interests)
+                        {
+                            var existing = await db.VolunteerInterests
+                                .FirstOrDefaultAsync(i => i.Title == interestName);
+
+                            if (existing != null)
+                            {
+                                interests.Add(existing);
+                            }
+                            else
+                            {
+                                var newInterest = new VolunteerInterest
+                                {
+                                    Title = interestName,
+                                    Description = interestName 
+                                };
+                                db.VolunteerInterests.Add(newInterest);
+                                interests.Add(newInterest);
+                            }
+                        }
+                    }
+
+                    var volunteer = new Volunteer
                     {
                         UserId = appUser.Id,
                         FirstName = dto.FirstName!,
@@ -52,14 +79,17 @@ namespace Volunti.Endpoints
                         Bio = dto.Bio ?? string.Empty,
                         ProfileImageUrl = dto.ProfileImageUrl ?? string.Empty,
                         PhoneNumber = dto.PhoneNumber!,
-                        Muncipilaity = dto.Muncipilaity!,
+                        Municipality = dto.Municipality!,
                         DriverLicense = dto.DriverLicense!,
                         Availability = dto.Availability!,
                         MaxDistanceKm = dto.MaxDistanceKm!,
                         NotificationPreference = dto.NotificationPreference!,
-                        EmailNotifications = dto.EmailNotifications!,
-                        IsVerified = false
-                    });
+                        EmailNotifications = dto.EmailNotifications,
+                        IsVerified = false,
+                        VolunteerInterests = interests
+                    };
+
+                    db.Volunteers.Add(volunteer);
                     await db.SaveChangesAsync();
 
                     return Results.Ok(new NewUserDto
@@ -71,7 +101,8 @@ namespace Volunti.Endpoints
                 }
                 catch (Exception e)
                 {
-                    return Results.Problem(e.Message, statusCode: 500);
+                    logger.LogError(e, "Registration failed for {Email}", dto.Email);
+                    return Results.Problem("Registration failed. Please try again.", statusCode: 500);
                 }
             });
 
@@ -101,11 +132,15 @@ namespace Volunti.Endpoints
                 RegisterOrganizationDto dto,
                 UserManager<AppUser> userManager,
                 ITokenService tokenService,
-                VoluntiDbContext db) =>
+                VoluntiDbContext db,
+                ILogger<Program> logger) =>
             {
                 try
                 {
-                    var appUser = new AppUser { UserName = dto.Email, Email = dto.Email };
+                    if (string.IsNullOrWhiteSpace(dto.Email))
+                        return Results.BadRequest(new { detail = "Email krävs." });
+
+                    var appUser = new AppUser { UserName = dto.Email.ToLower(), Email = dto.Email.ToLower() };
 
                     var createdUser = await userManager.CreateAsync(appUser, dto.Password!);
                     if (!createdUser.Succeeded)
@@ -118,12 +153,18 @@ namespace Volunti.Endpoints
                     db.Organizations.Add(new Organization
                     {
                         UserId = appUser.Id,
+                        CompanyName = dto.CompanyName!,
                         OrgName = dto.OrgName!,
-                        OrgNumber = dto.OrgNumber!,
+                        ContactName = dto.ContactName!,
+                        OrgNumber = dto.OrgNumber ?? string.Empty,
                         Description = dto.Description ?? string.Empty,
-                        City = dto.City ?? string.Empty,
+                        Municipality = dto.Municipality!,
                         ProfileImageUrl = dto.ProfileImageUrl ?? string.Empty,
-                        Website = dto.Website ?? string.Empty
+                        Website = dto.Website ?? string.Empty,
+                        RequiresDocumentation = dto.RequiresDocumentation,
+                        NotificationPreference = dto.NotificationPreference ?? "Rekommenderat",
+                        EmailNotifications = dto.EmailNotifications,
+                        Categories = dto.Categories != null ? string.Join(",", dto.Categories) : string.Empty
                     });
                     await db.SaveChangesAsync();
 
@@ -136,12 +177,15 @@ namespace Volunti.Endpoints
                 }
                 catch (Exception e)
                 {
-                    return Results.Problem(e.Message, statusCode: 500);
+                    logger.LogError(e, "Organization registration failed for {Email}", dto.Email);
+                    return Results.Problem("Registration failed. Please try again.", statusCode: 500);
                 }
             });
 
             app.MapPost("/login", async (LoginDto loginDto, SignInManager<AppUser> signInManager, UserManager<AppUser> userManager, ITokenService tokenService) =>
             {
+                if (string.IsNullOrWhiteSpace(loginDto.Username) || string.IsNullOrWhiteSpace(loginDto.Password))
+                    return Results.BadRequest("Username and password are required.");
                 var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == loginDto.Username.ToLower());
                 if (user == null) return Results.Unauthorized();
 
@@ -172,7 +216,17 @@ namespace Volunti.Endpoints
                 });
                 await db.SaveChangesAsync();
 
-                return Results.Ok(new { token });
+                // TODO: PRODUKTION - Skicka token via e-post istället för att returnera den i response
+                // HUR: 1) Lägg till en e-posttjänst (SendGrid, Mailgun, SMTP, etc.) i DI-containern
+                //      2) Bygg en reset-länk: $"https://volunti.se/reset-password?token={token}&email={user.Email}"
+                //      3) Skicka länken till user.Email
+                //      4) Ändra raden nedan till bara: return Results.Ok();
+                //
+                // VARFÖR: Tokenen är "biljetten" som låter någon återställa lösenordet utan att vara inloggad.
+                //         Att returnera den i response = vem som helst som vet en e-postadress kan ta över kontot.
+                //         I produktion ska tokenen ENDAST hamna i ägarens inkorg - det är så vi vet att det är
+                //         rätt person (eftersom bara de kan läsa sin egen e-post).
+                return Results.Ok(new { token }); // OBS: Endast för dev - tokenen returneras så man kan testa reset-flödet manuellt
             });
 
             app.MapPost("/auth/reset-password", async (ResetPasswordDto dto, UserManager<AppUser> userManager, VoluntiDbContext db) =>
@@ -221,7 +275,7 @@ namespace Volunti.Endpoints
                     firstName = volunteer.FirstName,
                     lastName = volunteer.LastName,
                     phoneNumber = volunteer.PhoneNumber,
-                    muncipilaity = volunteer.Muncipilaity,
+                    municipality = volunteer.Municipality,
                     driverLicense = volunteer.DriverLicense,
                     availability = volunteer.Availability,
                     maxDistanceKm = volunteer.MaxDistanceKm,

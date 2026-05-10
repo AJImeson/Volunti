@@ -38,7 +38,7 @@ namespace Volunti.Endpoints
                 if (org is null)
                     return Results.Forbid();
 
-                var newUser = new AppUser { UserName = dto.Email, Email = dto.Email };
+                var newUser = new AppUser { UserName = dto.Email.ToLower(), Email = dto.Email.ToLower() };
                 var createdUser = await userManager.CreateAsync(newUser, dto.Password!);
                 if (!createdUser.Succeeded)
                     return Results.BadRequest(createdUser.Errors.Select(e => e.Description));
