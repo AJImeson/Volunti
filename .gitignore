@@ -1,9 +1,13 @@
 # Environment
 
 .env
-.env.*
+.env.local
+.env.*.local
 !.env.example
+!.env.development
+!.env.production
 .claude/
+
 #.NET Build & Publish
 
 bin/
@@ -33,6 +37,15 @@ Thumbs.db
 
 /backend/Volunti/appsettings.json
 
-# Local context file - do not remove
+# Local context file do not remove
 CC_Context.md
 /backend/Volunti/Volunti.http
+
+# User uploaded files
+/backend/Volunti/uploads/
+backend/Volunti/wwwroot/profile-images/
+
+# SQL Server LocalDB filer
+*.mdf
+*.ldf
+*.ndf
