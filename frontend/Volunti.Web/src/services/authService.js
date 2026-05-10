@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE = "http://localhost:5066";
+const API_BASE = import.meta.env.VITE_API_BASE;
 const STORAGE_KEY = "volunti_session";
 
 /* ==========================================================================
