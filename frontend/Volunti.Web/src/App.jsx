@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
+import ScrollToTop from "./components/ScrollToTop";
 import MarketingPage from "./components/marketing/MarketingPage";
 import OrganizationsPage from "./components/marketing/OrganizationsPage";
 import FindMissionsPage from "./components/marketing/FindMissionsPage";
@@ -15,35 +17,26 @@ import MissionsPage from "./components/missions/MissionsPage";
 import CreateJobForm from "./components/organization/CreateJobForm";
 
 export default function App() {
-  const [currentView, setCurrentView] = useState("create-job");
-
   return (
-    <div className="app-container">
-      {currentView === "marketing" && <MarketingPage setView={setCurrentView} />}
-
-      {currentView === "organizations" && <OrganizationsPage setView={setCurrentView} />}
-
-      {currentView === "find-missions" && <FindMissionsPage setView={setCurrentView} />}
-
-      {currentView === "about" && <AboutPage setView={setCurrentView} />}
-
-      {currentView === "impact" && <ImpactPage setView={setCurrentView} />}
-
-      {currentView === "faq" && <FaqPage setView={setCurrentView} />}
-
-      {currentView === "privacy" && <PrivacyPage setView={setCurrentView} />}
-
-      {currentView === "landing" && <LandingPage setView={setCurrentView} />}
-
-      {currentView === "login" && <LoginForm setView={setCurrentView} />}
-
-      {currentView === "register" && <RegisterForm setView={setCurrentView} />}
-
-      {currentView === "profile" && <Profile setView={setCurrentView} />}
-
-      {currentView === "missions" && <MissionsPage setView={setCurrentView} />}
-
-      {currentView === "create-job" && <CreateJobForm setView={setCurrentView} />}
-    </div>
+    <BrowserRouter>
+      <div className="app-container">
+        <ScrollToTop />
+        <Routes>
+          <Route path="/" element={<MarketingPage />} />
+          <Route path="/organizations" element={<OrganizationsPage />} />
+          <Route path="/find-missions" element={<FindMissionsPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/impact" element={<ImpactPage />} />
+          <Route path="/faq" element={<FaqPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/landing" element={<LandingPage />} />
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/register" element={<RegisterForm />} />
+          <Route path="/missions" element={<MissionsPage />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/create-job" element={<CreateJobForm />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }

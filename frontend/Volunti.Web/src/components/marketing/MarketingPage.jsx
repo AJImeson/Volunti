@@ -9,18 +9,18 @@ import StoriesSection from "./StoriesSection";
 import CtaSection from "./CtaSection";
 import MarketingFooter from "./MarketingFooter";
 
-export default function MarketingPage({ setView }) {
+export default function MarketingPage() {
   return (
     <div className="marketing-page">
-      <MarketingNavbar setView={setView} />
-      <HeroSection setView={setView} />
+      <MarketingNavbar />
+      <HeroSection />
       <FeaturesSection />
       <HowItWorksSection />
       <CommunitySection />
       <FeedPreviewSection />
       <StoriesSection />
-      <CtaSection setView={setView} />
-      <MarketingFooter setView={setView} />
+      <CtaSection />
+      <MarketingFooter />
     </div>
   );
 }

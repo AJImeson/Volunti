@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./LoginForm.css";
 import { loginUser, saveSession } from "../../services/authService";
 
-export default function LoginForm({ setView }) {
+export default function LoginForm() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -24,7 +26,7 @@ export default function LoginForm({ setView }) {
       const user = await loginUser(email, password);
       saveSession(user);
       console.log("Inloggad som:", user);
-      setView("missions");
+      navigate("/missions");
     } catch (error) {
       setErrorMsg(error.message);
     } finally {
@@ -33,9 +35,7 @@ export default function LoginForm({ setView }) {
   };
 
   const handleLogoClick = () => {
-    if (typeof setView === "function") {
-      setView("marketing");
-    }
+    navigate("/");
   };
 
   const renderEyeIcon = (open) =>
@@ -77,7 +77,7 @@ export default function LoginForm({ setView }) {
         </h1>
         <button
           className="btn-nav-register"
-          onClick={() => setView("register")}
+          onClick={() => navigate("/register")}
         >
           Registrera dig
         </button>

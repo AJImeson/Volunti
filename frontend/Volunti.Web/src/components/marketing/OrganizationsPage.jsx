@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import MarketingNavbar from "./MarketingNavbar";
 import MarketingFooter from "./MarketingFooter";
 
@@ -73,10 +74,11 @@ const orgs = [
   { name: "Djurskyddet", initial: "DS", bgColor: "#7c3aed" },
 ];
 
-export default function OrganizationsPage({ setView }) {
+export default function OrganizationsPage() {
+  const navigate = useNavigate();
   return (
     <div className="marketing-page">
-      <MarketingNavbar setView={setView} />
+      <MarketingNavbar />
 
       <section className="org-hero">
         <div className="org-hero-content">
@@ -88,10 +90,10 @@ export default function OrganizationsPage({ setView }) {
             Volunti kopplar ihop er organisation med engagerade människor som vill göra skillnad. Gratis, enkelt och effektivt.
           </p>
           <div className="marketing-hero-cta">
-            <button className="marketing-btn-primary" onClick={() => setView("landing")}>
+            <button className="marketing-btn-primary" onClick={() => navigate("/landing")}>
               Registrera din organisation
             </button>
-            <button className="marketing-btn-outline" onClick={() => setView("landing")}>
+            <button className="marketing-btn-outline" onClick={() => navigate("/landing")}>
               Logga in
             </button>
           </div>
@@ -156,13 +158,13 @@ export default function OrganizationsPage({ setView }) {
           <p className="marketing-cta-subtitle">
             Registrera er organisation gratis och nå tusentals engagerade volontärer.
           </p>
-          <button className="marketing-btn-primary" onClick={() => setView("landing")}>
+          <button className="marketing-btn-primary" onClick={() => navigate("/landing")}>
             Kom igång gratis
           </button>
         </div>
       </section>
 
-      <MarketingFooter setView={setView} />
+      <MarketingFooter />
     </div>
   );
 }

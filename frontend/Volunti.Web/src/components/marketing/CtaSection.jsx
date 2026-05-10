@@ -1,6 +1,8 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function CtaSection({ setView }) {
+export default function CtaSection() {
+  const navigate = useNavigate();
   return (
     <section className="marketing-cta">
       <div className="marketing-cta-inner">
@@ -10,7 +12,7 @@ export default function CtaSection({ setView }) {
         </p>
         <button
           className="marketing-btn-primary"
-          onClick={() => setView("landing")}
+          onClick={() => navigate("/landing")}
         >
           Skapa konto gratis
         </button>

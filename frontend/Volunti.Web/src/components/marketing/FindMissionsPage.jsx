@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import MarketingNavbar from "./MarketingNavbar";
 import MarketingFooter from "./MarketingFooter";
 import MissionCard from "./MissionCard";
@@ -27,7 +28,8 @@ function FilterPill({ label, active, onClick }) {
   );
 }
 
-export default function FindMissionsPage({ setView }) {
+export default function FindMissionsPage() {
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState("Alla");
 
   const filtered = activeCategory === "Alla"
@@ -36,7 +38,7 @@ export default function FindMissionsPage({ setView }) {
 
   return (
     <div className="marketing-page">
-      <MarketingNavbar setView={setView} />
+      <MarketingNavbar />
 
       <section className="find-missions-header">
         <div className="marketing-section-inner">
@@ -61,7 +63,7 @@ export default function FindMissionsPage({ setView }) {
         <div className="marketing-section-inner" style={{ textAlign: "left" }}>
           <div className="find-missions-grid">
             {filtered.map((m) => (
-              <MissionCard key={m.id} mission={m} onApply={() => setView("landing")} />
+              <MissionCard key={m.id} mission={m} onApply={() => navigate("/landing")} />
             ))}
           </div>
 
@@ -69,14 +71,14 @@ export default function FindMissionsPage({ setView }) {
             <p className="find-missions-cta-text">
               Skapa ett gratis konto för att se alla uppdrag och anmäla dig med ett klick.
             </p>
-            <button className="marketing-btn-primary" onClick={() => setView("landing")}>
+            <button className="marketing-btn-primary" onClick={() => navigate("/landing")}>
               Skapa konto gratis
             </button>
           </div>
         </div>
       </section>
 
-      <MarketingFooter setView={setView} />
+      <MarketingFooter />
     </div>
   );
 }

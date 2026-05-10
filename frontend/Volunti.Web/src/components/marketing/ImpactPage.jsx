@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import MarketingNavbar from "./MarketingNavbar";
 import MarketingFooter from "./MarketingFooter";
 
@@ -42,10 +43,11 @@ function CategoryBar({ label, hours, color }) {
   );
 }
 
-export default function ImpactPage({ setView }) {
+export default function ImpactPage() {
+  const navigate = useNavigate();
   return (
     <div className="marketing-page">
-      <MarketingNavbar setView={setView} />
+      <MarketingNavbar />
 
       <section className="org-hero">
         <div className="org-hero-content">
@@ -92,13 +94,13 @@ export default function ImpactPage({ setView }) {
         <div className="marketing-cta-inner">
           <h2 className="marketing-cta-title">Bidra till nästa siffra</h2>
           <p className="marketing-cta-subtitle">Gå med och gör din insats till en del av statistiken.</p>
-          <button className="marketing-btn-primary" onClick={() => setView("landing")}>
+          <button className="marketing-btn-primary" onClick={() => navigate("/landing")}>
             Kom igång gratis
           </button>
         </div>
       </section>
 
-      <MarketingFooter setView={setView} />
+      <MarketingFooter />
     </div>
   );
 }

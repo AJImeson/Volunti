@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./CreateJobForm.css";
+import { createJob } from "../../services/jobService";
 
 const REQUIREMENTS = [
   { id: "backgroundCheck", label: "Belastningsregister krävs" },
@@ -32,10 +34,13 @@ const EMPTY_FORM = {
   requirements: [],
 };
 
-export default function CreateJobForm({ setView }) {
+export default function CreateJobForm() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState(EMPTY_FORM);
   const [fieldErrors, setFieldErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [serverError, setServerError] = useState("");
 
   const toggleRequirement = (id) => {
     setFormData((prev) => ({
@@ -64,16 +69,23 @@ export default function CreateJobForm({ setView }) {
     return errors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = validate();
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
       return;
     }
-    // TODO: POST till /org/jobs när backend-endpointen är klar
-    console.log("Nytt uppdrag:", formData);
-    setSubmitted(true);
+    setIsLoading(true);
+    setServerError("");
+    try {
+      await createJob(formData);
+      setSubmitted(true);
+    } catch (err) {
+      setServerError(err.response?.data || "Något gick fel, försök igen.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleReset = () => {
@@ -234,12 +246,14 @@ export default function CreateJobForm({ setView }) {
             </label>
           </div>
 
+          {serverError && <div className="error-msg-box">{serverError}</div>}
+
           <div className="create-job-actions">
-            <button type="button" className="btn-outline-blue" onClick={() => setView && setView("org-dashboard")}>
+            <button type="button" className="btn-outline-blue" onClick={() => navigate("/org-dashboard")}>
               Avbryt
             </button>
-            <button type="submit" className="btn-primary">
-              Publicera uppdrag
+            <button type="submit" className="btn-primary" disabled={isLoading}>
+              {isLoading ? "Publicerar..." : "Publicera uppdrag"}
             </button>
           </div>
 

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import MarketingNavbar from "./MarketingNavbar";
 import MarketingFooter from "./MarketingFooter";
 
@@ -58,10 +59,11 @@ function FaqItem({ q, a }) {
   );
 }
 
-export default function FaqPage({ setView }) {
+export default function FaqPage() {
+  const navigate = useNavigate();
   return (
     <div className="marketing-page">
-      <MarketingNavbar setView={setView} />
+      <MarketingNavbar />
 
       <section className="org-hero">
         <div className="org-hero-content">
@@ -85,13 +87,13 @@ export default function FaqPage({ setView }) {
         <div className="marketing-cta-inner">
           <h2 className="marketing-cta-title">Redo att komma igång?</h2>
           <p className="marketing-cta-subtitle">Skapa ett konto gratis och hitta ditt första uppdrag idag.</p>
-          <button className="marketing-btn-primary" onClick={() => setView("landing")}>
+          <button className="marketing-btn-primary" onClick={() => navigate("/landing")}>
             Skapa konto
           </button>
         </div>
       </section>
 
-      <MarketingFooter setView={setView} />
+      <MarketingFooter />
     </div>
   );
 }

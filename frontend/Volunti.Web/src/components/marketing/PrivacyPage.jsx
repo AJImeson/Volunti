@@ -2,6 +2,7 @@ import React from "react";
 import MarketingNavbar from "./MarketingNavbar";
 import MarketingFooter from "./MarketingFooter";
 
+
 const sections = [
   {
     title: "Vilka uppgifter samlar vi in?",
@@ -38,10 +39,10 @@ function PrivacySection({ title, text }) {
   );
 }
 
-export default function PrivacyPage({ setView }) {
+export default function PrivacyPage() {
   return (
     <div className="marketing-page">
-      <MarketingNavbar setView={setView} />
+      <MarketingNavbar />
 
       <section className="org-hero" style={{ minHeight: "40vh" }}>
         <div className="org-hero-content">
@@ -64,7 +65,7 @@ export default function PrivacyPage({ setView }) {
         </div>
       </section>
 
-      <MarketingFooter setView={setView} />
+      <MarketingFooter />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import MarketingNavbar from "./MarketingNavbar";
 import MarketingFooter from "./MarketingFooter";
 
@@ -18,10 +19,11 @@ function ValueCard({ title, desc }) {
   );
 }
 
-export default function AboutPage({ setView }) {
+export default function AboutPage() {
+  const navigate = useNavigate();
   return (
     <div className="marketing-page">
-      <MarketingNavbar setView={setView} />
+      <MarketingNavbar />
 
       <section className="org-hero">
         <div className="org-hero-content">
@@ -66,13 +68,13 @@ export default function AboutPage({ setView }) {
         <div className="marketing-cta-inner">
           <h2 className="marketing-cta-title">Bli en del av communityt</h2>
           <p className="marketing-cta-subtitle">Gå med tusentals volontärer som redan gör skillnad varje dag.</p>
-          <button className="marketing-btn-primary" onClick={() => setView("landing")}>
+          <button className="marketing-btn-primary" onClick={() => navigate("/landing")}>
             Kom igång gratis
           </button>
         </div>
       </section>
 
-      <MarketingFooter setView={setView} />
+      <MarketingFooter />
     </div>
   );
 }

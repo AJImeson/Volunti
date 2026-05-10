@@ -1,15 +1,18 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const links = [
-  { label: "Om oss", view: "about" },
-  { label: "Hitta uppdrag", view: "find-missions" },
-  { label: "För organisationer", view: "organizations" },
-  { label: "Vår påverkan", view: "impact" },
-  { label: "FAQ", view: "faq" },
-  { label: "Integritetspolicy", view: "privacy" },
+  { label: "Om oss", path: "/about" },
+  { label: "Hitta uppdrag", path: "/find-missions" },
+  { label: "För organisationer", path: "/organizations" },
+  { label: "Vår påverkan", path: "/impact" },
+  { label: "FAQ", path: "/faq" },
+  { label: "Integritetspolicy", path: "/privacy" },
 ];
 
-export default function MarketingFooter({ setView }) {
+export default function MarketingFooter() {
+  const navigate = useNavigate();
+
   return (
     <footer className="marketing-footer">
       <div className="marketing-footer-inner">
@@ -17,7 +20,7 @@ export default function MarketingFooter({ setView }) {
         <p className="marketing-footer-tagline">Små insatser. Stor skillnad.</p>
         <nav className="marketing-footer-links">
           {links.map((l) => (
-            <button key={l.view} className="marketing-footer-link" onClick={() => setView(l.view)}>
+            <button key={l.path} className="marketing-footer-link" onClick={() => navigate(l.path)}>
               {l.label}
             </button>
           ))}

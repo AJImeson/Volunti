@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from 'axios'
 import { saveSession } from '../services/authService';
 
-export default function RegisterPage({ setView }) {
+export default function RegisterPage() {
+  const navigate = useNavigate();
   /* ==========================================================================
      STATE OCH MINNE
      ========================================================================== */
@@ -245,7 +247,7 @@ export default function RegisterPage({ setView }) {
         profileImageUrl: ''
       });
       saveSession(response.data);
-      setView('missions');
+      navigate('/missions');
     } catch (error) {
       setErrorMsg('Något gick fel vid registreringen. Försök igen.');
     }
@@ -258,14 +260,12 @@ export default function RegisterPage({ setView }) {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     } else {
-      setView("landing");
+      navigate("/landing");
     }
   };
 
   const handleLogoClick = () => {
-    if (typeof setView === "function") {
-      setView("landing");
-    }
+    navigate("/landing");
   };
 
   /* ==========================================================================
@@ -362,7 +362,7 @@ export default function RegisterPage({ setView }) {
         >
           VOLUNTI
         </h1>
-        <button className="btn-nav-login" onClick={() => setView("login")}>
+        <button className="btn-nav-login" onClick={() => navigate("/login")}>
           Logga in
         </button>
       </div>
