@@ -12,9 +12,10 @@ import RegisterForm from "./components/RegisterForm";
 import Profile from "./components/Profile";
 import LoginForm from "./components/login/LoginForm";
 import MissionsPage from "./components/missions/MissionsPage";
+import CreateJobForm from "./components/organization/CreateJobForm";
 
 export default function App() {
-  const [currentView, setCurrentView] = useState("marketing");
+  const [currentView, setCurrentView] = useState("create-job");
 
   return (
     <div className="app-container">
@@ -41,6 +42,8 @@ export default function App() {
       {currentView === "profile" && <Profile setView={setCurrentView} />}
 
       {currentView === "missions" && <MissionsPage setView={setCurrentView} />}
+
+      {currentView === "create-job" && <CreateJobForm setView={setCurrentView} />}
     </div>
   );
 }
