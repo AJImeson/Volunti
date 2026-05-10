@@ -6,6 +6,7 @@ using Volunti.Data;
 using Volunti.Dtos.User;
 using Volunti.Interfaces;
 using Volunti.Models;
+using System.Security.Claims;
 
 namespace Volunti.Endpoints
 {
@@ -21,6 +22,17 @@ namespace Volunti.Endpoints
             {
                 try
                 {
+                    // Kolla om mejlen redan är registrerad
+                    var existingEmail = await userManager.FindByEmailAsync(dto.Email!);
+                    if (existingEmail != null)
+                        return Results.Conflict(new { detail = "Det finns redan ett konto med den här mejladressen." });
+
+                    // Kolla om telefonnumret redan används
+                    var existingPhone = await db.Volunteers
+                        .AnyAsync(v => v.PhoneNumber == dto.PhoneNumber);
+                    if (existingPhone)
+                        return Results.Conflict(new { detail = "Det finns redan ett konto med det här telefonnumret." });
+
                     var appUser = new AppUser { UserName = dto.Email, Email = dto.Email };
 
                     var createdUser = await userManager.CreateAsync(appUser, dto.Password!);
@@ -42,7 +54,7 @@ namespace Volunti.Endpoints
                         PhoneNumber = dto.PhoneNumber!,
                         Muncipilaity = dto.Muncipilaity!,
                         DriverLicense = dto.DriverLicense!,
-                        Availability = dto.Availability!, // Garanterat inte null eftersom det är obligatoriskt
+                        Availability = dto.Availability!,
                         MaxDistanceKm = dto.MaxDistanceKm!,
                         NotificationPreference = dto.NotificationPreference!,
                         EmailNotifications = dto.EmailNotifications!,
@@ -61,6 +73,28 @@ namespace Volunti.Endpoints
                 {
                     return Results.Problem(e.Message, statusCode: 500);
                 }
+            });
+
+            app.MapPost("/register/check-availability", async (
+                CheckAvailabilityDto dto,
+                UserManager<AppUser> userManager,
+                VoluntiDbContext db) =>
+            {
+                var emailTaken = false;
+                var phoneTaken = false;
+
+                if (!string.IsNullOrWhiteSpace(dto.Email))
+                {
+                    var existingEmail = await userManager.FindByEmailAsync(dto.Email);
+                    emailTaken = existingEmail != null;
+                }
+
+                if (!string.IsNullOrWhiteSpace(dto.PhoneNumber))
+                {
+                    phoneTaken = await db.Volunteers.AnyAsync(v => v.PhoneNumber == dto.PhoneNumber);
+                }
+
+                return Results.Ok(new { emailTaken, phoneTaken });
             });
 
             app.MapPost("/register/organization", async (
@@ -125,7 +159,7 @@ namespace Volunti.Endpoints
             app.MapPost("/auth/forgot-password", async (ForgotPasswordDto dto, UserManager<AppUser> userManager, VoluntiDbContext db) =>
             {
                 var user = await userManager.FindByEmailAsync(dto.Email);
-                if (user == null) return Results.Ok(); // Avslöja inte om e-posten finns
+                if (user == null) return Results.Ok(); 
 
                 var token = await userManager.GeneratePasswordResetTokenAsync(user);
                 var tokenHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
@@ -138,7 +172,6 @@ namespace Volunti.Endpoints
                 });
                 await db.SaveChangesAsync();
 
-                // I produktion: skicka token via e-post. Returnerar token direkt för nu.
                 return Results.Ok(new { token });
             });
 
@@ -162,6 +195,44 @@ namespace Volunti.Endpoints
 
                 return Results.Ok("Password reset successful");
             });
+
+            app.MapGet("/me", async (
+                ClaimsPrincipal claimsPrincipal,
+                UserManager<AppUser> userManager,
+                VoluntiDbContext db) =>
+            {
+                var userIdStr = userManager.GetUserId(claimsPrincipal);
+                if (userIdStr is null || !int.TryParse(userIdStr, out var userId))
+                    return Results.Unauthorized();
+
+                var user = await userManager.FindByIdAsync(userIdStr);
+                if (user is null) return Results.NotFound();
+
+                var volunteer = await db.Volunteers
+                    .FirstOrDefaultAsync(v => v.UserId == userId);
+
+                if (volunteer is null)
+                    return Results.NotFound("Volunteer profile not found");
+
+                return Results.Ok(new
+                {
+                    email = user.Email,
+                    userName = user.UserName,
+                    firstName = volunteer.FirstName,
+                    lastName = volunteer.LastName,
+                    phoneNumber = volunteer.PhoneNumber,
+                    muncipilaity = volunteer.Muncipilaity,
+                    driverLicense = volunteer.DriverLicense,
+                    availability = volunteer.Availability,
+                    maxDistanceKm = volunteer.MaxDistanceKm,
+                    bio = volunteer.Bio,
+                    dateOfBirth = volunteer.DateOfBirth,
+                    profileImageUrl = volunteer.ProfileImageUrl,
+                    notificationPreference = volunteer.NotificationPreference,
+                    emailNotifications = volunteer.EmailNotifications,
+                    isVerified = volunteer.IsVerified
+                });
+            }).RequireAuthorization();
         }
     }
 }

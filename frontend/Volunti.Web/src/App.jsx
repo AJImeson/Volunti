@@ -2,16 +2,19 @@ import React, { useState } from "react";
 import "./App.css";
 import LandingPage from "./components/LandingPage";
 import RegisterForm from "./components/RegisterForm";
-import Profile from "./components/Profile";
+import Profile from "./components/profile/Profile";
 import LoginForm from "./components/login/LoginForm";
 import MissionsPage from "./components/missions/MissionsPage";
 import OrgRegister1 from "./components/OrgRegister/OrgRegister1";
 import OrgRegister2 from "./components/OrgRegister/OrgRegister2";
 import OrgRegister3 from "./components/OrgRegister/OrgRegister3";
 import OrgRegister4 from "./components/OrgRegister/OrgRegister4";
+import SettingsPage from "./components/settingspage/SettingsPage";
 
 export default function App() {
-  const [currentView, setCurrentView] = useState("orgRegister1");
+  const [currentView, setCurrentView] = useState("landing");
+
+  console.log("App renderar view:", currentView);
 
   return (
     <div className="app-container">
@@ -25,13 +28,23 @@ export default function App() {
 
       {currentView === "missions" && <MissionsPage setView={setCurrentView} />}
 
-      {currentView === "orgRegister1" && <OrgRegister1 setView={setCurrentView} />}
+      {currentView === "settings" && <SettingsPage setView={setCurrentView} />}
 
-      {currentView === "orgRegister2" && <OrgRegister2 setView={setCurrentView} />}
+      {currentView === "orgRegister1" && (
+        <OrgRegister1 setView={setCurrentView} />
+      )}
 
-      {currentView === "orgRegister3" && <OrgRegister3 setView={setCurrentView} />}
+      {currentView === "orgRegister2" && (
+        <OrgRegister2 setView={setCurrentView} />
+      )}
 
-      {currentView === "orgRegister4" && <OrgRegister4 setView={setCurrentView} />}
+      {currentView === "orgRegister3" && (
+        <OrgRegister3 setView={setCurrentView} />
+      )}
+
+      {currentView === "orgRegister4" && (
+        <OrgRegister4 setView={setCurrentView} />
+      )}
     </div>
   );
 }

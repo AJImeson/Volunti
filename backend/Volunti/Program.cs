@@ -56,9 +56,20 @@ builder.Services.AddAuthorization();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
-        policy.WithOrigins("http://localhost:5173")
-              .AllowAnyHeader()
-              .AllowAnyMethod());
+    {
+        if (builder.Environment.IsDevelopment())
+        {
+            policy.AllowAnyOrigin()
+                  .WithHeaders("Content-Type", "Authorization")
+                  .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
+        }
+        else
+        {
+            policy.WithOrigins("https://volunti.se")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        }
+    });
 });
 
 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -66,6 +77,21 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 Console.WriteLine(Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(64)));
 
 var app = builder.Build();
+
+//Profilbild
+var wwwroot = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
+if (!Directory.Exists(wwwroot))
+{
+    Directory.CreateDirectory(wwwroot);
+}
+
+app.UseStaticFiles();
+
+var uploadsRoot = Path.Combine(builder.Environment.ContentRootPath, "uploads");
+if (!Directory.Exists(uploadsRoot))
+{
+    Directory.CreateDirectory(uploadsRoot);
+}
 
 using (var scope = app.Services.CreateScope())
 {
@@ -80,7 +106,10 @@ if (app.Environment.IsDevelopment())
 }
 
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
@@ -88,5 +117,7 @@ app.UseAuthorization();
 AuthEndpoints.RegisterEndpoints(app);
 OrganizationEndpoints.RegisterEndpoints(app);
 JobEndpoints.RegisterEndpoints(app);
+VolunteerProfileEndpoints.RegisterEndpoints(app); 
+FileEndpoints.RegisterEndpoints(app);
 
 app.Run();
