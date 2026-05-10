@@ -1,0 +1,140 @@
+/* ==========================================================================
+   CROP MODAL BACKDROP
+   ========================================================================== */
+.crop-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+  animation: cropFadeIn 0.2s ease-out;
+}
+
+.crop-modal {
+  background: white;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  animation: cropSlideIn 0.25s ease-out;
+}
+
+@keyframes cropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cropSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+.crop-header {
+  padding: 20px 24px 12px;
+  text-align: center;
+}
+
+.crop-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2f44a5;
+  margin: 0 0 4px 0;
+}
+
+.crop-header p {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ==========================================================================
+   CROP AREA
+   ========================================================================== */
+.crop-area {
+  position: relative;
+  width: 100%;
+  height: 360px;
+  background: #1a1a1a;
+}
+
+/* ==========================================================================
+   CONTROLS
+   ========================================================================== */
+.crop-controls {
+  padding: 16px 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.crop-zoom-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.crop-zoom-slider {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  outline: none;
+}
+
+.crop-zoom-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: #2f44a5;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.crop-zoom-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: #2f44a5;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ==========================================================================
+   ACTIONS
+   ========================================================================== */
+.crop-actions {
+  padding: 16px 24px 20px;
+  display: flex;
+  gap: 10px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.crop-actions button {
+  flex: 1;
+}
