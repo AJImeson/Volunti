@@ -64,14 +64,40 @@ builder.Services.AddAuthorization();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
-        policy.AllowAnyOrigin() // OBS: Endast för utveckling, ändra till specifik URL i produktion
-              .WithHeaders("Content-Type", "Authorization")
-              .WithMethods("GET", "POST", "PUT", "DELETE"));
+    {
+        if (builder.Environment.IsDevelopment())
+        {
+            policy.AllowAnyOrigin()
+                  .WithHeaders("Content-Type", "Authorization")
+                  .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
+        }
+        else
+        {
+            policy.WithOrigins("https://volunti.se")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        }
+    });
 });
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
+
+//Profilbild
+var wwwroot = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
+if (!Directory.Exists(wwwroot))
+{
+    Directory.CreateDirectory(wwwroot);
+}
+
+app.UseStaticFiles();
+
+var uploadsRoot = Path.Combine(builder.Environment.ContentRootPath, "uploads");
+if (!Directory.Exists(uploadsRoot))
+{
+    Directory.CreateDirectory(uploadsRoot);
+}
 
 using (var scope = app.Services.CreateScope())
 {
@@ -85,10 +111,11 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-// TODO: PRODUKTION - Säkerställ att riktigt HTTPS-certifikat finns innan deploy
-// HUR: DevOps fixar certifikat (Let's Encrypt, Azure managed cert eller liknande)
-//      Self-signed dev-cert ger varningar i webbläsaren och funkar inte mot riktig frontend
-app.UseHttpsRedirection();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
@@ -96,5 +123,7 @@ app.UseAuthorization();
 AuthEndpoints.RegisterEndpoints(app);
 OrganizationEndpoints.RegisterEndpoints(app);
 JobEndpoints.RegisterEndpoints(app);
+VolunteerProfileEndpoints.RegisterEndpoints(app); 
+FileEndpoints.RegisterEndpoints(app);
 
 app.Run();

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volunti.Data;
 
@@ -11,9 +12,11 @@ using Volunti.Data;
 namespace Volunti.Migrations
 {
     [DbContext(typeof(VoluntiDbContext))]
-    partial class VoluntiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260509142334_AddVolunteerFiles")]
+    partial class AddVolunteerFiles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -350,30 +353,12 @@ namespace Volunti.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrganizationId"));
 
-                    b.Property<string>("Categories")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CompanyName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContactName")
+                    b.Property<string>("City")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("EmailNotifications")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Municipality")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NotificationPreference")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OrgName")
@@ -387,9 +372,6 @@ namespace Volunti.Migrations
                     b.Property<string>("ProfileImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("RequiresDocumentation")
-                        .HasColumnType("bit");
 
                     b.Property<int?>("RoleId")
                         .HasColumnType("int");
@@ -590,10 +572,10 @@ namespace Volunti.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("MaxDistanceKm")
+                    b.Property<int>("MaxDistanceKm")
                         .HasColumnType("int");
 
-                    b.Property<string>("Municipality")
+                    b.Property<string>("Muncipilaity")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -652,48 +634,6 @@ namespace Volunti.Migrations
                     b.HasIndex("VolunteerId");
 
                     b.ToTable("VolunteerApplications");
-                });
-
-            modelBuilder.Entity("Volunti.Models.VolunteerExperience", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("HoursTotal")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Organization")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<int>("VolunteerId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("VolunteerId");
-
-                    b.ToTable("VolunteerExperiences");
                 });
 
             modelBuilder.Entity("Volunti.Models.VolunteerFile", b =>
@@ -993,17 +933,6 @@ namespace Volunti.Migrations
                         .IsRequired();
 
                     b.Navigation("Job");
-
-                    b.Navigation("Volunteer");
-                });
-
-            modelBuilder.Entity("Volunti.Models.VolunteerExperience", b =>
-                {
-                    b.HasOne("Volunti.Models.Volunteer", "Volunteer")
-                        .WithMany()
-                        .HasForeignKey("VolunteerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("Volunteer");
                 });

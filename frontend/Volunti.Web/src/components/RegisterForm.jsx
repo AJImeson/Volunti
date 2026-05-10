@@ -1,7 +1,128 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios'
-import { saveSession } from '../services/authService';
+import {
+  registerVolunteer,
+  checkAvailability,
+  uploadFile,
+  normalizePhoneNumber,
+} from "../services/authService";
+
+function PendingFileUploader({
+  label,
+  files,
+  onAdd,
+  onRemove,
+  buttonLabel = "+ Ladda upp",
+}) {
+  const [titleInput, setTitleInput] = React.useState("");
+  const [selectedFile, setSelectedFile] = React.useState(null);
+  const [isExpanded, setIsExpanded] = React.useState(false);
+  const fileInputRef = React.useRef(null);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      if (!titleInput) {
+        setTitleInput(file.name.replace(/\.[^/.]+$/, ""));
+      }
+    }
+  };
+
+  const handleAdd = () => {
+    if (!selectedFile) return;
+    onAdd({
+      file: selectedFile,
+      title: titleInput.trim() || selectedFile.name,
+    });
+    setTitleInput("");
+    setSelectedFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    setIsExpanded(false);
+  };
+
+  return (
+    <div className="register-file-section">
+      <h3 className="form-section-title">{label}</h3>
+
+      {files.length > 0 && (
+        <ul className="register-file-list">
+          {files.map((f, i) => (
+            <li key={i} className="register-file-item">
+              <span>📄 {f.title}</span>
+              <button
+                type="button"
+                className="register-file-remove"
+                onClick={() => onRemove(i)}
+                aria-label="Ta bort fil"
+              >
+                ×
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {isExpanded ? (
+        <div className="register-file-form">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png"
+            onChange={handleFileChange}
+            style={{ display: "none" }}
+            id={`reg-file-${label}`}
+          />
+          <label htmlFor={`reg-file-${label}`} className="register-file-pick">
+            {selectedFile
+              ? `📄 ${selectedFile.name}`
+              : "📎 Välj fil (PDF, JPG, PNG)"}
+          </label>
+
+          <input
+            type="text"
+            value={titleInput}
+            onChange={(e) => setTitleInput(e.target.value)}
+            placeholder="Titel (t.ex. 'Intyg från Röda Korset')"
+            className="text-input"
+          />
+
+          <div className="register-file-actions">
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={handleAdd}
+              disabled={!selectedFile}
+              style={{ flex: 1 }}
+            >
+              Lägg till
+            </button>
+            <button
+              type="button"
+              className="btn-outline-blue"
+              onClick={() => {
+                setIsExpanded(false);
+                setSelectedFile(null);
+                setTitleInput("");
+              }}
+              style={{ flex: 1 }}
+            >
+              Avbryt
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button
+          type="button"
+          className="action-link-btn"
+          onClick={() => setIsExpanded(true)}
+        >
+          {buttonLabel}
+        </button>
+      )}
+    </div>
+  );
+}
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -15,6 +136,11 @@ export default function RegisterPage() {
   const [fieldErrors, setFieldErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState({
+    certificates: [],
+    recommendations: [],
+  });
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -73,20 +199,20 @@ export default function RegisterPage() {
 
       // 1. Om man klickar på "Nej"
       if (typ === "Nej") {
-        if (currentList.includes("Nej")) return { ...prev, korkort: [] }; // Klickar ur Nej
-        return { ...prev, korkort: ["Nej"] }; // Klickar i Nej (rensar allt annat)
+        if (currentList.includes("Nej")) return { ...prev, korkort: [] };
+        return { ...prev, korkort: ["Nej"] };
       }
 
       // 2. Om man klickar på något annat än Nej, måste Nej rensas bort
       currentList = currentList.filter((item) => item !== "Nej");
 
       if (currentList.includes(typ)) {
-        // Om den redan var ikryssad, ta bort den
+        // Om den redan var ikryssad
         currentList = currentList.filter((item) => item !== typ);
       } else {
         currentList.push(typ);
 
-        //Om man klickar i C, lägg automatiskt till B i bakgrunden (om den inte redan finns)
+        //Om man klickar i C lägg automatiskt till B i bakgrunden (om den inte redan finns)
         if (typ === "C" && !currentList.includes("B")) currentList.push("B");
         // Samma för A och AM
         if (typ === "A" && !currentList.includes("AM")) currentList.push("AM");
@@ -161,6 +287,23 @@ export default function RegisterPage() {
         return false;
       }
 
+      const phoneDigits = formData.phone.replace(/[\s-]/g, "");
+      if (!/^\d{7,15}$/.test(phoneDigits)) {
+        setErrorMsg(
+          "Ange ett giltigt telefonnummer (minst 7 siffror, utan landskod).",
+        );
+        setFieldErrors({ phone: true });
+        return false;
+      }
+      const normalizedPhone = normalizePhoneNumber(formData.phone);
+
+      if (!/^0\d{9}$/.test(normalizedPhone)) {
+        setFieldErrors((prevErrors) => ({
+          ...prevErrors,
+          phone: "Ogiltigt telefonnummer. Ange 10 siffror inkl. 0 i början.",
+        }));
+      }
+
       if (formData.email !== formData.confirmEmail) {
         setErrorMsg("Mejladresserna stämmer inte överens.");
         setFieldErrors({ email: true, confirmEmail: true });
@@ -173,16 +316,27 @@ export default function RegisterPage() {
         return false;
       }
 
-      const hasNumber = /\d/;
-      const hasSymbol = /[!@#$%^&*(),.?":{}|<>_]/;
+      const pwd = formData.password;
+      const hasDigit = /\d/.test(pwd);
+      const hasLower = /[a-z]/.test(pwd);
+      const hasUpper = /[A-Z]/.test(pwd);
+      const hasSymbol = /[^a-zA-Z0-9]/.test(pwd);
+
       if (
-        formData.password.length < 8 ||
-        !hasNumber.test(formData.password) ||
-        !hasSymbol.test(formData.password)
+        pwd.length < 12 ||
+        !hasDigit ||
+        !hasLower ||
+        !hasUpper ||
+        !hasSymbol
       ) {
-        setErrorMsg(
-          "Lösenordet måste vara minst 8 tecken och innehålla både en siffra och en symbol.",
-        );
+        const missing = [];
+        if (pwd.length < 12) missing.push("minst 12 tecken");
+        if (!hasUpper) missing.push("en stor bokstav");
+        if (!hasLower) missing.push("en liten bokstav");
+        if (!hasDigit) missing.push("en siffra");
+        if (!hasSymbol) missing.push("ett specialtecken");
+
+        setErrorMsg(`Lösenordet måste innehålla: ${missing.join(", ")}.`);
         setFieldErrors({ password: true });
         return false;
       }
@@ -221,38 +375,78 @@ export default function RegisterPage() {
   };
 
   const handleNext = async () => {
-  if (!validateStep()) return;
+    if (!validateStep()) return;
 
-  if (currentStep < 4) {
-    setCurrentStep(currentStep + 1);
-    window.scrollTo(0, 0);
-  } else {
-    try {
-      // TODO: PRODUKTION - Använd API_URL från authService istället för hårdkodad URL
-      // HUR: Importera API_URL från '../services/authService' och använd `${API_URL}/register/volunteer`
-      const response = await axios.post('https://localhost:7007/register/volunteer', {
-        email: formData.email,
-        password: formData.password,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phoneNumber: formData.phone,
-        municipality: formData.kommun,
-        driverLicense: formData.korkort.join(', '),
-        availability: formData.availability.join(', '),
-        maxDistanceKm: formData.distanceAny ? null : formData.distance,
-        notificationPreference: formData.notificationLevel,
-        emailNotifications: formData.emailNotification === 'Ja',
-        interests: formData.categories,
-        bio: '',
-        profileImageUrl: ''
-      });
-      saveSession(response.data);
-      navigate('/missions');
-    } catch (error) {
-      setErrorMsg('Något gick fel vid registreringen. Försök igen.');
+    if (currentStep === 1) {
+      setIsSubmitting(true);
+      try {
+        const result = await checkAvailability(formData.email, formData.phone);
+
+        if (result.emailTaken && result.phoneTaken) {
+          setErrorMsg(
+            "Både mejladressen och telefonnumret är redan registrerade.",
+          );
+          setFieldErrors({ email: true, confirmEmail: true, phone: true });
+          return;
+        }
+        if (result.emailTaken) {
+          setErrorMsg("Det finns redan ett konto med den här mejladressen.");
+          setFieldErrors({ email: true, confirmEmail: true });
+          return;
+        }
+        if (result.phoneTaken) {
+          setErrorMsg("Det finns redan ett konto med det här telefonnumret.");
+          setFieldErrors({ phone: true });
+          return;
+        }
+      } finally {
+        setIsSubmitting(false);
+      }
     }
-  }
-};
+
+    if (currentStep < 4) {
+      setCurrentStep(currentStep + 1);
+      window.scrollTo(0, 0);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrorMsg("");
+
+    try {
+      await registerVolunteer(formData);
+
+      const allFiles = [
+        ...pendingFiles.certificates.map((f) => ({
+          ...f,
+          category: "certificate",
+        })),
+        ...pendingFiles.recommendations.map((f) => ({
+          ...f,
+          category: "certificate",
+        })),
+      ];
+
+      for (const item of allFiles) {
+        try {
+          await uploadFile({
+            file: item.file,
+            category: item.category,
+            title: item.title,
+          });
+        } catch (uploadErr) {
+          console.warn("Kunde inte ladda upp fil:", item.file.name, uploadErr);
+        }
+      }
+
+      navigate("/profile");
+    } catch (err) {
+      setErrorMsg(err.message || "Något gick fel. Försök igen.");
+      window.scrollTo(0, 0);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handlePrev = () => {
     setErrorMsg("");
@@ -406,8 +600,8 @@ export default function RegisterPage() {
         {errorMsg && <div className="error-msg-box">{errorMsg}</div>}
 
         {/* ==========================================================================
-            STEG 1: PERSONUPPGIFTER
-            ========================================================================== */}
+          STEG 1: PERSONUPPGIFTER
+          ========================================================================== */}
         {currentStep === 1 && (
           <>
             <input
@@ -417,6 +611,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               className={`text-input ${fieldErrors.firstName ? "input-error" : ""}`}
               placeholder="Förnamn *"
+              autoComplete="given-name"
             />
             <input
               type="text"
@@ -425,6 +620,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               className={`text-input ${fieldErrors.lastName ? "input-error" : ""}`}
               placeholder="Efternamn *"
+              autoComplete="family-name"
             />
             <input
               type="email"
@@ -433,6 +629,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               className={`text-input ${fieldErrors.email ? "input-error" : ""}`}
               placeholder="Mejl *"
+              autoComplete="email"
             />
             <input
               type="email"
@@ -441,6 +638,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               className={`text-input ${fieldErrors.confirmEmail ? "input-error" : ""}`}
               placeholder="Bekräfta mejladress *"
+              autoComplete="off"
             />
 
             <div className="phone-section">
@@ -458,6 +656,8 @@ export default function RegisterPage() {
                   onChange={handleChange}
                   className={`text-input ${fieldErrors.phone ? "input-error" : ""}`}
                   style={{ flex: 1 }}
+                  autoComplete="tel"
+                  inputMode="tel"
                 />
               </div>
             </div>
@@ -470,6 +670,7 @@ export default function RegisterPage() {
                 onChange={handleChange}
                 className={`text-input ${fieldErrors.password ? "input-error" : ""}`}
                 placeholder="Lösenord *"
+                autoComplete="new-password"
               />
               <button
                 type="button"
@@ -490,6 +691,7 @@ export default function RegisterPage() {
                 onChange={handleChange}
                 className={`text-input ${fieldErrors.confirmPassword ? "input-error" : ""}`}
                 placeholder="Bekräfta lösenord *"
+                autoComplete="new-password"
               />
               <button
                 type="button"
@@ -560,7 +762,6 @@ export default function RegisterPage() {
               }
             >
               {["B", "AM", "A", "C", "Nej"].map((typ) => {
-                // Vi använder vår funktion för att kolla om just denna knapp ska vara låst
                 const disabled = isKorkortDisabled(typ);
 
                 return (
@@ -590,15 +791,45 @@ export default function RegisterPage() {
               })}
             </div>
 
-            <h3 className="form-section-title" style={{ marginTop: "1.5rem" }}>
-              Har du något intyg?*
-            </h3>
-            <button className="action-link-btn">+ Ladda upp</button>
+            {/* INTYG */}
+            <PendingFileUploader
+              label="Har du något intyg?"
+              files={pendingFiles.certificates}
+              onAdd={(f) =>
+                setPendingFiles((prev) => ({
+                  ...prev,
+                  certificates: [...prev.certificates, f],
+                }))
+              }
+              onRemove={(i) =>
+                setPendingFiles((prev) => ({
+                  ...prev,
+                  certificates: prev.certificates.filter((_, idx) => idx !== i),
+                }))
+              }
+              buttonLabel="+ Ladda upp"
+            />
 
-            <h3 className="form-section-title" style={{ marginTop: "1.5rem" }}>
-              Har du några rekommendationer?
-            </h3>
-            <button className="action-link-btn">+ Lägg till</button>
+            {/* REKOMMENDATIONER */}
+            <PendingFileUploader
+              label="Har du några rekommendationer?"
+              files={pendingFiles.recommendations}
+              onAdd={(f) =>
+                setPendingFiles((prev) => ({
+                  ...prev,
+                  recommendations: [...prev.recommendations, f],
+                }))
+              }
+              onRemove={(i) =>
+                setPendingFiles((prev) => ({
+                  ...prev,
+                  recommendations: prev.recommendations.filter(
+                    (_, idx) => idx !== i,
+                  ),
+                }))
+              }
+              buttonLabel="+ Lägg till"
+            />
           </>
         )}
 
@@ -842,8 +1073,16 @@ export default function RegisterPage() {
             Föregående
           </button>
 
-          <button className="btn-primary" onClick={handleNext}>
-            {currentStep === 4 ? "Kom igång" : "Nästa"}
+          <button
+            className="btn-primary"
+            onClick={handleNext}
+            disabled={isSubmitting}
+          >
+            {isSubmitting
+              ? "Skickar..."
+              : currentStep === 4
+                ? "Kom igång"
+                : "Nästa"}
           </button>
         </div>
       </div>

@@ -2,6 +2,11 @@
 
 :root {
   --primary-blue: #2a43a6;
+
+  --darker-blue: #1c2d73;
+  --lighter-blue: #3b59d6;
+  --soft-blue: #e8ecf8;
+
   --bg-white: #ffffff;
   --text-dark: #1a1a1a;
   --text-light: #ffffff;
@@ -653,6 +658,88 @@ body {
 
 .action-link-btn:hover {
   text-decoration: underline;
+}
+/* ==========================================================================
+   FILUPPLADDNING I REGISTRERINGSFORMULÄRET
+   ========================================================================== */
+
+.register-file-section {
+  margin-bottom: 1.5rem;
+}
+
+.register-file-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.75rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.register-file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.85rem;
+  background: var(--bg-white, white);
+  border: 1.5px solid var(--primary-blue, #2a43a6);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--text-dark, #1a1a1a);
+}
+
+.register-file-remove {
+  background: transparent;
+  border: none;
+  color: #999;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 4px;
+  transition: color 0.15s;
+}
+
+.register-file-remove:hover {
+  color: #dc2626;
+}
+
+.register-file-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1rem;
+  background: var(--gray-light, #f9fafb);
+  border-radius: 12px;
+  border: 1px solid var(--gray-border, #d1d5db);
+  margin-top: 0.5rem;
+}
+
+.register-file-pick {
+  display: block;
+  padding: 0.85rem;
+  background: white;
+  border: 1.5px dashed var(--primary-blue, #2a43a6);
+  border-radius: 10px;
+  color: var(--primary-blue, #2a43a6);
+  font-size: 0.9rem;
+  text-align: center;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+
+.register-file-pick:hover {
+  background: rgba(42, 67, 166, 0.05);
+}
+
+.register-file-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.register-file-actions .btn-primary,
+.register-file-actions .btn-outline-blue {
+  padding: 0.7rem;
+  font-size: 0.9rem;
 }
 
 /* ==========================================================================

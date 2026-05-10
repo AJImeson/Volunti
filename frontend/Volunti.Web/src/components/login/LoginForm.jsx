@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LoginForm.css";
-import { loginUser, saveSession } from "../../services/authService";
+import { loginUser } from "../../services/authService";
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -24,7 +24,6 @@ export default function LoginForm() {
 
     try {
       const user = await loginUser(email, password);
-      saveSession(user);
       console.log("Inloggad som:", user);
       navigate("/missions");
     } catch (error) {

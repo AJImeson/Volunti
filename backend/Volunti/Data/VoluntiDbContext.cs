@@ -23,7 +23,11 @@ namespace Volunti.Data
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
         public DbSet<OrganizationMember> OrganizationMembers { get; set; }
-
+        
+        public DbSet<VolunteerFile> VolunteerFiles { get; set; }
+        
+        public DbSet<VolunteerExperience> VolunteerExperiences { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
