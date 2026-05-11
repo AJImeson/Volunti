@@ -1027,7 +1027,7 @@ const Profile = ({ setView }) => {
           <div className="profile-info">
             <h2>{fullName}</h2>
             <div className="profile-stats">
-              <span>{user.muncipilaity || "–"}</span>
+              <span>{user.municipality || "–"}</span>
               <span className="separator">|</span>
               <span>Volontär</span>
             </div>
