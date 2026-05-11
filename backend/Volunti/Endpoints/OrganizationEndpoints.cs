@@ -57,6 +57,39 @@ namespace Volunti.Endpoints
 
                 return Results.Ok(new { newUser.Email, org.OrganizationId });
             }).RequireAuthorization(policy => policy.RequireRole("OrgAdmin"));
+
+
+            // Endpoint för att ta bort en organization
+            app.MapDelete("/organizations/{id}", async (int id, VoluntiDbContext db, HttpContext http) =>
+            {
+                var userIdClaim = http.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+                if (userIdClaim == null)
+                    return Results.Unauthorized();
+
+                if (!int.TryParse(userIdClaim, out var userId))
+                    return Results.Unauthorized();
+
+                var isAdmin = http.User.IsInRole("Admin");
+
+                var organization = await db.Organizations.Include(o => o.Jobs).FirstOrDefaultAsync(o => o.OrganizationId == id);
+
+                if (organization == null)
+                    return Results.NotFound("Organization hittades inte.");
+
+                if (!isAdmin && organization.UserId != userId)
+                    return Results.BadRequest("Du har inte behörighet att ta bort denna organization.");
+
+                db.Jobs.RemoveRange(organization.Jobs);
+
+                db.Organizations.Remove(organization);
+
+                await db.SaveChangesAsync();
+
+                return Results.Ok($"Organization: '{organization.OrgName}' med id: '{organization.OrganizationId}' togs bort.");
+            })
+            .RequireAuthorization();
+
         }
     }
 }
