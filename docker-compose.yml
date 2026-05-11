@@ -3,6 +3,7 @@ services:
     image: ${CI_REGISTRY_IMAGE}/backend:${IMAGE_TAG}
     environment:
       - ConnectionStrings__DefaultConnection=Server=mssql;Database=Burgundy;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True
+      - Jwt__Key=${JWT__SigningKey}
       - ASPNETCORE_HTTP_PORTS=8080
       - Jwt__Issuer=https://api-${PUBLIC_HOST}.doe25.swarm.chas-lab.dev
       - Jwt__Audience=https://${PUBLIC_HOST}.doe25.swarm.chas-lab.dev
