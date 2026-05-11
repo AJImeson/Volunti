@@ -9,12 +9,12 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 PORTAINER_URL = os.getenv("PORTAINER_URL")
 API_KEY = os.getenv("PORTAINER_TOKEN")
 
-DEFAULT_STACK_NAME = f"volunti-{os.getenv('CI_PROJECT_NAME')}'{os.getenv('CI_COMMIT_REF_SLUG')}"
+DEFAULT_STACK_NAME = f"volunti-{os.getenv('CI_PROJECT_NAME')}-{os.getenv('CI_COMMIT_REF_SLUG')}"
 STACK_NAME = os.getenv("STACK_NAME", DEFAULT_STACK_NAME)
 COMPOSE_FILE = os.getenv("COMPOSE_FILE", "docker-compose.yml")
 
 SUBSTITUTE_VARS = os.getenv("SUBSTITUTE_VARS", "false").lower() == "true"
-PUBLIC_HOST = os.getenv("PUBLIC_HOST")
+PUBLIC_HOST = os.getenv("PUBLIC_HOST", "")
 mssql_sa_password = os.getenv("MSSQL_SA_PASSWORD", "")
 jwt_signing_key = os.getenv("JWT__SigningKey", "")
 ENDPOINT_ID = 8
@@ -77,20 +77,21 @@ def deploy_stack(endpoint_id, swarm_id):
                 f"content: |\n{indented}"
         )
 
+    compose_content = compose_content.replace("${MSSQL_SA_PASSWORD}", mssql_sa_password)
+    compose_content = compose_content.replace("${JWT__SigningKey}", jwt_signing_key)
+    compose_content = compose_content.replace("${STACK_NAME}", STACK_NAME)
+    compose_content = compose_content.replace("${PUBLIC_HOST}", PUBLIC_HOST)
+
     if SUBSTITUTE_VARS:
         image_path = os.getenv("CI_REGISTRY_IMAGE", "")
         image_tag = os.getenv("IMAGE_TAG", "latest")
         project_slug = os.getenv("CI_PROJECT_NAME", "my-project").lower()
 
 
-    compose_content = compose_content.replace("${CI_REGISTRY_IMAGE}", image_path)
-    compose_content = compose_content.replace("${IMAGE_TAG}", image_tag)
-    compose_content = compose_content.replace("${STACK_NAME}", STACK_NAME)
-    compose_content = compose_content.replace("${PUBLIC_HOST}", PUBLIC_HOST)
-    compose_content = compose_content.replace("${PROJECT_SLUG}", project_slug)
-    compose_content = compose_content.replace("${MSSQL_SA_PASSWORD}", mssql_sa_password)
-    compose_content = compose_content.replace("${JWT__SigningKey}", jwt_signing_key)
-    print(f"DEBUG: Image line is: {[line for line in compose_content.splitlines() if 'image:' in line]}")
+        compose_content = compose_content.replace("${CI_REGISTRY_IMAGE}", image_path)
+        compose_content = compose_content.replace("${IMAGE_TAG}", image_tag)
+        compose_content = compose_content.replace("${PROJECT_SLUG}", project_slug)
+        print(f"DEBUG: Image line is: {[line for line in compose_content.splitlines() if 'image:' in line]}")
 
 
     stack_url = f"{PORTAINER_URL}/api/stacks"
