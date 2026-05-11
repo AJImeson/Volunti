@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   registerVolunteer,
   checkAvailability,
@@ -123,7 +124,8 @@ function PendingFileUploader({
   );
 }
 
-export default function RegisterPage({ setView }) {
+export default function RegisterPage() {
+  const navigate = useNavigate();
   /* ==========================================================================
      STATE OCH MINNE
      ========================================================================== */
@@ -437,7 +439,7 @@ export default function RegisterPage({ setView }) {
         }
       }
 
-      setView("profile");
+      navigate("/profile");
     } catch (err) {
       setErrorMsg(err.message || "Något gick fel. Försök igen.");
       window.scrollTo(0, 0);
@@ -452,14 +454,12 @@ export default function RegisterPage({ setView }) {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     } else {
-      setView("landing");
+      navigate("/landing");
     }
   };
 
   const handleLogoClick = () => {
-    if (typeof setView === "function") {
-      setView("landing");
-    }
+    navigate("/landing");
   };
 
   /* ==========================================================================
@@ -556,7 +556,7 @@ export default function RegisterPage({ setView }) {
         >
           VOLUNTI
         </h1>
-        <button className="btn-nav-login" onClick={() => setView("login")}>
+        <button className="btn-nav-login" onClick={() => navigate("/login")}>
           Logga in
         </button>
       </div>
