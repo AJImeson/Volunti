@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using Volunti.Interfaces;
 using Volunti.Service;
 using Volunti.Endpoints;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -103,7 +104,11 @@ if (!Directory.Exists(wwwroot))
     Directory.CreateDirectory(wwwroot);
 }
 
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(wwwroot),
+    RequestPath = ""
+});
 
 var uploadsRoot = Path.Combine(builder.Environment.ContentRootPath, "uploads");
 if (!Directory.Exists(uploadsRoot))
