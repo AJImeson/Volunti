@@ -86,6 +86,42 @@ namespace Volunti.Endpoints
             })
             .RequireAuthorization();
 
+
+
+            // Endpoint för att ta bort ett jobb
+            app.MapDelete("/jobs/{id}", async (int id, VoluntiDbContext db, HttpContext http) =>
+            {
+                var userIdClaim = http.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+                if (userIdClaim == null)
+                    return Results.Unauthorized();
+
+                if (!int.TryParse(userIdClaim, out var userId))
+                    return Results.Unauthorized();
+
+                var isAdmin = http.User.IsInRole("Admin");
+
+                var organization = await db.Organizations.FirstOrDefaultAsync(o => o.UserId == userId);
+
+                var job = await db.Jobs.FindAsync(id);
+
+                if (job == null)
+                    return Results.NotFound("Jobbet hittades inte.");
+
+
+                if (!isAdmin && (organization == null || job.OrganizationId != organization.OrganizationId))
+                    return Results.BadRequest("Du har inte behörighet att ta bort detta jobb.");
+
+
+                db.Jobs.Remove(job);
+
+                await db.SaveChangesAsync();
+
+                return Results.Ok($"Jobb: '{job.Title}' med id: '{job.JobId}' togs bort.");
+
+            })
+            .RequireAuthorization();
+
         }
     }
 }
