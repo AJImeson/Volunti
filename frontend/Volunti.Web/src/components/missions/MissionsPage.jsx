@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./MissionsPage.css";
 import { MissionDetailsModal, MissionAcceptedModal } from "./MissionModal";
 
@@ -65,7 +66,8 @@ const mockMissions = [
   },
 ];
 
-export default function MissionsPage({ setView }) {
+export default function MissionsPage() {
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState("feed");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -102,7 +104,7 @@ export default function MissionsPage({ setView }) {
           <button
             className="icon-btn"
             aria-label="Profil"
-            onClick={() => setView("profile")}
+            onClick={() => navigate("/profile")}
           >
             <svg
               width="24"
@@ -121,7 +123,7 @@ export default function MissionsPage({ setView }) {
           <button
             className="icon-btn"
             aria-label="Inställningar"
-            onClick={() => setView("settings")}
+            onClick={() => navigate("/settings")}
           >
             <svg
               width="24"
