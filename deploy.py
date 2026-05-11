@@ -11,7 +11,7 @@ API_KEY = os.getenv("PORTAINER_TOKEN")
 STACK_NAME = f"volunti-{os.getenv('CI_PROJECT_NAME')}-{os.getenv('CI_COMMIT_REF_SLUG')}"
 PUBLIC_HOST = os.getenv("PUBLIC_HOST")
 mssql_sa_password = os.getenv("MSSQL_SA_PASSWORD", "")
-jwt_signing_key = os.getenv("JWT_SIGNING_KEY", "")
+jwt_signing_key = os.getenv("JWT__SigningKey", "")
 ENDPOINT_ID = 8
 
 # Load the compose-file
@@ -75,7 +75,7 @@ def deploy_stack(endpoint_id, swarm_id):
     compose_content = compose_content.replace("${PUBLIC_HOST}", PUBLIC_HOST)
     compose_content = compose_content.replace("${PROJECT_SLUG}", project_slug)
     compose_content = compose_content.replace("${MSSQL_SA_PASSWORD}", mssql_sa_password)
-    compose_content = compose_content.replace("${JWT_SIGNING_KEY}", jwt_signing_key)
+    compose_content = compose_content.replace("${JWT__SigningKey}", jwt_signing_key)
     print(f"DEBUG: Image line is: {[line for line in compose_content.splitlines() if 'image:' in line]}")
 
     stack_url = f"{PORTAINER_URL}/api/stacks"
