@@ -4,6 +4,9 @@ services:
     environment:
       - ConnectionStrings__DefaultConnection=Server=mssql;Database=Burgundy;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True
       - ASPNETCORE_HTTP_PORTS=8080
+      - JWT__Issuer=https://api-${PUBLIC_HOST}.doe25.swarm.chas-lab.dev
+      - JWT__Audience=https://${PUBLIC_HOST}.doe25.swarm.chas-lab.dev
+      - JWT__SigningKey=3e21136c-c9be-4e85-80e2-e31bc04bad90cf439168-9b51-4657-bcbc-4f0b185247ec18b52dca-eb10-4f9d-a970-8bb4941a470c
     networks:
       - traefik-public
       - internal
