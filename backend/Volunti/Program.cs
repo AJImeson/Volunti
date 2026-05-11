@@ -73,12 +73,21 @@ builder.Services.AddCors(options =>
         }
         else
         {
-            policy.WithOrigins(
+            policy.SetIsOriginAllowed(origin =>
+            {
+                var allowedHosts = new[]
+                {
                     "https://volunti.se",
                     "https://volunti.doe25.swarm.chas-lab.dev"
-                )
-                .AllowAnyHeader()
-                .AllowAnyMethod();
+                };
+                if (allowedHosts.Contains(origin)) return true;
+                
+                // Tillåt review-environments
+                var uri = new Uri(origin);
+                return uri.Host.EndsWith(".doe25.swarm.chas-lab.dev");
+            })
+            .AllowAnyHeader()
+            .AllowAnyMethod();
         }
     });
 });
