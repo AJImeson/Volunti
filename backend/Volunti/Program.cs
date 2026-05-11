@@ -73,9 +73,12 @@ builder.Services.AddCors(options =>
         }
         else
         {
-            policy.WithOrigins("https://volunti.se")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
+            policy.WithOrigins(
+                    "https://volunti.se",
+                    "https://volunti.doe25.swarm.chas-lab.dev"
+                )
+                .AllowAnyHeader()
+                .AllowAnyMethod();
         }
     });
 });
