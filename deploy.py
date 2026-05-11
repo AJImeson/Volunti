@@ -3,20 +3,22 @@ import os
 import sys
 import urllib3
 import json
+import base64
+import hashlib
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # From Gitlab CI/CD
 PORTAINER_URL = os.getenv("PORTAINER_URL")
 API_KEY = os.getenv("PORTAINER_TOKEN")
 
-DEFAULT_STACK_NAME = f"volunti-{os.getenv('CI_PROJECT_NAME')}-{os.getenv('CI_COMMIT_REF_SLUG')}"
+DEFAULT_STACK_NAME = f"volunti-{os.getenv('CI_PROJECT_NAME')}{os.getenv('CI_COMMIT_REF_SLUG')}"
 STACK_NAME = os.getenv("STACK_NAME", DEFAULT_STACK_NAME)
 COMPOSE_FILE = os.getenv("COMPOSE_FILE", "docker-compose.yml")
 
 SUBSTITUTE_VARS = os.getenv("SUBSTITUTE_VARS", "false").lower() == "true"
-PUBLIC_HOST = os.getenv("PUBLIC_HOST", "")
+PUBLIC_HOST = os.getenv("PUBLIC_HOST")
 mssql_sa_password = os.getenv("MSSQL_SA_PASSWORD", "")
-jwt_signing_key = os.getenv("JWT__SigningKey", "")
+GRAFANA_PASSWORD = os.getenv("GRAFANA_PASSWORD", "")
 ENDPOINT_ID = 8
 
 if not PORTAINER_URL or not API_KEY:
@@ -62,37 +64,56 @@ def get_swarm_id(endpoint_id):
         print(f"Error fetching swarm ID: {e}")
         return None
 
+def configuration_check(endpoint_id,set_name, file_path):
+    with open(file_path, "r") as f:
+           content = f.read()
+
+    backend_host = os.getenv("BACKEND_HOST", "")
+    content = content.replace("${BACKEND_HOST}", backend_host)
+
+    suffix = hashlib.sha256(content.encode()).hexdigest()[:8]
+    name = f"{set_name}_{suffix}"
+ 
+    list_url = f"{PORTAINER_URL}/api/endpoints/{endpoint_id}/docker/configs"
+    r = requests.get(list_url, headers=headers, verify=False)
+    r.raise_for_status()
+
+    if any(c["Spec"]["Name"] == name for c in r.json()):
+           print(f"Config '{name}' already exists.")
+           return name
+
+    create_url = f"{PORTAINER_URL}/api/endpoints/{endpoint_id}/docker/configs/create"
+    payload = {
+        "Name": name,
+        "Data": base64.b64encode(content.encode()).decode(),
+    }
+    r = requests.post(create_url, headers=headers, json=payload, verify=False)
+    r.raise_for_status()
+    print(f"Swarm config set: '{name}'")
+    return name
+
 def deploy_stack(endpoint_id, swarm_id):
 # Deploying stack to Portainer
     with open(COMPOSE_FILE, 'r') as f:
         compose_content = f.read()
 
-    prometheus_path = os.path.join(os.path.dirname(COMPOSE_FILE), "prometheus.yml")
-    if os.path.exists(prometheus_path):
-        with open(prometheus_path, 'r') as f:
-            prometheus_content = f.read()
-        indented = "\n".join("  " + line for line in prometheus_content.splitlines())
-        compose_content = compose_content.replace(
-                "file: ./prometheus.yml",
-                f"content: |\n{indented}"
-        )
-
-    compose_content = compose_content.replace("${MSSQL_SA_PASSWORD}", mssql_sa_password)
-    compose_content = compose_content.replace("${JWT__SigningKey}", jwt_signing_key)
-    compose_content = compose_content.replace("${STACK_NAME}", STACK_NAME)
-    compose_content = compose_content.replace("${PUBLIC_HOST}", PUBLIC_HOST)
+    
 
     if SUBSTITUTE_VARS:
         image_path = os.getenv("CI_REGISTRY_IMAGE", "")
         image_tag = os.getenv("IMAGE_TAG", "latest")
         project_slug = os.getenv("CI_PROJECT_NAME", "my-project").lower()
 
-
         compose_content = compose_content.replace("${CI_REGISTRY_IMAGE}", image_path)
         compose_content = compose_content.replace("${IMAGE_TAG}", image_tag)
+        compose_content = compose_content.replace("${STACK_NAME}", STACK_NAME)
+        compose_content = compose_content.replace("${PUBLIC_HOST}", PUBLIC_HOST or "")
         compose_content = compose_content.replace("${PROJECT_SLUG}", project_slug)
-        print(f"DEBUG: Image line is: {[line for line in compose_content.splitlines() if 'image:' in line]}")
+        compose_content = compose_content.replace("${MSSQL_SA_PASSWORD}", mssql_sa_password)
+        compose_content = compose_content.replace("${GRAFANA_PASSWORD}", GRAFANA_PASSWORD)
+        compose_content = compose_content.replace("${PROMETHEUS_CONFIG_NAME}", os.getenv("PROMETHEUS_CONFIG_NAME", ""))
 
+        print(f"DEBUG: Image line is: {[line for line in compose_content.splitlines() if 'image:' in line]}")
 
     stack_url = f"{PORTAINER_URL}/api/stacks"
     params = {"filters": json.dumps({"Name": [STACK_NAME]})}
@@ -132,6 +153,11 @@ if __name__ == "__main__":
     if eid:
         sid = get_swarm_id(eid)
         print(f"Using Endpoint ID: {eid} with Swarm ID: {sid}")
+
+        prometheus_path = os.path.join(os.path.dirname(COMPOSE_FILE), "prometheus.yml")
+        if os.path.exists(prometheus_path):
+            os.environ["PROMETHEUS_CONFIG_NAME"] = configuration_check(eid, "prometheus_config", prometheus_path)
+
         deploy_stack(eid, sid)
     else:
         print("No endpoints found in Portainer.")
