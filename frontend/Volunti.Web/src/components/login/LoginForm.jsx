@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LoginForm.css";
-import { loginUser } from "../../services/authService";
+import { loginUser, getToken } from "../../services/authService";
+
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -24,8 +25,18 @@ export default function LoginForm() {
 
     try {
       const user = await loginUser(email, password);
+      const token = getToken(); // Get JWT token from authService
+      const payload = JSON.parse(atob(token.split(".")[1])); // split the token and take the middle part and then parse from B64 to string
+      const role = payload.role; // put the role, Volunteer, OrgAdmin, Orguser
       console.log("Inloggad som:", user);
-      navigate("/missions");
+      if (role === "OrgAdmin") {
+        navigate("/org-dashboard");
+      } 
+      else if (role === "OrgUser") {
+        navigate("/org-user-dashboard");
+      } else {
+        navigate("/missions");
+    }
     } catch (error) {
       setErrorMsg(error.message);
     } finally {
