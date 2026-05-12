@@ -1,7 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.AspNetCore.Identity;
 using Volunti.Interfaces;
 using Volunti.Models;
 using Microsoft.IdentityModel.Tokens;
@@ -19,14 +18,15 @@ namespace Volunti.Service
             _config = config;
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"] ?? throw new Exception("Jwt:Key missing")));
         }
-        public string CreateToken(AppUser user)
+        public string CreateToken(AppUser user, IList<string> roles)
         {
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Email, user.Email!),
                 new Claim(JwtRegisteredClaimNames.GivenName, user.UserName!),
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Role, roles.FirstOrDefault() ?? "")
             };
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
@@ -46,5 +46,7 @@ namespace Volunti.Service
 
             return tokenHandler.WriteToken(token);
         }
+
+       
     }
 }
