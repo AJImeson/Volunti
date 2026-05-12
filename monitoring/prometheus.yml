@@ -28,7 +28,7 @@ scrape_configs:
           - 'tasks.cadvisor'
         type: 'A'
         port: 8080
-    relabel_config:
+    relabel_configs:
       - source_labels: [__adress__]
         target_label: host
         regex: '^([^:]+):\d+$'
