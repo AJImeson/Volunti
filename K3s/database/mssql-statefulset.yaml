@@ -1,0 +1,49 @@
+# https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mssql-sts
+  namespace: volunti
+spec:
+  selector:
+    matchLabels:
+      app: mssql-sts # has to match .spec.template.metadata.labels
+  serviceName: "mssql-sts"
+  replicas: 3 # by default is 1
+  template:
+    metadata:
+      labels:
+        app: mssql-sts # has to match .spec.selector.matchLabels
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: mssql-sts
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        ports:
+        - containerPort: 1433
+          name: mssql
+        env:
+          - name: ACCEPT_EULA
+            value: "Y"
+          - name: MSSQL_PID
+            value: "Developer"
+          - name: SA_PASSWORD
+            #valueFrom: behöver lära mig hur man gjorde med secrets från lektionen
+            #secretKeyRef:
+            #name:
+            #Key:
+        volumeMounts:
+        - name: mssql-data
+          mountPath: /var/opt/mssql
+  volumeClaimTemplates:
+  - metadata:
+      name: mssql-data
+    spec:
+      storageClassName: # vet inte än
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 5Gi
+---
+
