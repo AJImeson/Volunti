@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./LoginForm.css";
 import { loginUser, getToken } from "../../services/authService";
 
 
 export default function LoginForm() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const sessionMessage = location.state?.message;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -106,6 +108,10 @@ export default function LoginForm() {
         <h2 className="login-card-title">Logga in</h2>
 
         {errorMsg && <div className="error-msg-box">{errorMsg}</div>}
+
+        {sessionMessage && (
+          <div className="error-msg-box">{sessionMessage}</div>
+        )}
 
         <form onSubmit={handleLogin} className="login-form">
           <input
