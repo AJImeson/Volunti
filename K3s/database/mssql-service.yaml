@@ -1,0 +1,17 @@
+# https://kubernetes.io/docs/concepts/services-networking/service/
+apiVersion: v1
+kind: Service
+metadata:
+  name: mssql-service
+  namespace: volunti
+spec:
+  selector:
+    app: mssql                  #behövs det nå labels?? och ska man döpa targetPort till ett namn? och sen göra samma i poden?
+  ports:
+  - name: mssql
+    protocol: TCP
+    port: 1433
+    targetPort: 1433
+  ClusterIP: None
+---
+
