@@ -180,3 +180,37 @@
   color: white;
   box-shadow: 0 10px 20px rgba(47, 68, 165, 0.3);
 }
+
+.user-type-toggle {
+  display: flex;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 4px;
+  margin: 1.5rem auto 0;
+  width: fit-content;
+  gap: 4px;
+}
+
+.user-type-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  padding: 0.55rem 1.6rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.user-type-btn:hover:not(.active) {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.user-type-btn.active {
+  background: #fff;
+  color: var(--primary-blue, #2b3da8);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}

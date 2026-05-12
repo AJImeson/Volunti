@@ -1,96 +1,144 @@
-import React from "react";
-import "./OrgRegister3.css";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const OrgRegister3 = () => {
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    branscher: [],
+    dokumentation: "",
+  });
+
+  const toggleBransch = (value) => {
+    setFormData((prev) => ({
+      ...prev,
+      branscher: prev.branscher.includes(value)
+        ? prev.branscher.filter((b) => b !== value)
+        : [...prev.branscher, value],
+    }));
+  };
+
   return (
-    <div className="app-container">
-      <div className="setup-wrapper">
-        <header className="setup-header">
-          <h1 className="volunti-logo">VOLUNTI</h1>
-          <button className="login-btn">Logga in</button>
-        </header>
+    <div className="auth-wrapper">
+      {/* --- TOPPMENY --- */}
+      <div className="auth-top-nav">
+        <h1
+          className="auth-logo"
+          onClick={() => navigate("/landing")}
+          style={{ cursor: "pointer" }}
+        >
+          VOLUNTI
+        </h1>
+        <button className="btn-nav-login" onClick={() => navigate("/login")}>
+          Logga in
+        </button>
+      </div>
 
-        {/* Stepper */}
-        <div className="stepper-container">
-          <div className="dot"></div>
+      {/* --- VOLONTÄR / ORGANISATION --- */}
+      <div className="user-type-toggle">
+        <button
+          type="button"
+          className="user-type-btn"
+          onClick={() => navigate("/register")}
+        >
+          Volontär
+        </button>
+        <button type="button" className="user-type-btn active">
+          Organisation
+        </button>
+      </div>
+
+      {/* --- HEADER --- */}
+      <div className="auth-header">
+        <div className="stepper">
+          <div className="step-dot active"></div>
           <div className="step-line"></div>
-          <div className="dot"></div>
+          <div className="step-dot active"></div>
           <div className="step-line"></div>
-          <div className="dot active"></div>
+          <div className="step-dot active"></div>
           <div className="step-line"></div>
-          <div className="dot"></div>
+          <div className="step-dot"></div>
         </div>
 
-        <div className="setup-intro">
-          <p className="step-count">Steg 3 av 4</p>
-          <h2 className="setup-title">Vad behöver ni hjälp med?</h2>
-          <p className="setup-subtitle">
-            Fyll i dina uppgifter för att komma igång.
-          </p>
+        <p className="auth-step-text">Steg 3 av 4</p>
+        <h2 className="auth-title">Vad behöver ni hjälp med?</h2>
+        <p className="auth-subtitle">
+          Fyll i era uppgifter för att komma igång.
+        </p>
+      </div>
+
+      {/* --- FORMULÄR --- */}
+      <div className="bottom-sheet-card auth-form-container">
+        <h3 className="form-section-title" style={{ marginTop: 0 }}>
+          Vad är det för bransch?*
+        </h3>
+        <div className="chip-group">
+          {[
+            "Skola",
+            "Äldreomsorg",
+            "Miljö",
+            "Barn och ungdom",
+            "Matutdelning",
+            "Djur",
+            "Administration",
+            "Digital hjälp",
+          ].map((cat) => (
+            <button
+              key={cat}
+              className={`chip-btn ${
+                formData.branscher.includes(cat) ? "active" : ""
+              }`}
+              onClick={() => toggleBransch(cat)}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
 
-        <main className="setup-content-card">
-          {/* Bransch-sektionen */}
-          <div className="form-group">
-            <h3 className="section-label">Vad är det för bransch?*</h3>
-            <div className="pill-grid">
-              <button className="pill-btn">Skola</button>
-              <button className="pill-btn">Äldreomsorg</button>
-              <button className="pill-btn">Miljö</button>
-              <button className="pill-btn">Barn och ungdom</button>
-              <button className="pill-btn">Matutdelning</button>
-              <button className="pill-btn">Djur</button>
-              <button className="pill-btn">Adminstration</button>
-              <button className="pill-btn">Digital hjälp</button>
-            </div>
-          </div>
+        <h3 className="form-section-title">
+          Behövs det dokumentation för att utföra arbetet?
+        </h3>
+        <div className="radio-group">
+          <label className="radio-label">
+            <input
+              type="radio"
+              name="dokumentation"
+              value="Ja"
+              checked={formData.dokumentation === "Ja"}
+              onChange={(e) =>
+                setFormData({ ...formData, dokumentation: e.target.value })
+              }
+            />
+            Ja
+          </label>
+          <label className="radio-label">
+            <input
+              type="radio"
+              name="dokumentation"
+              value="Nej"
+              checked={formData.dokumentation === "Nej"}
+              onChange={(e) =>
+                setFormData({ ...formData, dokumentation: e.target.value })
+              }
+            />
+            Nej
+          </label>
+        </div>
 
-          {/* Dokumentation-sektionen (Radioknappar) */}
-          <div className="form-group">
-            <h3 className="section-label">
-              Behövs det dokumentation för att utföra arbetet?
-            </h3>
-            <div className="radio-group">
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="dokumentation"
-                  value="ja"
-                  className="radio-input"
-                />
-                <span className="radio-custom"></span>
-                Ja
-              </label>
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="dokumentation"
-                  value="nej"
-                  className="radio-input"
-                />
-                <span className="radio-custom"></span>
-                Nej
-              </label>
-            </div>
-          </div>
-
-          <footer className="setup-footer">
-            <button
-              className="btn-back"
-              onClick={() => navigate("/org-register/2")}
-            >
-              Föregående
-            </button>
-            <button
-              className="btn-next"
-              onClick={() => navigate("/org-register/4")}
-            >
-              Kom igång
-            </button>
-          </footer>
-        </main>
+        {/* --- NAVIGERINGSKNAPPAR --- */}
+        <div className="input-row" style={{ marginTop: "2rem" }}>
+          <button
+            className="btn-outline-blue"
+            onClick={() => navigate("/org-register/2")}
+          >
+            Föregående
+          </button>
+          <button
+            className="btn-primary"
+            onClick={() => navigate("/org-register/4")}
+          >
+            Nästa
+          </button>
+        </div>
       </div>
     </div>
   );
