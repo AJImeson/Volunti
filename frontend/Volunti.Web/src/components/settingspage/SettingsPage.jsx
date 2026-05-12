@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./SettingsPage.css";
+import { useNavigate } from "react-router-dom";
 
 /* ==========================================================================
    IKONKOMPONENT
@@ -98,7 +99,8 @@ function Icon({ name, size = 20, className = "" }) {
 /* ==========================================================================
    TOPP NAV 
    ========================================================================== */
-function SettingsTopNav({ setView }) {
+function SettingsTopNav() {
+  const navigate = useNavigate();
   return (
     <div className="settings-top-nav">
       <h1 className="settings-logo">VOLUNTI</h1>
@@ -106,14 +108,14 @@ function SettingsTopNav({ setView }) {
         <button
           className="icon-btn"
           aria-label="Profil"
-          onClick={() => setView("profile")}
+          onClick={() => navigate("/profile")}
         >
           <Icon name="user" size={24} />
         </button>
         <button
           className="icon-btn"
           aria-label="Tillbaka till uppdrag"
-          onClick={() => setView("missions")}
+          onClick={() => navigate("/missions")}
         >
           <Icon name="home" size={24} />
         </button>
@@ -359,7 +361,7 @@ const SUB_VIEW_TITLES = {
   delete: "Radera konto",
 };
 
-export default function SettingsPage({ setView }) {
+export default function SettingsPage() {
   const [subView, setSubView] = useState("menu");
 
   const isMenu = subView === "menu";
@@ -380,7 +382,7 @@ export default function SettingsPage({ setView }) {
 
   return (
     <div className="settings-wrapper">
-      <SettingsTopNav setView={setView} />
+      <SettingsTopNav />
 
       <div className="settings-blue-header">
         {!isMenu && (

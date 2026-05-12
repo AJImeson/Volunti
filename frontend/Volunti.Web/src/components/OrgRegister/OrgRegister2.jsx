@@ -1,7 +1,9 @@
-import React from 'react';
-import './OrgRegister2.css';
+import React from "react";
+import "./OrgRegister2.css";
+import { useNavigate } from "react-router-dom";
 
-const OrgRegister2 = ({ setView }) => {  
+const OrgRegister2 = () => {
+  const navigate = useNavigate();
   return (
     <div className="app-container">
       <div className="setup-wrapper">
@@ -31,7 +33,9 @@ const OrgRegister2 = ({ setView }) => {
             {/* Dropdown för kommun */}
             <div className="input-wrapper">
               <select className="setup-input select-input">
-                <option value="" disabled selected>Välj kommun</option>
+                <option value="" disabled selected>
+                  Välj kommun
+                </option>
                 <option value="stockholm">Stockholm</option>
                 <option value="goteborg">Göteborg</option>
                 <option value="malmo">Malmö</option>
@@ -42,17 +46,27 @@ const OrgRegister2 = ({ setView }) => {
 
             {/* Textarea för beskrivning */}
             <div className="input-wrapper">
-              <textarea 
-                className="setup-input textarea-input" 
+              <textarea
+                className="setup-input textarea-input"
                 placeholder="Berätta kort om er organisation..."
               ></textarea>
             </div>
           </div>
 
-            <footer className="setup-footer">
-                <button className="btn-back" onClick={() => setView("orgRegister1")}>Föregående</button>
-                <button className="btn-next" onClick={() => setView("orgRegister3")}>Nästa</button>
-            </footer>
+          <footer className="setup-footer">
+            <button
+              className="btn-back"
+              onClick={() => navigate("/org-register/1")}
+            >
+              Föregående
+            </button>
+            <button
+              className="btn-next"
+              onClick={() => navigate("/org-register/3")}
+            >
+              Nästa
+            </button>
+          </footer>
         </main>
       </div>
     </div>
