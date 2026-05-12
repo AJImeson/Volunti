@@ -561,6 +561,24 @@ export default function RegisterPage() {
         </button>
       </div>
 
+      {/* --- VOLONTÄR / ORGANISATION --- */}
+      <div className="user-type-toggle">
+        <button
+          type="button"
+          className="user-type-btn active"
+          onClick={() => {}}
+        >
+          Volontär
+        </button>
+        <button
+          type="button"
+          className="user-type-btn"
+          onClick={() => navigate("/org-register/1")}
+        >
+          Organisation
+        </button>
+      </div>
+
       {/* --- DYNAMISK HEADER OCH STEGINDIKATOR --- */}
       <div className="auth-header">
         <div className="stepper">
