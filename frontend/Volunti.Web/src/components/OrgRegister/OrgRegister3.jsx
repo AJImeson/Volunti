@@ -1,7 +1,9 @@
-import React from 'react';
-import './OrgRegister3.css';
+import React from "react";
+import "./OrgRegister3.css";
+import { useNavigate } from "react-router-dom";
 
-const OrgRegister3 = ({ setView }) => { 
+const OrgRegister3 = () => {
+  const navigate = useNavigate();
   return (
     <div className="app-container">
       <div className="setup-wrapper">
@@ -24,11 +26,12 @@ const OrgRegister3 = ({ setView }) => {
         <div className="setup-intro">
           <p className="step-count">Steg 3 av 4</p>
           <h2 className="setup-title">Vad behöver ni hjälp med?</h2>
-          <p className="setup-subtitle">Fyll i dina uppgifter för att komma igång.</p>
+          <p className="setup-subtitle">
+            Fyll i dina uppgifter för att komma igång.
+          </p>
         </div>
 
         <main className="setup-content-card">
-          
           {/* Bransch-sektionen */}
           <div className="form-group">
             <h3 className="section-label">Vad är det för bransch?*</h3>
@@ -46,15 +49,27 @@ const OrgRegister3 = ({ setView }) => {
 
           {/* Dokumentation-sektionen (Radioknappar) */}
           <div className="form-group">
-            <h3 className="section-label">Behövs det dokumentation för att utföra arbetet?</h3>
+            <h3 className="section-label">
+              Behövs det dokumentation för att utföra arbetet?
+            </h3>
             <div className="radio-group">
               <label className="radio-label">
-                <input type="radio" name="dokumentation" value="ja" className="radio-input" />
+                <input
+                  type="radio"
+                  name="dokumentation"
+                  value="ja"
+                  className="radio-input"
+                />
                 <span className="radio-custom"></span>
                 Ja
               </label>
               <label className="radio-label">
-                <input type="radio" name="dokumentation" value="nej" className="radio-input" />
+                <input
+                  type="radio"
+                  name="dokumentation"
+                  value="nej"
+                  className="radio-input"
+                />
                 <span className="radio-custom"></span>
                 Nej
               </label>
@@ -62,8 +77,18 @@ const OrgRegister3 = ({ setView }) => {
           </div>
 
           <footer className="setup-footer">
-            <button className="btn-back" onClick={() => setView("orgRegister2")}>Föregående</button>
-            <button className="btn-next" onClick={() => setView("orgRegister4")}>Kom igång</button>
+            <button
+              className="btn-back"
+              onClick={() => navigate("/org-register/2")}
+            >
+              Föregående
+            </button>
+            <button
+              className="btn-next"
+              onClick={() => navigate("/org-register/4")}
+            >
+              Kom igång
+            </button>
           </footer>
         </main>
       </div>
