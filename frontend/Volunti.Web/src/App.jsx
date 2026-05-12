@@ -45,6 +45,8 @@ export default function App() {
           <Route path="/org-register/2" element={<OrgRegister2 />} />
           <Route path="/org-register/3" element={<OrgRegister3 />} />
           <Route path="/org-register/4" element={<OrgRegister4 />} />
+          <Route path="/org-dashboard" element={<div>OrgAdmin Dashboard - Coming Soon</div>} />
+          <Route path="/org-user-dashboard" element={<div>OrgUser Dashboard - Coming Soon</div>} />
         </Routes>
       </div>
     </BrowserRouter>

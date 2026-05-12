@@ -41,6 +41,7 @@ namespace Volunti.Endpoints
                         return Results.BadRequest(createdUser.Errors.Select(e => e.Description));
 
                     var roleResult = await userManager.AddToRoleAsync(appUser, "Volunteer");
+                    var roles = await userManager.GetRolesAsync(appUser);
                     if (!roleResult.Succeeded)
                         return Results.Problem(string.Join(", ", roleResult.Errors.Select(e => e.Description)), statusCode: 500);
 
@@ -96,7 +97,7 @@ namespace Volunti.Endpoints
                     {
                         UserName = appUser.UserName!,
                         Email = appUser.Email!,
-                        Token = tokenService.CreateToken(appUser)
+                        Token = tokenService.CreateToken(appUser, roles)
                     });
                 }
                 catch (Exception e)
@@ -147,6 +148,8 @@ namespace Volunti.Endpoints
                         return Results.BadRequest(createdUser.Errors.Select(e => e.Description));
 
                     var roleResult = await userManager.AddToRoleAsync(appUser, "OrgAdmin");
+                    var roles = await userManager.GetRolesAsync(appUser);
+
                     if (!roleResult.Succeeded)
                         return Results.Problem(string.Join(", ", roleResult.Errors.Select(e => e.Description)), statusCode: 500);
 
@@ -172,7 +175,7 @@ namespace Volunti.Endpoints
                     {
                         UserName = appUser.UserName!,
                         Email = appUser.Email!,
-                        Token = tokenService.CreateToken(appUser)
+                        Token = tokenService.CreateToken(appUser, roles)
                     });
                 }
                 catch (Exception e)
@@ -192,11 +195,13 @@ namespace Volunti.Endpoints
                 var result = await signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
                 if (!result.Succeeded) return Results.Unauthorized();
 
+                var roles = await userManager.GetRolesAsync(user);
+
                 return Results.Ok(new NewUserDto
                 {
                     UserName = user.UserName!,
                     Email = user.Email!,
-                    Token = tokenService.CreateToken(user)
+                    Token = tokenService.CreateToken(user, roles)
                 });
             });
 
