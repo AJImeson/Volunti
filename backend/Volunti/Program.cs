@@ -121,6 +121,19 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 
+// Repositories
+builder.Services.AddScoped<IJobRepository, JobRepository>();
+builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+builder.Services.AddScoped<IVolunteerRepository, VolunteerRepository>();
+builder.Services.AddScoped<IFileRepository, FileRepository>();
+
+// Services
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IJobService, JobService>();
+builder.Services.AddScoped<IOrganizationService, OrganizationService>();
+builder.Services.AddScoped<IVolunteerProfileService, VolunteerProfileService>();
+builder.Services.AddScoped<IFileService, FileService>();
+
 var app = builder.Build();
 
 //Profilbild
