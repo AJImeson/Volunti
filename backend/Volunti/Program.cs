@@ -142,5 +142,6 @@ OrganizationEndpoints.RegisterEndpoints(app);
 JobEndpoints.RegisterEndpoints(app);
 VolunteerProfileEndpoints.RegisterEndpoints(app); 
 FileEndpoints.RegisterEndpoints(app);
+ApplicationEndpoints.RegisterEndpoints(app);
 
 app.Run();
