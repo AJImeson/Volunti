@@ -4,6 +4,7 @@ using Volunti.Mappers;
 using Volunti.Models;
 using Volunti.DTOs;
 
+
 namespace Volunti.Endpoints
 {
     public class JobEndpoints
@@ -84,11 +85,11 @@ namespace Volunti.Endpoints
 
 
             })
-            .RequireAuthorization();
+            .RequireAuthorization(policy => policy.RequireRole("OrgAdmin", "OrgUser")); // Enbart OrgAdmin och OrgUser kan posta jobb
 
 
 
-            // Endpoint för att ta bort ett jobb
+            // Endpoint för att ta bort ett jobb och enbart ett jobb via id!
             app.MapDelete("/jobs/{id}", async (int id, VoluntiDbContext db, HttpContext http) =>
             {
                 var userIdClaim = http.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
@@ -120,7 +121,7 @@ namespace Volunti.Endpoints
                 return Results.Ok($"Jobb: '{job.Title}' med id: '{job.JobId}' togs bort.");
 
             })
-            .RequireAuthorization();
+            .RequireAuthorization(policy => policy.RequireRole("OrgAdmin")); // Enbart OrgAdmin kan ta bort ett jobb
 
         }
     }
