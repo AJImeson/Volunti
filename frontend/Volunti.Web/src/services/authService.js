@@ -114,6 +114,61 @@ export const registerVolunteer = async (formData) => {
   }
 };
 
+
+export const registerOrganization = async (formData) => {
+  const payload = {
+    email: formData.email,
+    password: formData.password,
+
+    companyName: formData.foretagsnamn,
+    orgName: formData.organisationsnamn,
+    contactName: formData.namn,
+
+    municipality: formData.kommun,
+    description: formData.beskrivning,
+
+    categories: formData.branscher,
+
+    requiresDocumentation:
+      formData.dokumentation === "Ja",
+
+    notificationPreference:
+      formData.notificationLevel,
+
+    emailNotifications:
+      formData.emailNotification === "Ja",
+  };
+
+  try {
+    const { data } = await api.post(
+      "/register/organization",
+      payload,
+    );
+
+    const profile = {
+      email: data.email,
+      userName: data.userName,
+      companyName: formData.foretagsnamn,
+      orgName: formData.organisationsnamn,
+    };
+
+    saveSession({
+      token: data.token,
+      profile,
+    });
+
+    return profile;
+  } catch (error) {
+    throw new Error(
+      extractErrorMessage(
+        error,
+        "Registreringen misslyckades.",
+      ),
+    );
+  }
+};
+
+
 export const checkAvailability = async (email, phoneNumber) => {
   try {
     const { data } = await api.post("/register/check-availability", {

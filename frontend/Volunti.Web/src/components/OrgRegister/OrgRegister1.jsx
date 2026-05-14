@@ -1,16 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useOrgRegister } from "../context/OrgRegisterContext";
 
 const OrgRegister1 = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    foretagsnamn: "",
-    organisationsnamn: "",
-    email: "",
-    confirmEmail: "",
-    password: "",
-    namn: "",
-  });
+  const { formData, setFormData } = useOrgRegister();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
