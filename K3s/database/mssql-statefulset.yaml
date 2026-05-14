@@ -7,13 +7,13 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: mssql-sts # has to match .spec.template.metadata.labels
+      app: mssql-sts
   serviceName: "mssql-sts"
-  replicas: 3 # by default is 1
+  replicas: 1
   template:
     metadata:
       labels:
-        app: mssql-sts # has to match .spec.selector.matchLabels
+        app: mssql-sts
     spec:
       terminationGracePeriodSeconds: 10
       containers:
@@ -28,10 +28,10 @@ spec:
           - name: MSSQL_PID
             value: "Developer"
           - name: SA_PASSWORD
-            #valueFrom: behöver lära mig hur man gjorde med secrets från lektionen
-            #secretKeyRef:
-            #name:
-            #Key:
+            valueFrom: behöver lära mig hur man gjorde med secrets från lektionen
+              secretKeyRef:
+                name: mssql-secret
+                Key: SA_PASSWORD
         volumeMounts:
         - name: mssql-data
           mountPath: /var/opt/mssql
@@ -39,7 +39,7 @@ spec:
   - metadata:
       name: mssql-data
     spec:
-      storageClassName: # vet inte än
+      storageClassName: local-path
       accessModes:
       - ReadWriteOnce
       resources:
