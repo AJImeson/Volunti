@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mssql-data
-  namespace: volunti
+  namespace: doe25-group-13
 spec:
   accessModes:
     - ReadWriteOnce

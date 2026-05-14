@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: mssql-sts
-  namespace: volunti
+  namespace: doe25-group-13
 spec:
   selector:
     matchLabels:

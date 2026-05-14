@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mssql-service
-  namespace: volunti
+  namespace: doe25-group-13
 spec:
   selector:
     app: mssql                  #behövs det nå labels?? och ska man döpa targetPort till ett namn? och sen göra samma i poden?
