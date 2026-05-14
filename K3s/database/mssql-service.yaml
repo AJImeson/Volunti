@@ -5,6 +5,7 @@ metadata:
   name: mssql-service
   namespace: doe25-group-13
 spec:
+  clusterIP: None
   selector:
     app: mssql                  #behövs det nå labels?? och ska man döpa targetPort till ett namn? och sen göra samma i poden?
   ports:
@@ -12,6 +13,6 @@ spec:
     protocol: TCP
     port: 1433
     targetPort: 1433
-  ClusterIP: None
+  
 ---
 
