@@ -27,11 +27,11 @@ spec:
             value: "Y"
           - name: MSSQL_PID
             value: "Developer"
-          - name: SA_PASSWORD
-            valueFrom: behöver lära mig hur man gjorde med secrets från lektionen
+          - name: MSSQL_SA_PASSWORD
+            valueFrom: #behöver lära mig hur man gjorde med secrets från lektionen
               secretKeyRef:
                 name: mssql-secret
-                Key: SA_PASSWORD
+                key: MSSQL_SA_PASSWORD
         volumeMounts:
         - name: mssql-data
           mountPath: /var/opt/mssql
