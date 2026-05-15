@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using Volunti.Interfaces;
 using Volunti.Service;
 using Volunti.Endpoints;
+using Prometheus; // Prometheus dependencies
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,14 +78,17 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseHttpMetrics(); // For prometheus
+
 AuthEndpoints.RegisterEndpoints(app);
 OrganizationEndpoints.RegisterEndpoints(app);
 JobEndpoints.RegisterEndpoints(app);
+
+app.MapMetrics(); // For prometheus
 
 app.Run();
