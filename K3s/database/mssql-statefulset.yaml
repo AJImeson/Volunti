@@ -28,7 +28,7 @@ spec:
           - name: MSSQL_PID
             value: "Developer"
           - name: MSSQL_SA_PASSWORD
-            valueFrom: #behöver lära mig hur man gjorde med secrets från lektionen
+            valueFrom: 
               secretKeyRef:
                 name: mssql-secret
                 key: MSSQL_SA_PASSWORD
