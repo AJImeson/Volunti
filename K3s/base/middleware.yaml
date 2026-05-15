@@ -1,0 +1,7 @@
+apiVersion: traefik.io/v1aplha1
+kind: Middleware
+metadata:
+  name: volunti-basic-auth
+spec:
+  basicAuth:
+    secret: volunti-secret
