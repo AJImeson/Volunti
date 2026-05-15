@@ -5,3 +5,18 @@ metadata:
   namespace: doe25-group-13
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: registry.chas-lab.dev/doe25/group-13/frontend:latest
+        ports:
+        - containerPort: 80
+
+---
