@@ -159,6 +159,9 @@ export const registerOrganization = async (formData) => {
 
     return profile;
   } catch (error) {
+    if (!error.response){
+      throw new Error("Kunde inte ansluta till servern.");
+    }
     throw new Error(
       extractErrorMessage(
         error,
