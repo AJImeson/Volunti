@@ -4,4 +4,4 @@ metadata:
   name: volunti-basic-auth
 spec:
   basicAuth:
-    secret: volunti-secret
+    secret: mssql-secret
