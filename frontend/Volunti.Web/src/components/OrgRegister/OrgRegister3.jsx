@@ -1,12 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useOrgRegister } from "../context/OrgRegisterContext";
 
 const OrgRegister3 = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    branscher: [],
-    dokumentation: "",
-  });
+  const { formData, setFormData } = useOrgRegister();
 
   const toggleBransch = (value) => {
     setFormData((prev) => ({

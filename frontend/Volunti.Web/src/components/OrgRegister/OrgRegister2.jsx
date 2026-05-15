@@ -1,14 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useOrgRegister } from "../context/OrgRegisterContext";
 
 const OrgRegister2 = () => {
   const navigate = useNavigate();
+  const { formData, setFormData } = useOrgRegister();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    kommun: "",
-    beskrivning: "",
-  });
-
+  
   return (
     <div className="auth-wrapper">
       {/* --- TOPPMENY --- */}
