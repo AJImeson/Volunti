@@ -128,3 +128,10 @@
 .org-dashboard-error {
   color: #dc2626;
 }
+
+.org-dashboard-info-note {
+  font-size: 0.85rem;
+  color: var(--gray-text);
+  font-style: italic;
+  margin: 0 0 1rem;
+}
