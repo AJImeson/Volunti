@@ -55,4 +55,4 @@ Paste the output into `Jwt:Key` in `appsettings.Development.json`.
 ## 4. Run
 
 **Backend** (Visual Studio): open `backend/Volunti.slnx`, F5.
-**Frontend**: `cd frontend && npm install && npm run dev`.
+**Frontend**: `cd frontend/Volunti-Web && npm install && npm run dev`.
