@@ -1,0 +1,137 @@
+/* Wrapper - följer samma mönster som CreateJobForm: ljus bakgrund, centrerat innehåll */
+.org-dashboard-wrapper {
+  min-height: 100vh;
+  background-color: var(--gray-light);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem 1rem 4rem;
+}
+
+/* Kort - bredare än CreateJobForm för att rymma två sektioner sida vid sida på desktop */
+.org-dashboard-card {
+  background: var(--bg-white);
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 900px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+
+.org-dashboard-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin: 0 0 0.4rem;
+}
+
+.org-dashboard-subtitle {
+  font-size: 0.95rem;
+  color: var(--gray-text);
+  margin: 0 0 2rem;
+}
+
+/* Sektioner - en för jobb, en för ansökningar */
+.org-dashboard-section {
+  margin-bottom: 2.5rem;
+}
+
+.org-dashboard-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+  flex-wrap: wrap; /* så knappen wrappar under titeln på mobil istället för att krocka */
+}
+
+.org-dashboard-section-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary-blue);
+  margin: 0;
+}
+
+/* Listor av jobb och ansökningar - inga bullets, bara stackat */
+.org-dashboard-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Jobb-item: bara info, ingen action */
+.org-dashboard-job-item {
+  padding: 1rem;
+  border: 1px solid var(--gray-border);
+  border-radius: 8px;
+  background-color: var(--gray-light);
+}
+
+/* Ansöknings-item: info + action-knappar i flex-row */
+.org-dashboard-app-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--gray-border);
+  border-radius: 8px;
+  background-color: var(--gray-light);
+  flex-wrap: wrap; /* knappar hamnar under text på smala skärmar */
+}
+
+.org-dashboard-app-info {
+  flex: 1;
+  min-width: 200px;
+}
+
+.org-dashboard-app-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.org-dashboard-item-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0 0 0.25rem;
+}
+
+.org-dashboard-item-meta {
+  font-size: 0.85rem;
+  color: var(--gray-text);
+  margin: 0;
+}
+
+/* Empty state och meddelanden */
+.org-dashboard-empty {
+  font-size: 0.95rem;
+  color: var(--gray-text);
+  margin: 0;
+  padding: 1rem;
+  background-color: var(--gray-light);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.org-dashboard-message,
+.org-dashboard-error {
+  font-size: 1rem;
+  color: var(--text-dark);
+  text-align: center;
+  margin-top: 3rem;
+}
+
+.org-dashboard-error {
+  color: #dc2626;
+}
+
+.org-dashboard-info-note {
+  font-size: 0.85rem;
+  color: var(--gray-text);
+  font-style: italic;
+  margin: 0 0 1rem;
+}
