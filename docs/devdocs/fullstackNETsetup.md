@@ -56,3 +56,32 @@ Paste the output into `Jwt:Key` in `appsettings.Development.json`.
 
 **Backend** (Visual Studio): open `backend/Volunti.slnx`, F5.
 **Frontend**: `cd frontend/Volunti.Web && npm install && npm run dev`.
+
+## Useful commands
+
+- `git blame src/App.jsx` — shows who wrote each line and when
+- `git log --oneline src/App.jsx` — commit history for a file
+- `q` — exit git pager view
+- `git add -A` — stage all changes across the repo (handles new + deleted files)
+
+## Architecture notes
+
+- **Token expiry**: hardcoded to 1 day in `backend/Volunti/Service/TokenService.cs` (`DateTime.UtcNow.AddDays(1)`) 
+- **JWT algorithm**: HS512 (requires 64-byte key minimum).
+- **CORS**: `AllowAnyOrigin()` in dev, allowlist in prod (see `Program.cs`).
+- **OrgRegister context**: one `<OrgRegisterProvider>` wraps all 4 step routes via a layout route + `<Outlet />` in `App.jsx` so `formData` survives navigation.
+- **Frontend env vars**: `VITE_API_BASE` in `frontend/Volunti.Web/.env.development` (`http://localhost:5066`) and `.env.production` (deployed API URL).
+
+## Known issues (Phase 2 polish)
+
+- OrgRegister Step 1: field order is off (Namn should be first, confirm password missing, confirm email duplicated)
+- OrgRegister Step 1: missing organisationsnummer field
+- OrgRegister Steps 1-4: no client-side validation — "Nästa" button works even with empty required fields (compare to RegisterForm.jsx which has full `validateStep()` logic)
+- OrgRegister Step 4: on successful registration, navigates to `/profile` (volunteer page) instead of `/org-dashboard` — wrong landing page for org accounts
+
+
+## Production TODOs (DevOps)
+
+- Set `Jwt:Key`, `Jwt:Issuer`, `Jwt:Audience` as environment variables / secrets (NEVER commit `appsettings.Production.json` with a real key)
+- Lock CORS to `https://volunti.se` and `https://volunti.doe25.swarm.chas-lab.dev`
+- Move JWT to httpOnly cookie (Phase 3 in roadmap)

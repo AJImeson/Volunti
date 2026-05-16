@@ -9,7 +9,7 @@ const OrgRegister4 = () => {
   const handleRegister = async () => {
     try {
       await registerOrganization (formData);
-      navigate("/profile");
+      navigate("/org-dashboard"); // var "/profile"  
     } catch (error) {
       alert(error.message);
     }

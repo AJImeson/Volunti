@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import "./App.css";
 import ScrollToTop from "./components/ScrollToTop";
 import MarketingPage from "./components/marketing/MarketingPage";
@@ -44,10 +44,13 @@ export default function App() {
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
           <Route path="/create-job" element={<ProtectedRoute><CreateJobForm /></ProtectedRoute>} />
-          <Route path="/org-register/1" element={<OrgRegisterProvider><OrgRegister1 /></OrgRegisterProvider>} />
-          <Route path="/org-register/2" element={<OrgRegisterProvider><OrgRegister2 /></OrgRegisterProvider>} />
-          <Route path="/org-register/3" element={<OrgRegisterProvider><OrgRegister3 /></OrgRegisterProvider>} />
-          <Route path="/org-register/4" element={<OrgRegisterProvider><OrgRegister4 /></OrgRegisterProvider>} />
+          {/* En provider runt alla 4 steg så formData överlever navigering (separata providers nollställer state) */}
+          <Route element={<OrgRegisterProvider><Outlet /></OrgRegisterProvider>}>
+          <Route path="/org-register/1" element={<OrgRegister1 />} />
+          <Route path="/org-register/2" element={<OrgRegister2 />} />
+          <Route path="/org-register/3" element={<OrgRegister3 />} />
+          <Route path="/org-register/4" element={<OrgRegister4 />} />
+          </Route>
           <Route path="/org-dashboard" element={<div>OrgAdmin Dashboard - Coming Soon</div>} />
           <Route path="/org-user-dashboard" element={<div>OrgUser Dashboard - Coming Soon</div>} />
         </Routes>
