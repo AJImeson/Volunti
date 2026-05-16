@@ -22,7 +22,8 @@ import OrgRegister4 from "./components/OrgRegister/OrgRegister4";
 import SettingsPage from "./components/settingspage/SettingsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { OrgRegisterProvider } from "./components/context/OrgRegisterContext";
-
+import OrgDashboard from "./components/organization/OrgDashboard";
+import OrgUserDashboard from "./components/organization/OrgUserDashboard";
 
 export default function App() {
   return (
@@ -46,13 +47,13 @@ export default function App() {
           <Route path="/create-job" element={<ProtectedRoute><CreateJobForm /></ProtectedRoute>} />
           {/* En provider runt alla 4 steg så formData överlever navigering (separata providers nollställer state) */}
           <Route element={<OrgRegisterProvider><Outlet /></OrgRegisterProvider>}>
-          <Route path="/org-register/1" element={<OrgRegister1 />} />
-          <Route path="/org-register/2" element={<OrgRegister2 />} />
-          <Route path="/org-register/3" element={<OrgRegister3 />} />
-          <Route path="/org-register/4" element={<OrgRegister4 />} />
+            <Route path="/org-register/1" element={<OrgRegister1 />} />
+            <Route path="/org-register/2" element={<OrgRegister2 />} />
+            <Route path="/org-register/3" element={<OrgRegister3 />} />
+            <Route path="/org-register/4" element={<OrgRegister4 />} />
           </Route>
-          <Route path="/org-dashboard" element={<div>OrgAdmin Dashboard - Coming Soon</div>} />
-          <Route path="/org-user-dashboard" element={<div>OrgUser Dashboard - Coming Soon</div>} />
+          <Route path="/org-dashboard" element={<ProtectedRoute><OrgDashboard /></ProtectedRoute>} />
+          <Route path="/org-user-dashboard" element={<ProtectedRoute><OrgUserDashboard /></ProtectedRoute>} />
         </Routes>
       </div>
     </BrowserRouter>
