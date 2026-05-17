@@ -401,3 +401,9 @@ export const clearSession = () => {
 export const authFetch = api;
 
 export default api;
+
+/*Skick join till org user som OrgAdmin */
+export const inviteOrgMember = async (email, password) => {
+  const { data } = await api.post("/org/members", { email, password });
+  return data;
+};
