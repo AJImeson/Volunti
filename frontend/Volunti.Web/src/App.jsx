@@ -1,3 +1,5 @@
+//RoleProtectedRoute skyddar så att rätt roll har tillgång till rätt sida
+
 import React from "react";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import "./App.css";
@@ -21,6 +23,7 @@ import OrgRegister3 from "./components/OrgRegister/OrgRegister3";
 import OrgRegister4 from "./components/OrgRegister/OrgRegister4";
 import SettingsPage from "./components/settingspage/SettingsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import { OrgRegisterProvider } from "./components/context/OrgRegisterContext";
 import OrgDashboard from "./components/organization/OrgDashboard";
 import OrgUserDashboard from "./components/organization/OrgUserDashboard";
@@ -52,8 +55,8 @@ export default function App() {
             <Route path="/org-register/3" element={<OrgRegister3 />} />
             <Route path="/org-register/4" element={<OrgRegister4 />} />
           </Route>
-          <Route path="/org-dashboard" element={<ProtectedRoute><OrgDashboard /></ProtectedRoute>} />
-          <Route path="/org-user-dashboard" element={<ProtectedRoute><OrgUserDashboard /></ProtectedRoute>} />
+          <Route path="/org-dashboard" element={<RoleProtectedRoute allowedRoles={["OrgAdmin"]}><OrgDashboard /></RoleProtectedRoute>} />
+          <Route path="/org-user-dashboard" element={<RoleProtectedRoute allowedRoles={["OrgUser"]}><OrgUserDashboard /></RoleProtectedRoute>} />
         </Routes>
       </div>
     </BrowserRouter>

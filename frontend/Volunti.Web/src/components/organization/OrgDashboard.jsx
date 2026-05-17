@@ -6,6 +6,9 @@ import {
   updateApplicationStatus,
 } from "../../services/jobService";
 import "./OrgDashboard.css";
+import { clearSession, inviteOrgMember } from "../../services/authService";
+import "../missions/MissionModal.css";
+
 
 // OrgAdmin Dashboard - full kontroll: publicera uppdrag, godkänn/avvisa ansökningar
 export default function OrgDashboard() {
@@ -15,6 +18,9 @@ export default function OrgDashboard() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [invitePassword, setInvitePassword] = useState("");
 
   useEffect(() => {
     loadDashboardData();
@@ -48,6 +54,18 @@ export default function OrgDashboard() {
     }
   };
 
+  const handleInvite = async () => {
+    try {
+      await inviteOrgMember(inviteEmail, invitePassword);
+      setShowInviteModal(false);
+      setInviteEmail("");
+      setInvitePassword("");
+      alert("Medarbetare tillagd!");
+    } catch (err) {
+      alert("Kunde inte bjuda in medarbetare. Försök igen.");
+    }
+  };
+
   if (loading) {
     return (
       <div className="org-dashboard-wrapper">
@@ -66,11 +84,47 @@ export default function OrgDashboard() {
 
   return (
     <div className="org-dashboard-wrapper">
+      {/* NAV HÄR */}
+      <div className="org-dashboard-nav">
+        <h1
+          className="org-dashboard-logo"
+          onClick={() => navigate("/org-dashboard")}
+          style={{ cursor: "pointer" }}
+        >
+          VOLUNTI
+        </h1>
+
+        <div className="org-dashboard-nav-icons">
+          <button
+            className="icon-btn"
+            aria-label="Logga ut"
+            onClick={() => {
+              clearSession();
+              navigate("/landing");
+            }}
+          >
+            Logga ut
+          </button>
+        </div>
+      </div>
       <div className="org-dashboard-card">
         <h1 className="org-dashboard-title">Adminpanel</h1>
         <p className="org-dashboard-subtitle">
           Hantera era uppdrag och ansökningar.
         </p>
+
+        {/* Sektion 0: Medarbetare */}
+        <section className="org-dashboard-section">
+          <div className="org-dashboard-section-header">
+            <h2 className="org-dashboard-section-title">Medarbetare</h2>
+            <button
+              className="btn-primary"
+              onClick={() => setShowInviteModal(true)}
+            >
+              + Bjud in medarbetare
+            </button>
+          </div>
+        </section>
 
         {/* Sektion 1: Publicerade uppdrag */}
         <section className="org-dashboard-section">
@@ -87,9 +141,7 @@ export default function OrgDashboard() {
           </div>
 
           {jobs.length === 0 ? (
-            <p className="org-dashboard-empty">
-              Inga uppdrag publicerade än.
-            </p>
+            <p className="org-dashboard-empty">Inga uppdrag publicerade än.</p>
           ) : (
             <ul className="org-dashboard-list">
               {jobs.map((job) => (
@@ -150,6 +202,47 @@ export default function OrgDashboard() {
           )}
         </section>
       </div>
+
+      {showInviteModal && (
+        <div
+          className="modal-backdrop"
+          onClick={() => setShowInviteModal(false)}
+        >
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-body">
+              <h2>Bjud in medarbetare</h2>
+
+              <input
+                type="email"
+                className="text-input"
+                placeholder="E-postadress"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+              />
+
+              <input
+                type="password"
+                className="text-input"
+                placeholder="Lösenord"
+                value={invitePassword}
+                onChange={(e) => setInvitePassword(e.target.value)}
+              />
+
+              <div className="modal-actions">
+                <button className="btn-primary" onClick={handleInvite}>
+                  Bjud in
+                </button>
+                <button
+                  className="btn-outline-blue"
+                  onClick={() => setShowInviteModal(false)}
+                >
+                  Avbryt
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
