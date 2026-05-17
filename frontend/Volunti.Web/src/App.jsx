@@ -56,7 +56,7 @@ export default function App() {
             <Route path="/org-register/4" element={<OrgRegister4 />} />
           </Route>
           <Route path="/org-dashboard" element={<RoleProtectedRoute allowedRoles={["OrgAdmin"]}><OrgDashboard /></RoleProtectedRoute>} />
-          <Route path="/org-user-dashboard" element={<RoleProtectedRoute allowedRoles={["OrgAdmin", "OrgUser"]}><OrgUserDashboard /></RoleProtectedRoute>} />
+          <Route path="/org-user-dashboard" element={<RoleProtectedRoute allowedRoles={["OrgUser"]}><OrgUserDashboard /></RoleProtectedRoute>} />
         </Routes>
       </div>
     </BrowserRouter>

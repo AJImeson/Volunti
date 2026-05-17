@@ -6,6 +6,7 @@ import {
   updateApplicationStatus,
 } from "../../services/jobService";
 import "./OrgDashboard.css";
+import { clearSession } from "../../services/authService";
 
 // OrgAdmin Dashboard - full kontroll: publicera uppdrag, godkänn/avvisa ansökningar
 export default function OrgDashboard() {
@@ -66,6 +67,29 @@ export default function OrgDashboard() {
 
   return (
     <div className="org-dashboard-wrapper">
+      {/* NAV HÄR */}
+      <div className="org-dashboard-nav">
+        <h1
+          className="org-dashboard-logo"
+          onClick={() => navigate("/org-dashboard")}
+          style={{ cursor: "pointer" }}
+        >
+          VOLUNTI
+        </h1>
+
+        <div className="org-dashboard-nav-icons">
+          <button
+            className="icon-btn"
+            aria-label="Logga ut"
+            onClick={() => {
+              clearSession();
+              navigate("/landing");
+            }}
+          >
+            Logga ut
+          </button>
+        </div>
+      </div>
       <div className="org-dashboard-card">
         <h1 className="org-dashboard-title">Adminpanel</h1>
         <p className="org-dashboard-subtitle">
@@ -87,9 +111,7 @@ export default function OrgDashboard() {
           </div>
 
           {jobs.length === 0 ? (
-            <p className="org-dashboard-empty">
-              Inga uppdrag publicerade än.
-            </p>
+            <p className="org-dashboard-empty">Inga uppdrag publicerade än.</p>
           ) : (
             <ul className="org-dashboard-list">
               {jobs.map((job) => (

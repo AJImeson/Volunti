@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMyJobs, getMyApplications } from "../../services/jobService";
 import "./OrgDashboard.css";
+import { clearSession } from "../../services/authService";
 
 // OrgUser Dashboard - kan publicera uppdrag men INTE godkänna/avvisa ansökningar
 export default function OrgUserDashboard() {
@@ -35,6 +36,29 @@ export default function OrgUserDashboard() {
 
   return (
     <div className="org-dashboard-wrapper">
+       {/* NAV HÄR */}
+            <div className="org-dashboard-nav">
+              <h1
+                className="org-dashboard-logo"
+                onClick={() => navigate("/org-user-dashboard")}
+                style={{ cursor: "pointer" }}
+              >
+                VOLUNTI
+              </h1>
+      
+              <div className="org-dashboard-nav-icons">
+                <button
+                  className="icon-btn"
+                  aria-label="Logga ut"
+                  onClick={() => {
+                    clearSession();
+                    navigate("/landing");
+                  }}
+                >
+                  Logga ut
+                </button>
+              </div>
+            </div>
       <div className="org-dashboard-card">
         <h1 className="org-dashboard-title">Medarbetarpanel</h1>
         <p className="org-dashboard-subtitle">Översikt över organisationens uppdrag och pågående ansökningar.</p>
