@@ -1,14 +1,36 @@
-/* Wrapper - följer samma mönster som CreateJobForm: ljus bakgrund, centrerat innehåll */
+/* Wrapper - staplar nav och kort vertikalt */
 .org-dashboard-wrapper {
   min-height: 100vh;
-  background-color: var(--gray-light);
+  background-color: var(--primary-blue);
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 2rem 1rem 4rem;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* Kort - bredare än CreateJobForm för att rymma två sektioner sida vid sida på desktop */
+/* Nav - full bredd, blå bakgrund */
+.org-dashboard-nav {
+  width: 100%;
+  background-color: var(--primary-blue);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1rem;
+}
+
+.org-dashboard-logo {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #000000;
+  margin: 0;
+  letter-spacing: -1px;
+}
+
+.org-dashboard-nav-icons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Kort - vit bakgrund, centrerat, med luft från nav */
 .org-dashboard-card {
   background: var(--bg-white);
   border-radius: 16px;
@@ -16,6 +38,8 @@
   width: 100%;
   max-width: 900px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  margin-top: 2rem;
+  margin-bottom: 2rem;
 }
 
 .org-dashboard-title {
@@ -31,7 +55,6 @@
   margin: 0 0 2rem;
 }
 
-/* Sektioner - en för jobb, en för ansökningar */
 .org-dashboard-section {
   margin-bottom: 2.5rem;
 }
@@ -42,17 +65,16 @@
   align-items: center;
   margin-bottom: 1rem;
   gap: 1rem;
-  flex-wrap: wrap; /* så knappen wrappar under titeln på mobil istället för att krocka */
+  flex-wrap: wrap;
 }
 
 .org-dashboard-section-title {
   font-size: 1.2rem;
   font-weight: 700;
   color: var(--primary-blue);
-  margin: 0;
+  margin-bottom: 0.5rem;
 }
 
-/* Listor av jobb och ansökningar - inga bullets, bara stackat */
 .org-dashboard-list {
   list-style: none;
   padding: 0;
@@ -62,7 +84,6 @@
   gap: 0.75rem;
 }
 
-/* Jobb-item: bara info, ingen action */
 .org-dashboard-job-item {
   padding: 1rem;
   border: 1px solid var(--gray-border);
@@ -70,7 +91,6 @@
   background-color: var(--gray-light);
 }
 
-/* Ansöknings-item: info + action-knappar i flex-row */
 .org-dashboard-app-item {
   display: flex;
   justify-content: space-between;
@@ -80,7 +100,7 @@
   border: 1px solid var(--gray-border);
   border-radius: 8px;
   background-color: var(--gray-light);
-  flex-wrap: wrap; /* knappar hamnar under text på smala skärmar */
+  flex-wrap: wrap;
 }
 
 .org-dashboard-app-info {
@@ -106,7 +126,6 @@
   margin: 0;
 }
 
-/* Empty state och meddelanden */
 .org-dashboard-empty {
   font-size: 0.95rem;
   color: var(--gray-text);
@@ -133,5 +152,5 @@
   font-size: 0.85rem;
   color: var(--gray-text);
   font-style: italic;
-  margin: 0 0 1rem;
+  margin-bottom: 0.5rem
 }
