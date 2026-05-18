@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./MissionsPage.css";
 import { MissionDetailsModal, MissionAcceptedModal } from "./MissionModal";
-import { fetchAllJobs, applyToJob } from "../../services/jobService";
+import {
+  fetchAllJobs,
+  applyToJob,
+  getMyApplicationsAsVolunteer,
+} from "../../services/jobService";
 
 // Konvertera Job från backend till mission format
 function jobToMission(job) {
@@ -20,9 +24,11 @@ function jobToMission(job) {
     timeAgo: formatRelativeTime(job.createdOn),
     title: job.title,
     description: job.description || "Ingen beskrivning angiven.",
-    arrangor: "—",
-    plats: [job.address, job.city].filter(Boolean).join(", ") || "Ej angivet",
+    arrangor: "Arrangör",
+    plats: [job.city, job.address].filter(Boolean).join(", ") || "Ej angivet",
     datum: `${fmtTime(job.startTime)} – ${fmtTime(job.endTime)}`,
+    _startTime: job.startTime,
+    _endTime: job.endTime,
     image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800",
     likes: 0,
     likedBy: "",
@@ -57,6 +63,11 @@ export default function MissionsPage() {
   const [loadError, setLoadError] = useState("");
   const [applyError, setApplyError] = useState("");
 
+  const [activeTab, setActiveTab] = useState("uppdrag");
+  const [applications, setApplications] = useState([]);
+  const [isLoadingApps, setIsLoadingApps] = useState(true);
+  const [appsError, setAppsError] = useState("");
+
   useEffect(() => {
     let cancelled = false;
     fetchAllJobs()
@@ -76,6 +87,31 @@ export default function MissionsPage() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (activeTab !== "ansokningar") return;
+
+    let cancelled = false;
+
+    getMyApplicationsAsVolunteer()
+      .then((data) => {
+        if (cancelled) return;
+        setApplications(data);
+        setAppsError("");
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        console.error("Kunde inte hämta ansökningar:", err);
+        setAppsError("Kunde inte ladda dina ansökningar.");
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingApps(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab]);
 
   const openDetails = (mission) => {
     setActiveMission(mission);
@@ -191,78 +227,116 @@ export default function MissionsPage() {
           />
         </div>
       </div>
-
+      <div className="missions-tabs">
+        <button
+          className={`tab-pill ${activeTab === "uppdrag" ? "active" : ""}`}
+          onClick={() => setActiveTab("uppdrag")}
+        >
+          Uppdrag
+        </button>
+        <button
+          className={`tab-pill ${activeTab === "ansokningar" ? "active" : ""}`}
+          onClick={() => setActiveTab("ansokningar")}
+        >
+          Mina ansökningar
+        </button>
+      </div>
       {/* HUVUDINNEHÅLL */}
       <div className="missions-content">
-        {isLoading && (
-          <p style={{ textAlign: "center", color: "#666", padding: "2rem" }}>
-            Laddar uppdrag...
-          </p>
-        )}
-        {loadError && (
-          <p style={{ textAlign: "center", color: "#d33", padding: "2rem" }}>
-            {loadError}
-          </p>
-        )}
-        {applyError && (
-          <div
-            style={{
-              textAlign: "center",
-              color: "#d33",
-              padding: "0.75rem",
-              background: "#fee",
-              borderRadius: 8,
-              margin: "0 1rem 1rem 1rem",
-            }}
-          >
-            {applyError}
-          </div>
-        )}
-        {!isLoading && !loadError && missions.length === 0 && (
-          <p style={{ textAlign: "center", color: "#666", padding: "2rem" }}>
-            Inga uppdrag tillgängliga just nu.
-          </p>
-        )}
+        {/* UPPDRAG TAB */}
+        {activeTab === "uppdrag" && (
+          <>
+            {isLoading && (
+              <p
+                style={{ textAlign: "center", color: "#666", padding: "2rem" }}
+              >
+                Laddar uppdrag...
+              </p>
+            )}
+            {loadError && (
+              <p
+                style={{ textAlign: "center", color: "#d33", padding: "2rem" }}
+              >
+                {loadError}
+              </p>
+            )}
+            {applyError && (
+              <div
+                style={{
+                  textAlign: "center",
+                  color: "#d33",
+                  padding: "0.75rem",
+                  background: "#fee",
+                  borderRadius: 8,
+                  margin: "0 1rem 1rem 1rem",
+                }}
+              >
+                {applyError}
+              </div>
+            )}
+            {!isLoading && !loadError && missions.length === 0 && (
+              <p
+                style={{ textAlign: "center", color: "#666", padding: "2rem" }}
+              >
+                Inga uppdrag tillgängliga just nu.
+              </p>
+            )}
 
-        {viewMode === "feed" && (
-          <PreviousHelpedCarousel onShowAll={() => setViewMode("list")} />
-        )}
+            {viewMode === "feed" && (
+              <PreviousHelpedCarousel onShowAll={() => setViewMode("list")} />
+            )}
 
-        {/* HEADER FÖR LIST VYN*/}
-        {viewMode === "list" && (
-          <div className="section-header" style={{ marginBottom: "1.5rem" }}>
-            <h2 className="section-title">Alla uppdrag</h2>
-            <button
-              className="section-link"
-              onClick={() => setViewMode("feed")}
+            {/* HEADER FÖR LIST VYN*/}
+            {viewMode === "list" && (
+              <div
+                className="section-header"
+                style={{ marginBottom: "1.5rem" }}
+              >
+                <h2 className="section-title">Alla uppdrag</h2>
+                <button
+                  className="section-link"
+                  onClick={() => setViewMode("feed")}
+                >
+                  ‹ Tillbaka
+                </button>
+              </div>
+            )}
+
+            {/* MISSIONS LIST/FEED */}
+            <div
+              className={
+                viewMode === "feed" ? "missions-feed" : "missions-list"
+              }
             >
-              ‹ Tillbaka
-            </button>
-          </div>
+              {filteredMissions.map((mission) =>
+                viewMode === "feed" ? (
+                  <FeedCard
+                    key={mission.id}
+                    mission={mission}
+                    onView={openDetails}
+                    onAccept={openAccepted}
+                  />
+                ) : (
+                  <ListCard
+                    key={mission.id}
+                    mission={mission}
+                    onView={openDetails}
+                    onAccept={openAccepted}
+                  />
+                ),
+              )}
+            </div>
+          </>
         )}
 
-        {/* MISSIONS LIST/FEED */}
-        <div
-          className={viewMode === "feed" ? "missions-feed" : "missions-list"}
-        >
-          {filteredMissions.map((mission) =>
-            viewMode === "feed" ? (
-              <FeedCard
-                key={mission.id}
-                mission={mission}
-                onView={openDetails}
-                onAccept={openAccepted}
-              />
-            ) : (
-              <ListCard
-                key={mission.id}
-                mission={mission}
-                onView={openDetails}
-                onAccept={openAccepted}
-              />
-            ),
-          )}
-        </div>
+        {/* MINA ANSÖKNINGAR TAB */}
+        {activeTab === "ansokningar" && (
+          <ApplicationsList
+            applications={applications}
+            isLoading={isLoadingApps}
+            error={appsError}
+          />
+        )}
       </div>
 
       {activeModal === "details" && (
@@ -443,8 +517,33 @@ function PreviousHelpedCarousel({ onShowAll }) {
    FEED CARD: stor vy
    ========================================================================== */
 function FeedCard({ mission, onView, onAccept }) {
+  // Formatera datum (19 maj) och tid (12:00-15:00) separat
+  const formatDateShort = (dateStr) => {
+    if (!dateStr) return "";
+    return new Date(dateStr).toLocaleDateString("sv-SE", {
+      day: "numeric",
+      month: "short",
+    });
+  };
+
+  const formatTimeOnly = (dateStr) => {
+    if (!dateStr) return "";
+    return new Date(dateStr).toLocaleTimeString("sv-SE", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  // Plats utan address-prefix
+  const cityOnly = mission.plats?.split(",")[0]?.trim() || "—";
+
+  // Hämta raw start/end från mission via specialfält (vi behöver tillägg)
+  const startDate = mission._startTime;
+  const endDate = mission._endTime;
+
   return (
     <div className="feed-card">
+      {/* Header */}
       <div className="feed-card-header">
         <div className="org-avatar"></div>
         <div className="org-info">
@@ -453,22 +552,50 @@ function FeedCard({ mission, onView, onAccept }) {
         </div>
       </div>
 
+      {/* Titel + beskrivning */}
       <div className="feed-card-body">
         <h3 className="feed-title">{mission.title}</h3>
         <p className="feed-description">{mission.description}</p>
 
+        {/* Meta: arrangör, plats, datum, tid med ikoner */}
         <div className="feed-meta">
-          <p>
-            <strong>Arrangör:</strong> {mission.arrangor}
-          </p>
-          <p>
-            <strong>Plats:</strong> {mission.plats}
-          </p>
-          <p>
-            <strong>Datum & tid:</strong> {mission.datum}
-          </p>
+          <div className="meta-row">
+            <div className="meta-item">
+              <PersonIcon />
+              <span>{mission.arrangor}</span>
+            </div>
+            <div className="meta-item">
+              <LocationIcon />
+              <span>{cityOnly}</span>
+            </div>
+          </div>
+          {startDate && (
+            <div className="meta-row">
+              <div className="meta-item">
+                <CalendarIcon />
+                <span>{formatDateShort(startDate)}</span>
+              </div>
+              <div className="meta-item">
+                <ClockIcon />
+                <span>
+                  {formatTimeOnly(startDate)}-{formatTimeOnly(endDate)}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
+        {/* Kategori-pill */}
+        {mission.category && (
+          <div className="feed-pills">
+            <span className="feed-pill">
+              <CategoryIcon />
+              {mission.category}
+            </span>
+          </div>
+        )}
+
+        {/* Knappar */}
         <div className="feed-actions">
           <button className="btn-outline-blue" onClick={() => onView(mission)}>
             Visa
@@ -479,22 +606,117 @@ function FeedCard({ mission, onView, onAccept }) {
         </div>
       </div>
 
+      {/* Footer med likes + kommentarer (mockade) */}
       <div className="feed-card-footer">
-        <div className="feed-likes">
+        <div className="feed-likes-info">
           <span className="like-icon">👍</span>
-          <span className="like-text">{mission.likedBy}</span>
-          <span className="comment-count">{mission.comments} Kommentarer</span>
+          <span>{mission.likes || 0}</span>
         </div>
-        <div className="feed-social-actions">
-          <button className="social-btn">
-            <span>👍</span> Like
-          </button>
-          <button className="social-btn">
-            <span>💬</span> Kommentera
-          </button>
+        <div className="feed-comments-info">
+          <span className="comment-icon">💬</span>
+          <span>{mission.comments || 0} Kommentarer</span>
         </div>
       </div>
     </div>
+  );
+}
+
+/* ==========================================================================
+   IKONER
+   ========================================================================== */
+function PersonIcon() {
+  return (
+    <svg
+      className="meta-icon"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  );
+}
+
+function LocationIcon() {
+  return (
+    <svg
+      className="meta-icon"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
+  );
+}
+
+function CalendarIcon() {
+  return (
+    <svg
+      className="meta-icon"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+    </svg>
+  );
+}
+
+function ClockIcon() {
+  return (
+    <svg
+      className="meta-icon"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  );
+}
+
+function CategoryIcon() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
   );
 }
 
@@ -531,6 +753,110 @@ function ListCard({ mission, onView, onAccept }) {
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+/* ==========================================================================
+   APPLICATIONS LIST - Mina ansökningar
+   ========================================================================== */
+function ApplicationsList({ applications, isLoading, error }) {
+  if (isLoading) {
+    return (
+      <p style={{ textAlign: "center", color: "#666", padding: "2rem" }}>
+        Laddar dina ansökningar...
+      </p>
+    );
+  }
+
+  if (error) {
+    return (
+      <p style={{ textAlign: "center", color: "#d33", padding: "2rem" }}>
+        {error}
+      </p>
+    );
+  }
+
+  if (applications.length === 0) {
+    return (
+      <p style={{ textAlign: "center", color: "#666", padding: "2rem" }}>
+        Du har inte ansökt till några uppdrag än.
+      </p>
+    );
+  }
+
+  return (
+    <div className="applications-list">
+      <h2 className="section-title" style={{ marginBottom: "1rem" }}>
+        Mina ansökningar ({applications.length})
+      </h2>
+      {applications.map((app) => (
+        <ApplicationCard key={app.applicationId} application={app} />
+      ))}
+    </div>
+  );
+}
+
+function ApplicationCard({ application }) {
+  const fmtDate = (dateStr) => {
+    if (!dateStr) return "—";
+    return new Date(dateStr).toLocaleString("sv-SE", {
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const statusConfig = {
+    Pending: {
+      label: "Väntar svar",
+      className: "status-pending",
+    },
+    Approved: {
+      label: "Godkänd!",
+      className: "status-approved",
+    },
+    Rejected: {
+      label: "Tyvärr inte vald",
+      className: "status-rejected",
+    },
+  };
+
+  const status = statusConfig[application.status] || statusConfig.Pending;
+
+  return (
+    <div className="application-card">
+      <div className="application-card-header">
+        <div>
+          <h3 className="application-card-title">{application.jobTitle}</h3>
+          <p className="application-card-org">{application.organizationName}</p>
+        </div>
+        <span className={`status-badge ${status.className}`}>
+          {status.label}
+        </span>
+      </div>
+
+      <div className="application-card-meta">
+        {application.jobCity && (
+          <p>
+            <strong>Plats:</strong> {application.jobCity}
+            {application.jobAddress ? `, ${application.jobAddress}` : ""}
+          </p>
+        )}
+        {application.jobStartTime && (
+          <p>
+            <strong>Tid:</strong> {fmtDate(application.jobStartTime)} –{" "}
+            {fmtDate(application.jobEndTime)}
+          </p>
+        )}
+        <p style={{ color: "#888", fontSize: 13 }}>
+          Du ansökte: {fmtDate(application.createdAt)}
+        </p>
+      </div>
+
+      {application.jobDescription && (
+        <p className="application-card-desc">{application.jobDescription}</p>
+      )}
     </div>
   );
 }

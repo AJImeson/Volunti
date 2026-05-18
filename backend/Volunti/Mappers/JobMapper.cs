@@ -23,7 +23,14 @@ namespace Volunti.Mappers
                 IsUrgent = job.IsUrgent,
                 Status = job.Status.ToString(),
                 CreatedOn = job.CreatedOn,
-                OrganizationId = job.OrganizationId
+                OrganizationId = job.OrganizationId,
+                Organization = job.Organization != null ? new OrgSummaryDto
+                {
+                    OrganizationId = job.Organization.OrganizationId,
+                    OrgName = job.Organization.OrgName,
+                    ContactName = job.Organization.ContactName,
+                    ProfileImageUrl = job.Organization.ProfileImageUrl
+                } : null
             };
         }
     }
