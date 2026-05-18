@@ -44,7 +44,21 @@ export const updateApplicationStatus = async (applicationId, status) => {
   const response = await axios.put(
     `${API_URL}/applications/${applicationId}`,
     { status }, // backend förväntar { "status": "Approved" } eller "Rejected"
-    { headers: authHeaders() }
+    { headers: authHeaders() },
   );
+  return response.data;
+};
+
+// Hämta alla öppna jobb
+export const fetchAllJobs = async () => {
+  const response = await axios.get(`${API_URL}/jobs`);
+  return response.data;
+};
+
+// Volontär ansöker till ett jobb
+export const applyToJob = async (jobId) => {
+  const response = await axios.post(`${API_URL}/jobs/${jobId}/apply`, null, {
+    headers: authHeaders(),
+  });
   return response.data;
 };

@@ -1,70 +1,48 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./MissionsPage.css";
 import { MissionDetailsModal, MissionAcceptedModal } from "./MissionModal";
+import { fetchAllJobs, applyToJob } from "../../services/jobService";
 
-const mockMissions = [
-  {
-    id: 1,
-    organization: "Svenska kyrkan",
-    timeAgo: "20 minuter sen",
-    title: "Hjälp till vid lokal strandstädning",
-    description:
-      "Vi söker volontärer som vill hjälpa till att städa stranden från skräp och plast. Uppdraget innebär att samla in avfall, sortera det och bidra till en renare miljö.",
-    arrangor: "Karl Svensson",
-    plats: "Långholmen, Stockholm",
-    datum: "15 maj kl. 10:00–14:00",
-    image: "https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?w=800",
-    likes: 22,
-    likedBy: "Alex Svensson och 20 andra",
-    comments: 20,
-  },
-  {
-    id: 2,
-    organization: "Röda Korset",
-    timeAgo: "1 timme sen",
-    title: "Läxhjälp för ungdomar",
-    description:
-      "Hjälp ungdomar med skolarbete och läxor. Vi behöver volontärer som är duktiga på matte, svenska och engelska.",
-    arrangor: "Maria Andersson",
-    plats: "Södermalm, Stockholm",
-    datum: "20 maj kl. 16:00–18:00",
-    image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800",
-    likes: 15,
-    likedBy: "Emma Lundberg och 14 andra",
-    comments: 8,
-  },
-  {
-    id: 3,
-    organization: "Stadsmissionen",
-    timeAgo: "3 timmar sen",
-    title: "Matutdelning till behövande",
-    description:
-      "Vi delar ut mat till hemlösa och behövande. Du hjälper till med att packa och dela ut matkassar.",
-    arrangor: "Johan Karlsson",
-    plats: "Centrum, Stockholm",
-    datum: "18 maj kl. 12:00–15:00",
+// Konvertera Job från backend till mission format
+function jobToMission(job) {
+  const fmtTime = (date) =>
+    new Date(date).toLocaleString("sv-SE", {
+      day: "numeric",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+  return {
+    id: job.jobId,
+    organization: "Organisation",
+    timeAgo: formatRelativeTime(job.createdOn),
+    title: job.title,
+    description: job.description || "Ingen beskrivning angiven.",
+    arrangor: "—",
+    plats: [job.address, job.city].filter(Boolean).join(", ") || "Ej angivet",
+    datum: `${fmtTime(job.startTime)} – ${fmtTime(job.endTime)}`,
     image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800",
-    likes: 35,
-    likedBy: "Lisa Berg och 34 andra",
-    comments: 12,
-  },
-  {
-    id: 4,
-    organization: "Naturskyddsföreningen",
-    timeAgo: "5 timmar sen",
-    title: "Trädplantering i Hagaparken",
-    description:
-      "Var med och plantera nya träd i Hagaparken. Vi behöver hjälp med grävning, plantering och vattning.",
-    arrangor: "Erik Holm",
-    plats: "Hagaparken, Solna",
-    datum: "22 maj kl. 09:00–13:00",
-    image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800",
-    likes: 42,
-    likedBy: "Sofia Eriksson och 41 andra",
-    comments: 18,
-  },
-];
+    likes: 0,
+    likedBy: "",
+    comments: 0,
+    isUrgent: job.isUrgent,
+    category: job.category,
+  };
+}
+
+function formatRelativeTime(dateStr) {
+  if (!dateStr) return "";
+  const diffMin = Math.floor(
+    (Date.now() - new Date(dateStr).getTime()) / 60000,
+  );
+  if (diffMin < 1) return "nyss";
+  if (diffMin < 60) return `${diffMin} min sen`;
+  const diffH = Math.floor(diffMin / 60);
+  if (diffH < 24) return `${diffH} tim sen`;
+  return `${Math.floor(diffH / 24)} dagar sen`;
+}
 
 export default function MissionsPage() {
   const navigate = useNavigate();
@@ -74,14 +52,59 @@ export default function MissionsPage() {
   const [activeModal, setActiveModal] = useState(null);
   const [activeMission, setActiveMission] = useState(null);
 
+  const [missions, setMissions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [applyError, setApplyError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchAllJobs()
+      .then((jobs) => {
+        if (cancelled) return;
+        setMissions(jobs.map(jobToMission));
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        console.error("Kunde inte hämta jobb:", err);
+        setLoadError("Kunde inte ladda uppdrag. Försök igen senare.");
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const openDetails = (mission) => {
     setActiveMission(mission);
     setActiveModal("details");
   };
 
-  const openAccepted = (mission) => {
-    setActiveMission(mission);
-    setActiveModal("accepted");
+  const openAccepted = async (mission) => {
+    setApplyError("");
+    try {
+      await applyToJob(mission.id);
+      setActiveMission(mission);
+      setActiveModal("accepted");
+    } catch (err) {
+      console.error("Ansökan misslyckades:", err);
+      if (err.response?.status === 401) {
+        setApplyError("Du måste vara inloggad för att ansöka.");
+      } else if (err.response?.status === 403) {
+        setApplyError("Endast volontärer kan ansöka till uppdrag.");
+      } else if (err.response?.status === 404) {
+        setApplyError("Uppdraget finns inte längre.");
+      } else if (err.response?.status === 409) {
+        setApplyError("Du har redan ansökt till detta uppdrag.");
+      } else {
+        setApplyError(
+          err.response?.data?.detail || "Kunde inte skicka ansökan.",
+        );
+      }
+      setTimeout(() => setApplyError(""), 5000);
+    }
   };
 
   const closeModal = () => {
@@ -89,7 +112,7 @@ export default function MissionsPage() {
     setTimeout(() => setActiveMission(null), 300);
   };
 
-  const filteredMissions = mockMissions.filter(
+  const filteredMissions = missions.filter(
     (mission) =>
       mission.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       mission.organization.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -171,6 +194,36 @@ export default function MissionsPage() {
 
       {/* HUVUDINNEHÅLL */}
       <div className="missions-content">
+        {isLoading && (
+          <p style={{ textAlign: "center", color: "#666", padding: "2rem" }}>
+            Laddar uppdrag...
+          </p>
+        )}
+        {loadError && (
+          <p style={{ textAlign: "center", color: "#d33", padding: "2rem" }}>
+            {loadError}
+          </p>
+        )}
+        {applyError && (
+          <div
+            style={{
+              textAlign: "center",
+              color: "#d33",
+              padding: "0.75rem",
+              background: "#fee",
+              borderRadius: 8,
+              margin: "0 1rem 1rem 1rem",
+            }}
+          >
+            {applyError}
+          </div>
+        )}
+        {!isLoading && !loadError && missions.length === 0 && (
+          <p style={{ textAlign: "center", color: "#666", padding: "2rem" }}>
+            Inga uppdrag tillgängliga just nu.
+          </p>
+        )}
+
         {viewMode === "feed" && (
           <PreviousHelpedCarousel onShowAll={() => setViewMode("list")} />
         )}

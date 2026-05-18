@@ -55,8 +55,17 @@ namespace Volunti.Endpoints
                 if (!int.TryParse(userIdClaim, out var userId)) return Results.Unauthorized();
                 var volunteer = await db.Volunteers.FirstOrDefaultAsync(v => v.UserId == userId);
                 if (volunteer == null) return Results.NotFound("Volontären hittades inte.");
+
                 var job = await db.Jobs.FindAsync(id);
                 if (job == null) return Results.NotFound("Jobbet hittades inte.");
+
+                // Kolla om volontären redan ansökt till detta jobb
+                var existing = await db.VolunteerApplications
+                    .FirstOrDefaultAsync(a => a.VolunteerId == volunteer.Id && a.JobId == job.JobId);
+
+                if (existing != null)
+                    return Results.Conflict(new { detail = "Du har redan ansökt till detta uppdrag." });
+
                 var application = new VolunteerApplication
                 {
                     VolunteerId = volunteer.Id,
