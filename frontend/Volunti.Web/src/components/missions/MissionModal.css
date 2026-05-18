@@ -1,0 +1,232 @@
+/* ==========================================================================
+   BACKDROP OCH MODAL CONTAINER
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: modalFadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  background-color: var(--bg-white);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.25s ease-out;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ==========================================================================
+   BLÅ HEADER (för Visa-modalen)
+   ========================================================================== */
+.modal-blue-header {
+  background-color: var(--primary-blue);
+  padding: 1.25rem 1.5rem 1.25rem 1.5rem;
+  color: var(--text-light);
+}
+
+.modal-back-btn {
+  background: none;
+  border: none;
+  color: var(--text-light);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 0.4rem;
+  opacity: 0.9;
+}
+
+.modal-back-btn:hover {
+  opacity: 1;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-light);
+}
+
+/* ==========================================================================
+   TACK FÖR DIN HJÄLP-HEADER
+   ========================================================================== */
+.modal-thanks-section {
+  background-color: var(--primary-blue);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+
+.modal-thanks-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-light);
+  margin: 0;
+}
+
+/* ==========================================================================
+   MODAL BODY
+   ========================================================================== */
+.modal-body {
+  padding: 1.25rem;
+  background-color: var(--bg-white);
+}
+
+/* ==========================================================================
+   MISSION CARD 
+   ========================================================================== */
+.mission-card {
+  background-color: var(--bg-white);
+  border: 1px solid var(--gray-border);
+  border-radius: 16px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.mission-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.mission-org-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: var(--gray-border);
+  flex-shrink: 0;
+}
+
+.mission-org-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.mission-org-time {
+  font-size: 0.75rem;
+  color: var(--gray-text);
+  margin: 0.1rem 0 0 0;
+}
+
+.mission-meta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.mission-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-dark);
+}
+
+.mission-meta-item svg {
+  color: var(--gray-text);
+  flex-shrink: 0;
+}
+
+.mission-tags {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.mission-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--primary-blue);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  color: var(--primary-blue);
+  background-color: var(--bg-white);
+}
+
+.mission-description {
+  font-size: 0.85rem;
+  color: var(--text-dark);
+  line-height: 1.5;
+  text-align: center;
+  margin: 0 0 1rem 0;
+}
+
+.mission-likes-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  color: var(--gray-text);
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--gray-light);
+}
+
+.mission-card.compact .mission-description,
+.mission-card.compact .mission-likes-row {
+  display: none;
+}
+
+/* ==========================================================================
+   MODAL ACTIONS 
+   ========================================================================== */
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.modal-actions .btn-primary,
+.modal-actions .btn-outline-blue {
+  width: 100%;
+  padding: 0.85rem;
+  font-size: 1rem;
+}
+
+/* ==========================================================================
+   DESKTOP 
+   ========================================================================== */
+@media (min-width: 768px) {
+  .modal-content {
+    max-width: 520px;
+  }
+}

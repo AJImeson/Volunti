@@ -23,7 +23,11 @@ namespace Volunti.Data
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
         public DbSet<OrganizationMember> OrganizationMembers { get; set; }
-
+        
+        public DbSet<VolunteerFile> VolunteerFiles { get; set; }
+        
+        public DbSet<VolunteerExperience> VolunteerExperiences { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -100,6 +104,13 @@ namespace Volunti.Data
                 .HasForeignKey(m => m.OrganizationId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            modelBuilder.Entity<Job>()
+                .Property(Job => Job.Status)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<Job>()
+                .Property(j => j.Category)
+                .HasConversion<string>();
         }
     }
 }

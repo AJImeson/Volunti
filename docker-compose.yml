@@ -3,7 +3,10 @@ services:
     image: ${CI_REGISTRY_IMAGE}/backend:${IMAGE_TAG}
     environment:
       - ConnectionStrings__DefaultConnection=Server=mssql;Database=Burgundy;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True
+      - Jwt__Key=${JWT__SigningKey}
       - ASPNETCORE_HTTP_PORTS=8080
+      - Jwt__Issuer=https://api-${PUBLIC_HOST}.doe25.swarm.chas-lab.dev
+      - Jwt__Audience=https://${PUBLIC_HOST}.doe25.swarm.chas-lab.dev
     networks:
       - traefik-public
       - internal
@@ -14,7 +17,7 @@ services:
         - "traefik.enable=true"
         - "traefik.constraint-label=traefik-public"
         - "traefik.swarm.network=traefik-public"
-        - "traefik.http.routers.${STACK_NAME}-backend-https.rule=Host(`api.${STACK_NAME}.doe25.swarm.chas-lab.dev`)"
+        - "traefik.http.routers.${STACK_NAME}-backend-https.rule=Host(`api-${PUBLIC_HOST}.doe25.swarm.chas-lab.dev`)"
         - "traefik.http.routers.${STACK_NAME}-backend-https.entrypoints=https"
         - "traefik.http.routers.${STACK_NAME}-backend-https.tls=true"
         - "traefik.http.routers.${STACK_NAME}-backend-https.tls.certresolver=le"
@@ -52,13 +55,13 @@ services:
   #     placement:
   #       constraints:
   #         - node.role == manager # Ensure this runs on a manager node to initialize the volume permissions
-  
+
   mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
-        ACCEPT_EULA: "Y"
-        MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
-        MSSQL_PID: Developer
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
+      MSSQL_PID: Developer
     networks:
       - internal
     volumes:
@@ -69,7 +72,7 @@ services:
       placement:
         constraints:
           - node.role == manager # specific constraint to ensure the database runs on a manager node
-  
+
   adminer:
     image: adminer:latest
     networks:
@@ -83,7 +86,7 @@ services:
         - "traefik.constraint-label=traefik-public"
         - "traefik.swarm.network=traefik-public"
         # Här sätter vi en unik URL för Adminer, t.ex. db.dinstack...
-        - "traefik.http.routers.${STACK_NAME}-adminer-https.rule=Host(`db.${STACK_NAME}.doe25.swarm.chas-lab.dev`)"
+        - "traefik.http.routers.${STACK_NAME}-adminer-https.rule=Host(`db-${PUBLIC_HOST}.doe25.swarm.chas-lab.dev`)"
         - "traefik.http.routers.${STACK_NAME}-adminer-https.entrypoints=https"
         - "traefik.http.routers.${STACK_NAME}-adminer-https.tls=true"
         - "traefik.http.routers.${STACK_NAME}-adminer-https.tls.certresolver=le"

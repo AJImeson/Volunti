@@ -1,0 +1,216 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.setup-wrapper {
+  width: 420px;
+  background-color: #2f44a5;
+  font-family: "Inter", sans-serif;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+}
+
+/* HEADER */
+.setup-header {
+  padding: 60px 30px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+}
+
+.volunti-logo {
+  font-size: 38px;
+  font-weight: 900;
+  letter-spacing: -1.5px;
+  color: #000000;
+}
+
+.login-btn {
+  background: transparent;
+  border: 2px solid white;
+  color: white;
+  padding: 10px 24px;
+  border-radius: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+/* STEPPER - Uppdaterad sektion */
+.stepper-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  margin: 30px 0;
+  position: relative;
+  z-index: 10;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  background: #5d73e1;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  z-index: 2;
+}
+
+.dot.active {
+  background: white;
+  border: 2px solid #5d73e1;
+}
+
+.step-line {
+  width: 40px;
+  height: 2px;
+  background: #5d73e1;
+  z-index: 1;
+  margin: 0 -11px;
+}
+
+/* INTRO TEXT */
+.setup-intro {
+  padding: 0 30px 40px;
+  color: white;
+  position: relative;
+  z-index: 10;
+}
+
+.step-count {
+  font-size: 15px;
+  margin-bottom: 8px;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.setup-title {
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 10px;
+}
+
+.setup-subtitle {
+  font-size: 15px;
+  opacity: 0.8;
+  line-height: 1.4;
+}
+
+/* WHITE CARD */
+.setup-content-card {
+  background: white;
+  border-top-left-radius: 50px;
+  border-top-right-radius: 50px;
+  padding: 50px 30px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.05);
+}
+
+/* FORMULÄR */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 40px;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.setup-input {
+  width: 100%;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1.5px solid #2f44a5;
+  font-size: 16px;
+  font-weight: 500;
+  color: #101828;
+  background: white;
+  transition: all 0.2s;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  outline: none;
+}
+
+.setup-input::placeholder {
+  color: #333;
+}
+
+/* FOOTER NAV */
+.setup-footer {
+  display: flex;
+  gap: 15px;
+  margin-top: auto;
+  padding-bottom: 20px;
+}
+
+.btn-back,
+.btn-next {
+  flex: 1;
+  padding: 18px;
+  border-radius: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.btn-back {
+  background: white;
+  border: 2px solid #2f44a5;
+  color: #2f44a5;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.btn-next {
+  background: #2f44a5;
+  border: none;
+  color: white;
+  box-shadow: 0 10px 20px rgba(47, 68, 165, 0.3);
+}
+
+.user-type-toggle {
+  display: flex;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 4px;
+  margin: 1.5rem auto 0;
+  width: fit-content;
+  gap: 4px;
+}
+
+.user-type-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  padding: 0.55rem 1.6rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.user-type-btn:hover:not(.active) {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.user-type-btn.active {
+  background: #fff;
+  color: var(--primary-blue, #2b3da8);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
