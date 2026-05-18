@@ -1,13 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend
-  namespace:
+  name: volunti-backend
+  namespace: doe25-group-13
+  labels:
+    app: volunti-backend
 spec:
-  type: ClusterIp
+  type: ClusterIP
   selector:
-    app: backend
+    app: volunti-backend
   ports:
     - name: http
       port: 80
-      targetport: 8080
+      targetPort: 8080

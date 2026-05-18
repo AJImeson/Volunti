@@ -1,0 +1,31 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: volunti-backend
+  namespace: doe25-group-13
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: volunti-backend.rules
+      rules:
+        - alert: voluntiBackendErrorAlert
+          expr: |
+            sum(rate(http_requests_received_total{namespace="doe25-group-13",status=~"5..", handler!="/metrics}[5m]))
+              /
+            sum(rate(http_requests_received_total{namespace="doe25-group-13",hander!="/metrics"}[5m]))
+              > 0.05
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Volunti project 5xx rate above 5% (5m)"
+            description: "5% of all incoming requests are returnging 5xx above for the last 5 minutes."
+        - alert: voluntiWithoutTraffic
+          expr: |
+            sum(rate(http_requests_total{namespace="doe25-group-13",handler!="/metrics"}[10m])) == 0
+          for: 15m
+          labels:
+            severity: info
+          annotations:
+            summary: "Volunti hasn't received any network traffic for the past 15m"
