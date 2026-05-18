@@ -11,16 +11,18 @@ const REQUIREMENTS = [
   { id: "swedishFluency", label: "Flytande svenska" },
 ];
 
-{/* Svenska namn mappar till engelska som finns i backend */}
+{
+  /* Svenska namn mappar till engelska som finns i backend */
+}
 const CATEGORIES = [
-  { label: "Miljö", value: "Gardening" },
-  { label: "Djur", value: "AnimalCare" },
-  { label: "Socialt", value: "SocialWork" },
-  { label: "Utbildning", value: "Teaching" },
-  { label: "Hälsa", value: "Healthcare" },
-  { label: "Sport & Fritid", value: "Sports" },
-  { label: "Kultur", value: "EventSupport" },
-  { label: "Övrigt", value: "Administration" },
+  { value: "Gardening", label: "Miljö" },
+  { value: "AnimalCare", label: "Djur" },
+  { value: "SocialWork", label: "Socialt" },
+  { value: "Teaching", label: "Utbildning" },
+  { value: "Healthcare", label: "Hälsa" },
+  { value: "Sports", label: "Sport & Fritid" },
+  { value: "EventSupport", label: "Kultur" },
+  { value: "Administration", label: "Övrigt" },
 ];
 
 const EMPTY_FORM = {
@@ -54,8 +56,12 @@ export default function CreateJobForm() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
-    if (fieldErrors[name]) setFieldErrors((prev) => ({ ...prev, [name]: false }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+    if (fieldErrors[name])
+      setFieldErrors((prev) => ({ ...prev, [name]: false }));
   };
 
   const validate = () => {
@@ -64,7 +70,11 @@ export default function CreateJobForm() {
     if (!formData.category) errors.category = true;
     if (!formData.startTime) errors.startTime = true;
     if (!formData.endTime) errors.endTime = true;
-    if (formData.startTime && formData.endTime && formData.endTime <= formData.startTime)
+    if (
+      formData.startTime &&
+      formData.endTime &&
+      formData.endTime <= formData.startTime
+    )
       errors.endTime = "Sluttid måste vara efter starttid";
     if (!formData.city.trim()) errors.city = true;
     return errors;
@@ -102,7 +112,10 @@ export default function CreateJobForm() {
           <div className="create-job-success">
             <div className="create-job-success-icon">✓</div>
             <h2>Uppdraget är skapat!</h2>
-            <p>Det kommer att publiceras så snart funktionen är kopplad till backend.</p>
+            <p>
+              Det kommer att publiceras så snart funktionen är kopplad till
+              backend.
+            </p>
             <button className="btn-primary" onClick={handleReset}>
               Skapa nytt uppdrag
             </button>
@@ -116,10 +129,11 @@ export default function CreateJobForm() {
     <div className="create-job-wrapper">
       <div className="create-job-card">
         <h2 className="create-job-title">Publicera nytt uppdrag</h2>
-        <p className="create-job-subtitle">Fyll i information om uppdraget du söker volontärer till.</p>
+        <p className="create-job-subtitle">
+          Fyll i information om uppdraget du söker volontärer till.
+        </p>
 
         <form onSubmit={handleSubmit} className="create-job-form" noValidate>
-
           <div className="create-job-field">
             <label className="create-job-label">Titel *</label>
             <input
@@ -130,7 +144,9 @@ export default function CreateJobForm() {
               value={formData.title}
               onChange={handleChange}
             />
-            {fieldErrors.title && <span className="field-error-msg">Titel är obligatorisk</span>}
+            {fieldErrors.title && (
+              <span className="field-error-msg">Titel är obligatorisk</span>
+            )}
           </div>
 
           <div className="create-job-field">
@@ -155,10 +171,14 @@ export default function CreateJobForm() {
             >
               <option value="">Välj kategori</option>
               {CATEGORIES.map((cat) => (
-                <option key={cat.value} value={cat.value}>{cat.label}</option>
+                <option key={cat.value} value={cat.value}>
+                  {cat.label}
+                </option>
               ))}
             </select>
-            {fieldErrors.category && <span className="field-error-msg">Välj en kategori</span>}
+            {fieldErrors.category && (
+              <span className="field-error-msg">Välj en kategori</span>
+            )}
           </div>
 
           <div className="input-row">
@@ -171,7 +191,9 @@ export default function CreateJobForm() {
                 value={formData.startTime}
                 onChange={handleChange}
               />
-              {fieldErrors.startTime && <span className="field-error-msg">Ange starttid</span>}
+              {fieldErrors.startTime && (
+                <span className="field-error-msg">Ange starttid</span>
+              )}
             </div>
             <div className="create-job-field">
               <label className="create-job-label">Sluttid *</label>
@@ -184,7 +206,9 @@ export default function CreateJobForm() {
               />
               {fieldErrors.endTime && (
                 <span className="field-error-msg">
-                  {typeof fieldErrors.endTime === "string" ? fieldErrors.endTime : "Ange sluttid"}
+                  {typeof fieldErrors.endTime === "string"
+                    ? fieldErrors.endTime
+                    : "Ange sluttid"}
                 </span>
               )}
             </div>
@@ -212,7 +236,9 @@ export default function CreateJobForm() {
                 value={formData.city}
                 onChange={handleChange}
               />
-              {fieldErrors.city && <span className="field-error-msg">Ange stad</span>}
+              {fieldErrors.city && (
+                <span className="field-error-msg">Ange stad</span>
+              )}
             </div>
           </div>
 
@@ -250,14 +276,17 @@ export default function CreateJobForm() {
           {serverError && <div className="error-msg-box">{serverError}</div>}
 
           <div className="create-job-actions">
-            <button type="button" className="btn-outline-blue" onClick={() => navigate("/org-dashboard")}>
+            <button
+              type="button"
+              className="btn-outline-blue"
+              onClick={() => navigate("/org-dashboard")}
+            >
               Avbryt
             </button>
             <button type="submit" className="btn-primary" disabled={isLoading}>
               {isLoading ? "Publicerar..." : "Publicera uppdrag"}
             </button>
           </div>
-
         </form>
       </div>
     </div>

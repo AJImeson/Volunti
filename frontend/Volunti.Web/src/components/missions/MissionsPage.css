@@ -15,7 +15,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 0 1rem 0;
+  padding: 1.5rem 1rem 1rem 1rem;
 }
 
 .missions-logo {
@@ -54,7 +54,7 @@
 
 .missions-search-section {
   background-color: var(--primary-blue);
-  padding: 0 0 2.5rem 0;
+  padding: 0 1rem 1.5rem 1rem;
 }
 
 .search-input-wrapper {
@@ -213,30 +213,33 @@
 }
 
 /* ==========================================================================
-   FEED-CARDS (avancerad vy)
+   FEED-CARDS
    ========================================================================== */
 
 .missions-feed {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .feed-card {
   background-color: var(--bg-white);
   border-radius: 16px;
-  border-top: 1px solid var(--gray-border);
-  padding-top: 1.25rem;
-  box-shadow: none;
+  border: 1px solid var(--gray-border);
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .feed-card-header {
-  padding: 0 0.5rem 0.75rem 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
 }
 
 .org-avatar {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background-color: var(--gray-border);
   flex-shrink: 0;
@@ -247,7 +250,7 @@
 }
 
 .org-name {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-dark);
   margin: 0;
   font-size: 0.95rem;
@@ -259,102 +262,111 @@
   margin: 0.1rem 0 0 0;
 }
 
-.feed-menu-btn {
-  background: none;
-  border: none;
-  color: var(--gray-text);
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0 0.5rem;
-}
-
 .feed-card-body {
-  padding: 0 0.5rem;
+  padding: 0;
 }
 
 .feed-title {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--text-dark);
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.2rem 0;
 }
 
 .feed-description {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--gray-text);
-  line-height: 1.5;
-  margin: 0 0 1rem 0;
+  line-height: 1.4;
+  margin: 0 0 0.75rem 0;
 }
 
 .feed-meta {
-  text-align: center;
-  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+  text-align: left;
 }
 
-.feed-meta p {
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   font-size: 0.85rem;
   color: var(--text-dark);
-  margin: 0.2rem 0;
 }
 
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.meta-icon {
+  color: var(--text-dark);
+  flex-shrink: 0;
+}
+
+.feed-pills {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.feed-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.7rem;
+  border: 1.5px solid var(--primary-blue);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary-blue);
+  background: transparent;
+}
+
+/* Knappar */
 .feed-actions {
   display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .feed-actions .btn-outline-blue,
 .feed-actions .btn-primary {
   flex: 1;
+  padding: 0.6rem;
+  font-size: 0.9rem;
 }
 
 .feed-card-footer {
-  padding: 0.75rem 0.5rem 0 0.5rem;
-}
-
-.feed-likes {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-top: 1px solid var(--gray-border);
+  padding-top: 0.6rem;
   font-size: 0.85rem;
   color: var(--gray-text);
-  margin-bottom: 0.5rem;
 }
 
-.like-icon {
-  margin-right: 0.4rem;
-}
-
-.like-text {
-  flex: 1;
-}
-
-.feed-social-actions {
-  display: flex;
-  gap: 1rem;
-  border-top: 1px solid var(--gray-border);
-  padding-top: 0.5rem;
-}
-
-.social-btn {
-  flex: 1;
-  background: none;
-  border: none;
-  color: var(--gray-text);
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0.5rem;
+.feed-likes-info {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 0.4rem;
-  border-radius: 8px;
-  transition: background-color 0.2s;
 }
 
-.social-btn:hover {
-  background-color: var(--gray-light);
+.feed-comments-info {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.like-icon,
+.comment-icon {
+  font-size: 1rem;
 }
 
 /* ==========================================================================
@@ -475,6 +487,114 @@
   justify-content: space-between;
   align-items: center;
   margin-top: 0.5rem;
+}
+
+/* ==========================================================================
+   TABS - Uppdrag / Mina ansökningar
+   ========================================================================== */
+.missions-tabs {
+  display: flex;
+  gap: 1rem;
+  padding: 0 1rem 1.5rem 1rem;
+  background: var(--primary-blue);
+  justify-content: center;
+}
+
+.tab-pill {
+  padding: 0.55rem 1.5rem;
+  background: transparent;
+  color: white;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 110px;
+}
+
+.tab-pill.active {
+  border-color: white;
+}
+
+.tab-pill:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.1);
+}
+/* ==========================================================================
+   APPLICATIONS LIST
+   ========================================================================== */
+.applications-list {
+  padding: 1rem;
+}
+
+.application-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.application-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.application-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.2rem 0;
+  color: #222;
+}
+
+.application-card-org {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+}
+
+.application-card-meta {
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.application-card-meta p {
+  margin: 0.3rem 0;
+}
+
+.application-card-desc {
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #eee;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-approved {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-rejected {
+  background: #e2e3e5;
+  color: #383d41;
 }
 
 /* ==========================================================================
