@@ -160,6 +160,7 @@ export default function MissionsPage() {
       <div className="missions-top-nav">
         <h1 className="missions-logo">VOLUNTI</h1>
         <div className="missions-nav-icons">
+          <button className="dashboard-btn" onClick={() => navigate("/volunteer-dashboard")}>My Missions</button>
           <button
             className="icon-btn"
             aria-label="Profil"
