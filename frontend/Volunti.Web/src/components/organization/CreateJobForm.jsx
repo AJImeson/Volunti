@@ -11,15 +11,16 @@ const REQUIREMENTS = [
   { id: "swedishFluency", label: "Flytande svenska" },
 ];
 
+{/* Svenska namn mappar till engelska som finns i backend */}
 const CATEGORIES = [
-  "Miljö",
-  "Djur",
-  "Socialt",
-  "Utbildning",
-  "Hälsa",
-  "Sport & Fritid",
-  "Kultur",
-  "Övrigt",
+  { label: "Miljö", value: "Gardening" },
+  { label: "Djur", value: "AnimalCare" },
+  { label: "Socialt", value: "SocialWork" },
+  { label: "Utbildning", value: "Teaching" },
+  { label: "Hälsa", value: "Healthcare" },
+  { label: "Sport & Fritid", value: "Sports" },
+  { label: "Kultur", value: "EventSupport" },
+  { label: "Övrigt", value: "Administration" },
 ];
 
 const EMPTY_FORM = {
@@ -154,7 +155,7 @@ export default function CreateJobForm() {
             >
               <option value="">Välj kategori</option>
               {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
+                <option key={cat.value} value={cat.value}>{cat.label}</option>
               ))}
             </select>
             {fieldErrors.category && <span className="field-error-msg">Välj en kategori</span>}
