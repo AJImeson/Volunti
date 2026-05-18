@@ -10,7 +10,7 @@ namespace Volunti.Endpoints
     {
         public static void RegisterEndpoints(WebApplication app)
         {
-            // GET /applications/mine - lista alla ansökningar för inloggad orgs jobb
+            // GET /applications/mine lista alla ansökningar för inloggad orgs jobb
             app.MapGet("/applications/mine", async (VoluntiDbContext db, HttpContext http, string? status) =>
             {
                 var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -30,7 +30,6 @@ namespace Volunti.Endpoints
                     .Include(a => a.Job)
                     .Include(a => a.Volunteer)
                     .Where(a => a.Job.OrganizationId == organization.OrganizationId);
-                // Valfri filter: ?status=Pending
                 if (!string.IsNullOrEmpty(status) && Enum.TryParse<ApplicationStatus>(status, true, out var parsedStatus))
                     query = query.Where(a => a.Status == parsedStatus);
                 var applications = await query.ToListAsync();
@@ -55,8 +54,17 @@ namespace Volunti.Endpoints
                 if (!int.TryParse(userIdClaim, out var userId)) return Results.Unauthorized();
                 var volunteer = await db.Volunteers.FirstOrDefaultAsync(v => v.UserId == userId);
                 if (volunteer == null) return Results.NotFound("Volontären hittades inte.");
+
                 var job = await db.Jobs.FindAsync(id);
                 if (job == null) return Results.NotFound("Jobbet hittades inte.");
+
+                // Kolla om volontären redan ansökt till detta jobb
+                var existing = await db.VolunteerApplications
+                    .FirstOrDefaultAsync(a => a.VolunteerId == volunteer.Id && a.JobId == job.JobId);
+
+                if (existing != null)
+                    return Results.Conflict(new { detail = "Du har redan ansökt till detta uppdrag." });
+
                 var application = new VolunteerApplication
                 {
                     VolunteerId = volunteer.Id,
@@ -104,6 +112,42 @@ namespace Volunti.Endpoints
                 });
             })
             .RequireAuthorization(policy => policy.RequireRole("OrgAdmin"));
+
+            // GET /me/applications - volontär ser sina egna ansökningar
+            app.MapGet("/me/applications", async (VoluntiDbContext db, HttpContext http) =>
+            {
+                var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
+                    return Results.Unauthorized();
+
+                var volunteer = await db.Volunteers.FirstOrDefaultAsync(v => v.UserId == userId);
+                if (volunteer == null)
+                    return Results.NotFound("Volontären hittades inte.");
+
+                var applications = await db.VolunteerApplications
+                    .Include(a => a.Job)
+                        .ThenInclude(j => j.Organization)
+                    .Where(a => a.VolunteerId == volunteer.Id)
+                    .OrderByDescending(a => a.CreatedAt)
+                    .ToListAsync();
+
+                return Results.Ok(applications.Select(a => new
+                {
+                    applicationId = a.Id,
+                    status = a.Status.ToString(),
+                    createdAt = a.CreatedAt,
+                    jobId = a.JobId,
+                    jobTitle = a.Job.Title,
+                    jobDescription = a.Job.Description,
+                    jobStartTime = a.Job.StartTime,
+                    jobEndTime = a.Job.EndTime,
+                    jobCity = a.Job.City,
+                    jobAddress = a.Job.Address,
+                    jobCategory = a.Job.Category.ToString(),
+                    organizationName = a.Job.Organization != null ? a.Job.Organization.OrgName : "Okänd"
+                }));
+            })
+            .RequireAuthorization(policy => policy.RequireRole("Volunteer"));
         }
     }
 }

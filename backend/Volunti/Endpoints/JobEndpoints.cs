@@ -10,7 +10,6 @@ namespace Volunti.Endpoints
     {
         public static void RegisterEndpoints(WebApplication app)
         {
-            // GET /jobs/mine - MÅSTE registreras FÖRE /jobs/{id} annars matchas "mine" som id
             app.MapGet("/jobs/mine", async (VoluntiDbContext db, HttpContext http) =>
             {
                 var userIdClaim = http.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
@@ -27,6 +26,7 @@ namespace Volunti.Endpoints
                 if (organization == null)
                     return Results.NotFound("Användaren har ingen organisation.");
                 var jobs = await db.Jobs
+                    .Include(j => j.Organization)
                     .Where(j => j.OrganizationId == organization.OrganizationId)
                     .ToListAsync();
                 return Results.Ok(jobs.Select(j => j.ToJobDto()));
@@ -36,13 +36,17 @@ namespace Volunti.Endpoints
             // Returnerar alla jobb
             app.MapGet("/jobs", async (VoluntiDbContext db) =>
             {
-                var jobs = await db.Jobs.ToListAsync();
+                var jobs = await db.Jobs
+                    .Include(j => j.Organization)
+                    .ToListAsync();
                 return Results.Ok(jobs.Select(j => j.ToJobDto()));
             });
 
             app.MapGet("/jobs/{id}", async (int id, VoluntiDbContext db) =>
             {
-                var job = await db.Jobs.FindAsync(id);
+                var job = await db.Jobs
+                    .Include(j => j.Organization)
+                    .FirstOrDefaultAsync(j => j.JobId == id);
                 return job is null ? Results.NotFound() : Results.Ok(job.ToJobDto());
             });
 
@@ -64,7 +68,7 @@ namespace Volunti.Endpoints
                 }
                 else
                 {
-                    // Hitta org via Organizations.UserId (OrgAdmin) ELLER OrganizationMembers (OrgUser)
+                    // Hitta org via Organizations.UserId 
                     organization = await db.Organizations.FirstOrDefaultAsync(o => o.UserId == userId);
                     if (organization == null)
                     {
