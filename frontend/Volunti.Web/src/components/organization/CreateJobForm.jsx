@@ -11,6 +11,9 @@ const REQUIREMENTS = [
   { id: "swedishFluency", label: "Flytande svenska" },
 ];
 
+{
+  /* Svenska namn mappar till engelska som finns i backend */
+}
 const CATEGORIES = [
   { value: "Gardening", label: "Miljö" },
   { value: "AnimalCare", label: "Djur" },
