@@ -13,7 +13,7 @@ spec:
   template:
     metadata:
       labels:
-        app:
+        app: volunti-backend 
     spec:
       containers:
         - name: volunti-backend
@@ -23,21 +23,20 @@ spec:
             - name: http
               containerPort: 8080
           env:
-            - name: ASPNETCORE_URLS
-              value: "http://+:8080"
             - name: ASPNETCORE_ENVIRONMENT
-              value: "Prod"
+              value: "Production"
             - name: MSSQL_SA_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: mssql-secret
                   key: MSSQL_SA_PASSWORD
             - name: ConnectionStrings__DefaultConnection
-              value: "Server=mssql-service,1433;Database=volunti;User Id=sa;Password=$(MSSQL_SA_PASSWORD);TrustServerCertificate=true"
+              value: "Server=mssql-service;1433;Database=volunti;User Id=sa;Password=$(MSSQL_SA_PASSWORD);TrustServerCertificate=true"
             - name: Jwt__SigningKey
               valueFrom:
                 secretKeyRef:
                   name: jwt-key
                   key: Jwt__SigningKey
-      imagePullSecrets:
-        - name: temp-image 
+          envFrom:
+            - configMapRef:
+                name: backend-config 
