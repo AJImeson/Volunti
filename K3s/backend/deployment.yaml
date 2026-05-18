@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: volunti-backend
+  namespace: doe25-group-13
+  labels:
+    app: volunti-backend 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: volunti-backend
+  template:
+    metadata:
+      labels:
+        app:
+    spec:
+      containers:
+        - name: volunti-backend
+          image: registry.chas-lab.dev/chas-challenge-2026/grupp-13/burgundy/backend:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: ASPNETCORE_URLS
+              value: "http://+:8080"
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Prod"
+            - name: MSSQL_SA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mssql-secret
+                  key: MSSQL_SA_PASSWORD
+            - name: ConnectionStrings__DefaultConnection
+              value: "Server=mssql-service,1433;Database=volunti;User Id=sa;Password=$(MSSQL_SA_PASSWORD);TrustServerCertificate=true"
+            - name: Jwt__SigningKey
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-key
+                  key: Jwt__SigningKey
+      imagePullSecrets:
+        - name: temp-image 
