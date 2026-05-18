@@ -1,7 +1,7 @@
 apiVersion: traefik.k8s.io/v1
 kind: IngressRoute
 metadata:
-  name: volunti-ingress
+  name: volunti-frontend
   namespace: doe25-group-13
 spec:
   entryPoints:
@@ -12,6 +12,8 @@ spec:
       services:
         - volunti-frontend
       port: 80
+      middlewares:
+        - name: secure-headers
   tls:
     certResolver: letsencrypt
 

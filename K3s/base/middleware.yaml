@@ -6,3 +6,31 @@ metadata:
 spec:
   basicAuth:
     secret: mssql-secret
+
+---
+
+apiVersion: traefik.io/vialpha1
+kind: Middleware
+metadata:
+  name: https-re-routing
+  namespace: doe25-group-13
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
+
+---
+
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: secure-headers
+  namespace: doe25-group-13
+spec:
+  headers:
+    stsSeconds: 31536000
+    stsIncludeSubdomains: true
+    forceSTSHeader: true
+    contentTypeNosniff: true
+    browserXssFilter: true
+    referrerPolicy: "same-origin"
