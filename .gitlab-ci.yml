@@ -5,6 +5,10 @@ workflow:
       when: never
     - if: $CI_COMMIT_BRANCH
 
+variables:
+  KUBE_NAMESPACE: doe25-group-13
+  REGISTRY_IMAGE: registry.chas-lab.dev/chas-challenge-2026/grupp-13/burgundy
+
 stages:
 
   - build
