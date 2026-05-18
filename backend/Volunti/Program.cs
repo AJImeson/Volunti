@@ -9,10 +9,17 @@ using Volunti.Interfaces;
 using Volunti.Service;
 using Volunti.Endpoints;
 using Prometheus; // Prometheus dependencies
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
+
+// Serialiserar enums som strängar i båda riktningar (POST tar emot "Cleaning", GET returnerar "Approved" istället för 0/1/2)
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+});
 
 builder.Services.AddDbContext<VoluntiDbContext>(options =>
 {
@@ -30,6 +37,10 @@ builder.Services.AddIdentity<AppUser, Role>(options =>
 .AddEntityFrameworkStores<VoluntiDbContext>()
 .AddDefaultTokenProviders();
 
+// TODO: PRODUKTION - Kontrollera att JWT:SigningKey, JWT:Issuer och JWT:Audience
+//                    är satta i appsettings.Production.json eller som environment variables
+// HUR: SigningKey ska vara minst 32 tecken, slumpmässig, och ALDRIG checkas in i Git
+//      DevOps lägger den som secret i deployment-pipeline (Azure Key Vault, GitHub Secrets etc.)
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme =
@@ -43,28 +54,74 @@ builder.Services.AddAuthentication(options =>
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
-        ValidIssuer = builder.Configuration["JWT:Issuer"],
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidateAudience = true,
-        ValidAudience = builder.Configuration["JWT:Audience"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(
-            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"] ?? throw new Exception("JWT:SigningKey missing"))
+            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new Exception("Jwt:Key missing"))
         )
     };
 });
 builder.Services.AddAuthorization();
 
+// TODO: PRODUKTION - Lås CORS till specifik frontend-domän innan deploy
+// HUR: Byt ut AllowAnyOrigin() mot .WithOrigins("https://volunti.se") (eller riktiga frontend-URL:en)
+//      AllowAnyOrigin() = vem som helst på internet kan anropa vårt API från sin webbläsare = säkerhetsrisk
+//      DevOps ansvarar för att sätta rätt domän i produktionsmiljön
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
-        policy.WithOrigins("http://localhost:5173")
-              .AllowAnyHeader()
-              .AllowAnyMethod());
+    {
+        if (builder.Environment.IsDevelopment())
+        {
+            policy.AllowAnyOrigin()
+                  .WithHeaders("Content-Type", "Authorization")
+                  .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
+        }
+        else
+        {
+            policy.SetIsOriginAllowed(origin =>
+            {
+                var allowedHosts = new[]
+                {
+                    "https://volunti.se",
+                    "https://volunti.doe25.swarm.chas-lab.dev"
+                };
+                if (allowedHosts.Contains(origin)) return true;
+                
+                // Tillåt review-environments
+                var uri = new Uri(origin);
+                return uri.Host.EndsWith(".doe25.swarm.chas-lab.dev");
+            })
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+        }
+    });
 });
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
+
+//Profilbild
+var wwwroot = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
+if (!Directory.Exists(wwwroot))
+{
+    Directory.CreateDirectory(wwwroot);
+}
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(wwwroot),
+    RequestPath = ""
+});
+
+var uploadsRoot = Path.Combine(builder.Environment.ContentRootPath, "uploads");
+if (!Directory.Exists(uploadsRoot))
+{
+    Directory.CreateDirectory(uploadsRoot);
+}
 
 using (var scope = app.Services.CreateScope())
 {
@@ -78,7 +135,11 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
@@ -88,7 +149,11 @@ app.UseHttpMetrics(); // For prometheus
 AuthEndpoints.RegisterEndpoints(app);
 OrganizationEndpoints.RegisterEndpoints(app);
 JobEndpoints.RegisterEndpoints(app);
+VolunteerProfileEndpoints.RegisterEndpoints(app); 
+FileEndpoints.RegisterEndpoints(app);
+ApplicationEndpoints.RegisterEndpoints(app);
 
 app.MapMetrics(); // For prometheus
 
 app.Run();
+

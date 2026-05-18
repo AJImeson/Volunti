@@ -76,11 +76,26 @@
     - Removed the mock data and replaced with code from developers in both frontend and backend for integrating and testing - Axel & Mika
     - Sucesfully deployed the frontend stack to a working URL - Mika
 
-* 2026-04-28
-
-    - 
-
 * 2026-04-30
 
     - Fixing workflow rules for .gitlab-ci.yml, several deployments per branch occured - Axel
+
+* 2026-05-04
+
+    - Branched out a Monitoring branch for grafana - Axel
+
+* 2026-05-05
+
+    - Branched out a K3s branch for Kubernetes implementation - Mika
+    - Cleaned repository, deleted obsolete branches and merged frontend&backend logic for new 
+
+* 2026-05-06
+
+    - Worked on logic and pipeline building for Grafana monitoring, pipelines pass but no stack for Grafana is built.
+
+* 2026-05-07
+
+    - Structured K3s branch for future implementation of Kubernetes for a multi stack build - Mika
+    - Debugging of the monitoring stack - Axel
+
 

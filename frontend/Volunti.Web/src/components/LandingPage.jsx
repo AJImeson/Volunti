@@ -1,6 +1,9 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function LandingPage({ setView }) {
+export default function LandingPage() {
+  const navigate = useNavigate();
+
   return (
     <div className="landing-wrapper">
       <div className="landing-content">
@@ -33,16 +36,10 @@ export default function LandingPage({ setView }) {
           </div>
 
           <div className="btn-wrapper">
-            <button
-              className="btn-outline-white"
-              onClick={() => setView("login")}
-            >
+            <button className="btn-outline-white" onClick={() => navigate("/login")}>
               Logga in
             </button>
-            <button
-              className="btn-solid-white"
-              onClick={() => setView("register")}
-            >
+            <button className="btn-solid-white" onClick={() => navigate("/register")}>
               Registrera dig
             </button>
           </div>

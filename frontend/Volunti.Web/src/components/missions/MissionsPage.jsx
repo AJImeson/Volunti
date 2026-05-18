@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./MissionsPage.css";
+import { MissionDetailsModal, MissionAcceptedModal } from "./MissionModal";
 
 const mockMissions = [
   {
@@ -64,9 +66,28 @@ const mockMissions = [
   },
 ];
 
-export default function MissionsPage({ setView }) {
+export default function MissionsPage() {
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState("feed");
   const [searchQuery, setSearchQuery] = useState("");
+
+  const [activeModal, setActiveModal] = useState(null);
+  const [activeMission, setActiveMission] = useState(null);
+
+  const openDetails = (mission) => {
+    setActiveMission(mission);
+    setActiveModal("details");
+  };
+
+  const openAccepted = (mission) => {
+    setActiveMission(mission);
+    setActiveModal("accepted");
+  };
+
+  const closeModal = () => {
+    setActiveModal(null);
+    setTimeout(() => setActiveMission(null), 300);
+  };
 
   const filteredMissions = mockMissions.filter(
     (mission) =>
@@ -83,7 +104,7 @@ export default function MissionsPage({ setView }) {
           <button
             className="icon-btn"
             aria-label="Profil"
-            onClick={() => setView("profile")}
+            onClick={() => navigate("/profile")}
           >
             <svg
               width="24"
@@ -102,7 +123,7 @@ export default function MissionsPage({ setView }) {
           <button
             className="icon-btn"
             aria-label="Inställningar"
-            onClick={() => setView("settings")}
+            onClick={() => navigate("/settings")}
           >
             <svg
               width="24"
@@ -154,7 +175,7 @@ export default function MissionsPage({ setView }) {
           <PreviousHelpedCarousel onShowAll={() => setViewMode("list")} />
         )}
 
-        {/* HEADER FÖR LIST-VYN*/}
+        {/* HEADER FÖR LIST VYN*/}
         {viewMode === "list" && (
           <div className="section-header" style={{ marginBottom: "1.5rem" }}>
             <h2 className="section-title">Alla uppdrag</h2>
@@ -173,13 +194,42 @@ export default function MissionsPage({ setView }) {
         >
           {filteredMissions.map((mission) =>
             viewMode === "feed" ? (
-              <FeedCard key={mission.id} mission={mission} />
+              <FeedCard
+                key={mission.id}
+                mission={mission}
+                onView={openDetails}
+                onAccept={openAccepted}
+              />
             ) : (
-              <ListCard key={mission.id} mission={mission} />
+              <ListCard
+                key={mission.id}
+                mission={mission}
+                onView={openDetails}
+                onAccept={openAccepted}
+              />
             ),
           )}
         </div>
       </div>
+
+      {activeModal === "details" && (
+        <MissionDetailsModal
+          mission={activeMission}
+          onClose={closeModal}
+          onAccept={(m) => {
+            closeModal();
+            setTimeout(() => openAccepted(m), 200);
+          }}
+        />
+      )}
+
+      {activeModal === "accepted" && (
+        <MissionAcceptedModal
+          mission={activeMission}
+          onClose={closeModal}
+          onContact={(m) => console.log("Kontakta arrangör för:", m.title)}
+        />
+      )}
     </div>
   );
 }
@@ -217,7 +267,7 @@ function PreviousHelpedCarousel({ onShowAll }) {
   const dragStartX = React.useRef(0);
   const viewportRef = React.useRef(null);
 
-  // Auto-scroll
+  // Auto scroll
   React.useEffect(() => {
     if (isPaused) return;
     const id = setInterval(() => {
@@ -236,7 +286,7 @@ function PreviousHelpedCarousel({ onShowAll }) {
     pauseAutoScroll();
   };
 
-  // Drag/swipe-hantering
+  // Drag/swipe hantering
   const handleDragStart = (clientX) => {
     dragStartX.current = clientX;
     setIsDragging(true);
@@ -263,12 +313,12 @@ function PreviousHelpedCarousel({ onShowAll }) {
     pauseAutoScroll();
   };
 
-  // Touch-events
+  // Touch events
   const onTouchStart = (e) => handleDragStart(e.touches[0].clientX);
   const onTouchMove = (e) => handleDragMove(e.touches[0].clientX);
   const onTouchEnd = () => handleDragEnd();
 
-  // Mouse-events
+  // Mouse events
   const onMouseDown = (e) => {
     e.preventDefault();
     handleDragStart(e.clientX);
@@ -337,9 +387,9 @@ function PreviousHelpedCarousel({ onShowAll }) {
 }
 
 /* ==========================================================================
-   FEED CARD - stor avancerad vy
+   FEED CARD: stor vy
    ========================================================================== */
-function FeedCard({ mission }) {
+function FeedCard({ mission, onView, onAccept }) {
   return (
     <div className="feed-card">
       <div className="feed-card-header">
@@ -367,8 +417,12 @@ function FeedCard({ mission }) {
         </div>
 
         <div className="feed-actions">
-          <button className="btn-outline-blue">Visa</button>
-          <button className="btn-primary">Acceptera</button>
+          <button className="btn-outline-blue" onClick={() => onView(mission)}>
+            Visa
+          </button>
+          <button className="btn-primary" onClick={() => onAccept(mission)}>
+            Acceptera
+          </button>
         </div>
       </div>
 
@@ -392,9 +446,9 @@ function FeedCard({ mission }) {
 }
 
 /* ==========================================================================
-   LIST CARD - kompakt enkel vy
+   LIST CARD: kompakt vy
    ========================================================================== */
-function ListCard({ mission }) {
+function ListCard({ mission, onView, onAccept }) {
   return (
     <div className="list-card">
       <div
@@ -416,8 +470,12 @@ function ListCard({ mission }) {
           </p>
         </div>
         <div className="list-actions">
-          <button className="btn-outline-blue">Visa</button>
-          <button className="btn-primary">Acceptera</button>
+          <button className="btn-outline-blue" onClick={() => onView(mission)}>
+            Visa
+          </button>
+          <button className="btn-primary" onClick={() => onAccept(mission)}>
+            Acceptera
+          </button>
         </div>
       </div>
     </div>

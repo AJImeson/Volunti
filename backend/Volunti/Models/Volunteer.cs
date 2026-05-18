@@ -23,7 +23,7 @@ namespace Volunti.Models
         public string PhoneNumber { get; set; }
 
         [Required]
-        public string? Muncipilaity { get; set; } //Kommun
+        public string? Municipality { get; set; } //Kommun
 
         [Required]
         public string? DriverLicense { get; set; }   
@@ -35,7 +35,7 @@ namespace Volunti.Models
 
         [Required]
         public string? Availability { get; set; } // Vardag, Kvällar, Helger etc.
-        [Required]
+    
         public int? MaxDistanceKm { get; set; } // distance in km
 
         public string? NotificationPreference { get; set; } // (Rekommenderat/Minimalt/Allt)
