@@ -1,5 +1,7 @@
+//RoleProtectedRoute skyddar så att rätt roll har tillgång till rätt sida
+
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import "./App.css";
 import ScrollToTop from "./components/ScrollToTop";
 import MarketingPage from "./components/marketing/MarketingPage";
@@ -21,6 +23,10 @@ import OrgRegister3 from "./components/OrgRegister/OrgRegister3";
 import OrgRegister4 from "./components/OrgRegister/OrgRegister4";
 import SettingsPage from "./components/settingspage/SettingsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import RoleProtectedRoute from "./components/RoleProtectedRoute";
+import { OrgRegisterProvider } from "./components/context/OrgRegisterContext";
+import OrgDashboard from "./components/organization/OrgDashboard";
+import OrgUserDashboard from "./components/organization/OrgUserDashboard";
 
 export default function App() {
   return (
@@ -42,12 +48,15 @@ export default function App() {
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
           <Route path="/create-job" element={<ProtectedRoute><CreateJobForm /></ProtectedRoute>} />
-          <Route path="/org-register/1" element={<OrgRegister1 />} />
-          <Route path="/org-register/2" element={<OrgRegister2 />} />
-          <Route path="/org-register/3" element={<OrgRegister3 />} />
-          <Route path="/org-register/4" element={<OrgRegister4 />} />
-          <Route path="/org-dashboard" element={<div>OrgAdmin Dashboard - Coming Soon</div>} />
-          <Route path="/org-user-dashboard" element={<div>OrgUser Dashboard - Coming Soon</div>} />
+          {/* En provider runt alla 4 steg så formData överlever navigering (separata providers nollställer state) */}
+          <Route element={<OrgRegisterProvider><Outlet /></OrgRegisterProvider>}>
+            <Route path="/org-register/1" element={<OrgRegister1 />} />
+            <Route path="/org-register/2" element={<OrgRegister2 />} />
+            <Route path="/org-register/3" element={<OrgRegister3 />} />
+            <Route path="/org-register/4" element={<OrgRegister4 />} />
+          </Route>
+          <Route path="/org-dashboard" element={<RoleProtectedRoute allowedRoles={["OrgAdmin"]}><OrgDashboard /></RoleProtectedRoute>} />
+          <Route path="/org-user-dashboard" element={<RoleProtectedRoute allowedRoles={["OrgUser"]}><OrgUserDashboard /></RoleProtectedRoute>} />
         </Routes>
       </div>
     </BrowserRouter>

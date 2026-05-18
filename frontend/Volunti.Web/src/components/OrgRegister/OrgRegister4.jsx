@@ -1,13 +1,20 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useOrgRegister } from "../context/OrgRegisterContext";
+import { registerOrganization } from "../../services/authService";
 
 const OrgRegister4 = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    notificationLevel: "Rekommenderat",
-    emailNotification: "",
-  });
-
+  const { formData, setFormData } = useOrgRegister();
+  const handleRegister = async () => {
+    try {
+      await registerOrganization (formData);
+      navigate("/org-dashboard"); // var "/profile"  
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+  
   const renderIcon = (name) => {
     switch (name) {
       case "bag":
@@ -258,7 +265,7 @@ const OrgRegister4 = () => {
           >
             Föregående
           </button>
-          <button className="btn-primary" onClick={() => navigate("/profile")}>
+          <button className="btn-primary" onClick={handleRegister}>
             Kom igång
           </button>
         </div>
