@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./CreateJobForm.css";
 import { createJob } from "../../services/jobService";
 
+
 const REQUIREMENTS = [
   { id: "backgroundCheck", label: "Belastningsregister krävs" },
   { id: "drivingLicense", label: "Körkort krävs" },
@@ -118,6 +119,10 @@ export default function CreateJobForm() {
             </p>
             <button className="btn-primary" onClick={handleReset}>
               Skapa nytt uppdrag
+            </button>
+           {/* navigate(-1) navigerar tillbaka till föregående sida, vilket är org dashboard */}
+            <button className="btn-outline-blue" onClick={() => navigate(-1)}> 
+              Tillbaka
             </button>
           </div>
         </div>

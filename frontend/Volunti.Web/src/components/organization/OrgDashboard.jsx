@@ -19,12 +19,21 @@ export default function OrgDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showInviteModal, setShowInviteModal] = useState(false);
+  // Toast är ett vanligt UI-mönster för notifikationer - namnet kommer från att det "poppar upp" som toast ur en brödrost
+  const [toast, setToast] = useState(null);
   const [inviteEmail, setInviteEmail] = useState("");
   const [invitePassword, setInvitePassword] = useState("");
 
   useEffect(() => {
     loadDashboardData();
   }, []);
+
+  // Auto-dismiss toast efter 3 sekunder
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 3000);
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   const loadDashboardData = async () => {
     try {
@@ -50,7 +59,7 @@ export default function OrgDashboard() {
       await loadDashboardData();
     } catch (err) {
       console.error("Fel vid uppdatering av ansökan:", err);
-      alert("Kunde inte uppdatera ansökan. Försök igen.");
+      setToast({ type: "error", message: "Kunde inte uppdatera ansökan. Försök igen." });
     }
   };
 
@@ -60,9 +69,10 @@ export default function OrgDashboard() {
       setShowInviteModal(false);
       setInviteEmail("");
       setInvitePassword("");
-      alert("Medarbetare tillagd!");
+      setToast({ type: "success", message: "Medarbetare tillagd!" });
     } catch (err) {
-      alert("Kunde inte bjuda in medarbetare. Försök igen.");
+      console.error("Kunde inte bjuda in medarbetare. Försök igen.", err);
+      setToast({ type: "error", message: "Kunde inte bjuda in medarbetare. Försök igen." });
     }
   };
 
@@ -84,6 +94,7 @@ export default function OrgDashboard() {
 
   return (
     <div className="org-dashboard-wrapper">
+      {toast && <div className={`toast toast-${toast.type}`}>{toast.message}</div>}
       {/* NAV HÄR */}
       <div className="org-dashboard-nav">
         <h1

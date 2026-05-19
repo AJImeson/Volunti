@@ -164,3 +164,24 @@
   margin-bottom: 1rem;
   display: block;
 }
+
+.toast {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+}
+
+.toast-success {
+  background-color: #16a34a;
+}
+
+.toast-error {
+  background-color: #dc2626;
+}
