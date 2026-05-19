@@ -9,14 +9,18 @@ export default function VolunteerDashboard() {
   
 
   const [applications, setApplications] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
   const loadApplications = async () => {
     try {
       const data = await fetchMyApplications();
       setApplications(data);
+      setIsLoading(false);
     } catch (error) {
-      console.error(error);
+      setError("Could not load applications.");
+      setIsLoading(false);
     }
   };
 
@@ -61,7 +65,13 @@ export default function VolunteerDashboard() {
 
         <div className="volunteer-dashboard-list">
 
-          {applications.map((app) => (
+          {isLoading && <p>Loading applications...</p>}
+          {error && <p>{error}</p>}
+          {!isLoading && applications.length === 0 && (
+            <p>No applications yet.</p>
+          )}
+
+          {!isLoading && applications.map((app) => (
             <div key={app.applicationId} className="volunteer-dashboard-item">
 
               <h3>{app.jobTitle}</h3>
