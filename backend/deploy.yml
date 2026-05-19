@@ -28,5 +28,5 @@ stop_review:
     - python delete.py
   environment:
     name: production
-    action: stop
+    action: stop_review
   allow_failure: true
