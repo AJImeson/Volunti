@@ -39,12 +39,34 @@ export const getMyApplications = async (status = null) => {
   return response.data;
 };
 
-// Godkänn eller avvisa en ansökan (bara OrgAdmin enligt backend)
+// Godkänn eller avvisa en ansökan
 export const updateApplicationStatus = async (applicationId, status) => {
   const response = await axios.put(
     `${API_URL}/applications/${applicationId}`,
-    { status }, // backend förväntar { "status": "Approved" } eller "Rejected"
-    { headers: authHeaders() }
+    { status },
+    { headers: authHeaders() },
   );
+  return response.data;
+};
+
+// Hämta alla öppna jobb
+export const fetchAllJobs = async () => {
+  const response = await axios.get(`${API_URL}/jobs`);
+  return response.data;
+};
+
+// Volontär ansöker till ett jobb
+export const applyToJob = async (jobId) => {
+  const response = await axios.post(`${API_URL}/jobs/${jobId}/apply`, null, {
+    headers: authHeaders(),
+  });
+  return response.data;
+};
+
+// Volontär hämtar sina egna ansökningar
+export const getMyApplicationsAsVolunteer = async () => {
+  const response = await axios.get(`${API_URL}/me/applications`, {
+    headers: authHeaders(),
+  });
   return response.data;
 };
