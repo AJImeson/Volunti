@@ -87,8 +87,7 @@ namespace Volunti.Endpoints
                 await db.SaveChangesAsync();
 
                 return Results.Ok($"Organization: '{organization.OrgName}' med id: '{organization.OrganizationId}' togs bort.");
-            })
-            .RequireAuthorization();
+            }).RequireAuthorization(policy => policy.RequireRole("OrgAdmin"));
 
         }
     }
