@@ -10,7 +10,8 @@ backend-deploy:
   script:
     - python deploy.py backend
   environment:
-    name: production
+    name: production/$CI_COMMIT_REF_SLUG
+    url: https://volunti.example.com
     on_stop: stop_review
 
 stop_review:
@@ -26,6 +27,7 @@ stop_review:
   script:
     - python delete.py
   environment:
-    name: production
-    action: stop 
+    name: production/$CI_COMMIT_REF_SLUG
+    action: stop
+  when: manual 
   allow_failure: true
