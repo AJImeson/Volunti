@@ -124,30 +124,10 @@
 }
 
 
-.dashboard-btn {
-  background-color: transparent;
-  border: 1px solid rgba(255,255,255,0.25);
-  color: white;
-  padding: 0.55rem 1rem;
-  border-radius: 10px;
-  font-size: 0.95rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.dashboard-btn:hover {
-  background-color: rgba(255,255,255,0.1);
-  border-color: transparent;
-}
 
 @media(max-width: 390px){
     .volunteer-dashboard-nav {
         padding: 2rem 1rem;
-    }
-
-    .volunteer-dashboard-nav-buttons {
-        gap: 0.7rem;
     }
 
     .volunteer-dashboard-nav-buttons button {

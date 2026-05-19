@@ -1,32 +1,31 @@
 import "./VolunteerDashboard.css";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { fetchMyApplications } from "../../services/authService";
 
 export default function VolunteerDashboard() {
 
   const navigate = useNavigate();
+  
 
-  const applications = [
-    {
-      id: 1,
-      title: "Läxhjälp för ungdomar",
-      organization: "Röda korset",
-      status: "Pending"
-    },
+  const [applications, setApplications] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
 
-    {
-      id: 2,
-      title: "Hjälp till vid lokal strandstädning",
-      organization: "Svenska kyrkan",
-      status: "Approved"
-    },
+  useEffect(() => {
+  const loadApplications = async () => {
+    try {
+      const data = await fetchMyApplications();
+      setApplications(data);
+      setIsLoading(false);
+    } catch (error) {
+      setError("Could not load applications.");
+      setIsLoading(false);
+    }
+  };
 
-    {
-      id: 3,
-      title: "Matutdelning till behövande",
-      organization: "Stadsmissionen",
-      status: "Rejected"
-    },
-  ];
+  loadApplications();
+}, []);
 
   return (
     <div className="volunteer-dashboard-wrapper">
@@ -66,12 +65,16 @@ export default function VolunteerDashboard() {
 
         <div className="volunteer-dashboard-list">
 
-          {applications.map((app) => (
-            <div key={app.id} className="volunteer-dashboard-item">
+          {isLoading && <p>Loading applications...</p>}
+          {error && <p>{error}</p>}
+          {!isLoading && applications.length === 0 && (
+            <p>No applications yet.</p>
+          )}
 
-              <h3>{app.title}</h3>
+          {!isLoading && applications.map((app) => (
+            <div key={app.applicationId} className="volunteer-dashboard-item">
 
-              <p>{app.organization}</p>
+              <h3>{app.jobTitle}</h3>
 
               <span className={`status-badge ${app.status.toLowerCase()}`}>
                 {app.status}

@@ -369,6 +369,12 @@ export const removeExperience = async (id) => {
   await api.delete(`/me/experiences/${id}`);
 };
 
+//Applications
+export const fetchMyApplications = async () => {
+  const { data } = await api.get("/applications/volunteer/mine");
+  return data;
+};
+
 /* ==========================================================================
    SESSION
    ========================================================================== */
