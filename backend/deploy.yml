@@ -29,4 +29,4 @@ stop_review:
   environment:
     name: production
     action: stop
-    allow_failure: true
+  allow_failure: true
