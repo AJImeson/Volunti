@@ -65,7 +65,7 @@ export const applyToJob = async (jobId) => {
 
 // Volontär hämtar sina egna ansökningar
 export const getMyApplicationsAsVolunteer = async () => {
-  const response = await axios.get(`${API_URL}/me/applications`, {
+  const response = await axios.get(`${API_URL}/applications/volunteer/mine`, {
     headers: authHeaders(),
   });
   return response.data;
