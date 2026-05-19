@@ -11,7 +11,6 @@ backend-deploy:
     - python deploy.py backend
   environment:
     name: production
-    url: https://
     on_stop: stop_review
 
 stop_review:
@@ -28,5 +27,5 @@ stop_review:
     - python delete.py
   environment:
     name: production
-    action: stop_review
+    action: stop 
   allow_failure: true
