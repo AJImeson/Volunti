@@ -31,7 +31,7 @@ def rollout_pause(component):
 
 def main():
     if not REGISTRY or not TAG:
-        print("Please set a REGISTRY_IMAGE and a CI_COMMIT_SHORT_SHA", file=sys.stderr
+        print("Please set a REGISTRY_IMAGE and a CI_COMMIT_SHORT_SHA"), file=sys.stderr
         sys.exit(1)
     print(f"Deploying {COMPONENT}:{NAMESPACE}:{TAG}")
     apply_manifests(COMPONENT)
