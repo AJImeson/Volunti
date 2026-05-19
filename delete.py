@@ -6,7 +6,7 @@ NAMESPACE = os.getenv("KUBE_NAMESPACE", "doe25-group-13")
 
 def run_script(cmd, check=True):
     print(f"$ {' '.join(cmd)}", flush=True)
-    result = subprocess.run_script(cmd, text=True)
+    result = subprocess.run(cmd, text=True)
     if check and result.returncode != 0:
         sys.exit(result.returncode)
     return result
