@@ -24,7 +24,7 @@ stop_review:
   script:
     - python delete.py
   environment:
-    name: production
+    name: backend-production
     action: stop
   when: manual 
   allow_failure: true
