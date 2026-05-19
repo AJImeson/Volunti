@@ -125,17 +125,6 @@ namespace Volunti.Endpoints
                 if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
                     return Results.Unauthorized();
 
-            //    var volunteer = await db.Volunteers
-            //        .FirstOrDefaultAsync(v => v.UserId == userId);
-
-
-            //// GET /me/applications - volontär ser sina egna ansökningar
-            //app.MapGet("/me/applications", async (VoluntiDbContext db, HttpContext http) =>
-            //{
-            //    var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            //    if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
-            //        return Results.Unauthorized();
-
                 var volunteer = await db.Volunteers.FirstOrDefaultAsync(v => v.UserId == userId);
 
                 if (volunteer == null)
@@ -143,10 +132,10 @@ namespace Volunti.Endpoints
 
                 var applications = await db.VolunteerApplications
                     .Include(a => a.Job)
+                        .ThenInclude(j => j.Organization)
 
                     .Where(a => a.VolunteerId == volunteer.Id)
 
-                        //.ThenInclude(j => j.Organization)
                     .Where(a => a.VolunteerId == volunteer.Id)
                     .OrderByDescending(a => a.CreatedAt)
 
@@ -161,14 +150,6 @@ namespace Volunti.Endpoints
                     jobTitle = a.Job.Title,
 
                     city = a.Job.City,
-
-                    //jobDescription = a.Job.Description,
-                    //jobStartTime = a.Job.StartTime,
-                    //jobEndTime = a.Job.EndTime,
-                    //jobCity = a.Job.City,
-                    //jobAddress = a.Job.Address,
-                    //jobCategory = a.Job.Category.ToString(),
-                    //organizationName = a.Job.Organization != null ? a.Job.Organization.OrgName : "Okänd"
 
                 }));
             })
