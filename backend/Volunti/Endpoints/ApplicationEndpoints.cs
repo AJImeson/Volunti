@@ -82,7 +82,7 @@ namespace Volunti.Endpoints
                     VolunteerId = application.VolunteerId,
                     JobId = application.JobId
                 });
-            }).RequireAuthorization(policy => policy.RequireRole("Volunteer"));
+            }).RequireAuthorization(policy => policy.RequireRole("Volunteer")).RequireRateLimiting("write");
 
             // Endpoint för OrgAdmin att approve/reject application
             app.MapPut("/applications/{id}", async (int id, VoluntiDbContext db, HttpContext http, UpdateApplicationDto dto) =>

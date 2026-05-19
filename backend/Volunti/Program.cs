@@ -1,14 +1,15 @@
-using Volunti.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Scalar.AspNetCore;
-using Volunti.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Volunti.Interfaces;
-using Volunti.Service;
-using Volunti.Endpoints;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
+using Volunti.Data;
+using Volunti.Endpoints;
+using Volunti.Interfaces;
+using Volunti.Models;
+using Volunti.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,6 +63,25 @@ builder.Services.AddAuthentication(options =>
         )
     };
 });
+
+// Rate limiting begränsar antal requests per IP/användare under en tidsperiod - skyddar mot brute-force (t.ex. lösenordsgissning på /login) och spam (t.ex. massregistrering av konton)
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("auth", opt =>
+    {
+        opt.PermitLimit = 5;
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueLimit = 0;
+    });
+
+    options.AddFixedWindowLimiter("write", opt =>
+    {
+        opt.PermitLimit = 20;
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueLimit = 0;
+    });
+});
+
 builder.Services.AddAuthorization();
 
 // TODO: PRODUKTION - Lås CORS till specifik frontend-domän innan deploy
@@ -142,6 +162,7 @@ if (!app.Environment.IsDevelopment())
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 AuthEndpoints.RegisterEndpoints(app);
 OrganizationEndpoints.RegisterEndpoints(app);
