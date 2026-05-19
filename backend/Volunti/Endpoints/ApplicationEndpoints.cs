@@ -104,6 +104,40 @@ namespace Volunti.Endpoints
                 });
             })
             .RequireAuthorization(policy => policy.RequireRole("OrgAdmin"));
+
+
+            // Hämta alla ansökningar för inloggad volunteer
+            app.MapGet("/applications/volunteer/mine", async (
+                VoluntiDbContext db,
+                HttpContext http) =>
+            {
+                var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
+                    return Results.Unauthorized();
+
+                var volunteer = await db.Volunteers
+                    .FirstOrDefaultAsync(v => v.UserId == userId);
+
+                if (volunteer == null)
+                    return Results.NotFound("Volontären hittades inte.");
+
+                var applications = await db.VolunteerApplications
+                    .Include(a => a.Job)
+                    .Where(a => a.VolunteerId == volunteer.Id)
+                    .ToListAsync();
+
+                return Results.Ok(applications.Select(a => new
+                {
+                    applicationId = a.Id,
+                    status = a.Status.ToString(),
+                    createdAt = a.CreatedAt,
+                    jobId = a.JobId,
+                    jobTitle = a.Job.Title,
+                    city = a.Job.City
+                }));
+            })
+            .RequireAuthorization(policy => policy.RequireRole("Volunteer"));
         }
     }
 }
