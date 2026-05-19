@@ -10,8 +10,8 @@ backend-deploy:
   script:
     - python deploy.py backend
   environment:
-    name: production
-    url: https://volunti.example.com
+    name: backend-production
+    url: https://api.volunti.cc.k3s.chas.lab-dev
     on_stop: stop_review
 
 stop_review:

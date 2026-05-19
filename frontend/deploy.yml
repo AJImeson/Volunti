@@ -9,3 +9,6 @@ frontend-deploy:
     - chmod +x kubectl && mv kubectl /usr/local/bin
   script:
     - python deploy.py frontend
+  environment:
+    name: production-frontend
+    url: https://volunti.cc.k3s.chas.lab-dev
