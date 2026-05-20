@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./MissionsPage.css";
 import { MissionDetailsModal, MissionAcceptedModal } from "./MissionModal";
+import { getProfileImageUrl } from "../../services/authService";
 import {
   fetchAllJobs,
   applyToJob,
@@ -21,6 +22,7 @@ function jobToMission(job) {
   return {
     id: job.jobId,
     organization: "Organisation",
+    organizationImageUrl: job.organization?.profileImageUrl || null,
     timeAgo: formatRelativeTime(job.createdOn),
     title: job.title,
     description: job.description || "Ingen beskrivning angiven.",
@@ -518,7 +520,6 @@ function PreviousHelpedCarousel({ onShowAll }) {
    FEED CARD: stor vy
    ========================================================================== */
 function FeedCard({ mission, onView, onAccept }) {
-  // Formatera datum (19 maj) och tid (12:00-15:00) separat
   const formatDateShort = (dateStr) => {
     if (!dateStr) return "";
     return new Date(dateStr).toLocaleDateString("sv-SE", {
@@ -546,7 +547,20 @@ function FeedCard({ mission, onView, onAccept }) {
     <div className="feed-card">
       {/* Header */}
       <div className="feed-card-header">
-        <div className="org-avatar"></div>
+        <div className="org-avatar">
+          {mission.organizationImageUrl && (
+            <img
+              src={getProfileImageUrl(mission.organizationImageUrl)}
+              alt={mission.organization}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                borderRadius: "50%",
+              }}
+            />
+          )}
+        </div>
         <div className="org-info">
           <p className="org-name">{mission.organization}</p>
           <p className="org-time">{mission.timeAgo}</p>

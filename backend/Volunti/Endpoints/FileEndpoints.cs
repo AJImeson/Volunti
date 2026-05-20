@@ -246,24 +246,32 @@ namespace Volunti.Endpoints
                 if (userIdStr is null || !int.TryParse(userIdStr, out var userId))
                     return Results.Unauthorized();
 
+                // Försök hitta volontär eller organisation
                 var volunteer = await db.Volunteers.FirstOrDefaultAsync(v => v.UserId == userId);
-                if (volunteer is null) return Results.NotFound();
+                var organization = volunteer == null
+                    ? await db.Organizations.FirstOrDefaultAsync(o => o.UserId == userId)
+                    : null;
 
-                // Skapa public-mappen och radera ev. tidigare profilbild
+                if (volunteer is null && organization is null)
+                    return Results.NotFound("Användarprofil hittades inte.");
+
+                // Skapa public mappen
                 var publicFolder = Path.Combine(env.ContentRootPath, "wwwroot", "profile-images");
                 Directory.CreateDirectory(publicFolder);
 
-                // Ta bort gammal bild om den finns
-                if (!string.IsNullOrEmpty(volunteer.ProfileImageUrl))
+                // Ta bort gammal bild
+                string? oldImageUrl = volunteer?.ProfileImageUrl ?? organization?.ProfileImageUrl;
+                if (!string.IsNullOrEmpty(oldImageUrl))
                 {
-                    var oldFileName = Path.GetFileName(volunteer.ProfileImageUrl);
+                    var oldFileName = Path.GetFileName(oldImageUrl);
                     var oldPath = Path.Combine(publicFolder, oldFileName);
                     if (System.IO.File.Exists(oldPath))
                         System.IO.File.Delete(oldPath);
                 }
 
-                // Spara nya bilden
-                var newFileName = $"profile-{volunteer.Id}-{Guid.NewGuid()}{ext}";
+                // Spara nya bilden med prefix för vilken typ
+                var prefix = volunteer != null ? $"profile-{volunteer.Id}" : $"org-{organization!.OrganizationId}";
+                var newFileName = $"{prefix}-{Guid.NewGuid()}{ext}";
                 var fullPath = Path.Combine(publicFolder, newFileName);
                 using (var stream = new FileStream(fullPath, FileMode.Create))
                 {
@@ -272,7 +280,11 @@ namespace Volunti.Endpoints
 
                 // Spara relativ URL i databasen
                 var publicUrl = $"/profile-images/{newFileName}";
-                volunteer.ProfileImageUrl = publicUrl;
+                if (volunteer != null)
+                    volunteer.ProfileImageUrl = publicUrl;
+                else
+                    organization!.ProfileImageUrl = publicUrl;
+
                 await db.SaveChangesAsync();
 
                 return Results.Ok(new { profileImageUrl = publicUrl });
@@ -290,17 +302,27 @@ namespace Volunti.Endpoints
                     return Results.Unauthorized();
 
                 var volunteer = await db.Volunteers.FirstOrDefaultAsync(v => v.UserId == userId);
-                if (volunteer is null) return Results.NotFound();
+                var organization = volunteer == null
+                    ? await db.Organizations.FirstOrDefaultAsync(o => o.UserId == userId)
+                    : null;
 
-                if (!string.IsNullOrEmpty(volunteer.ProfileImageUrl))
+                if (volunteer is null && organization is null)
+                    return Results.NotFound();
+
+                string? imageUrl = volunteer?.ProfileImageUrl ?? organization?.ProfileImageUrl;
+                if (!string.IsNullOrEmpty(imageUrl))
                 {
-                    var fileName = Path.GetFileName(volunteer.ProfileImageUrl);
+                    var fileName = Path.GetFileName(imageUrl);
                     var fullPath = Path.Combine(env.ContentRootPath, "wwwroot", "profile-images", fileName);
                     if (System.IO.File.Exists(fullPath))
                         System.IO.File.Delete(fullPath);
                 }
 
-                volunteer.ProfileImageUrl = string.Empty;
+                if (volunteer != null)
+                    volunteer.ProfileImageUrl = string.Empty;
+                else
+                    organization!.ProfileImageUrl = string.Empty;
+
                 await db.SaveChangesAsync();
                 return Results.Ok();
             }).RequireAuthorization();
