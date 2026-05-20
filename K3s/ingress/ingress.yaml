@@ -10,8 +10,8 @@ spec:
     - match: Host(`volunti.cc.k3s.chas-lab.dev`)
       kind: Rule
       services:
-        - volunti-frontend
-      port: 80
+        - name: volunti-frontend
+          port: 80
       middlewares:
         - name: secure-headers
   tls:
@@ -38,7 +38,7 @@ spec:
 
 ---
 
-apiVersion: traefik.io/v1
+apiVersion: traefik.k8s.io/v1
 kind: IngressRoute
 metadata:
   name: adminer
@@ -47,7 +47,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`adminer.volunti.cc.k32.chas-lab.dev`)
+    - match: Host(`adminer.volunti.cc.k3s.chas-lab.dev`)
       kind: Rule
       services:
         - name: adminer
@@ -55,4 +55,4 @@ spec:
       middlewares:
         - name: volunti-basic-auth
   tls:
-    certResoler: letsencrypt
+    certResolver: letsencrypt
