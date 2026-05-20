@@ -5,7 +5,7 @@ metadata:
   namespace: doe25-group-13
 spec:
   basicAuth:
-    secret: mssql-secret
+    secret: adminer-basic-auth
 
 ---
 
