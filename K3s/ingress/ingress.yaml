@@ -1,20 +1,58 @@
-# https://kubernetes.io/docs/concepts/services-networking/ingress/
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: traefik.k8s.io/v1
+kind: IngressRoute
 metadata:
-  name: volunti-ingress
+  name: volunti-frontend
   namespace: doe25-group-13
 spec:
-  rules:
-  - host: example.foo.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: service1
-            port:
-              number: 80
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`volunti.cc.k3s.chas-lab.dev`)
+      kind: Rule
+      services:
+        - volunti-frontend
+      port: 80
+      middlewares:
+        - name: secure-headers
+  tls:
+    certResolver: letsencrypt
+
 ---
 
+apiVersion: traefik.k8s.io/v1
+kind: IngressRoute
+metadata:
+  name: volunti-backend
+  namespace: doe25-group-13
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`api.volunti.cc.k3s.chas-lab.dev`)
+      kind: Rule
+      services:
+        - name: volunti-backend
+          port: 80
+  tls:
+    certResolver: letsencrypt
+
+---
+
+apiVersion: traefik.io/v1
+kind: IngressRoute
+metadata:
+  name: adminer
+  namespace: doe25-group-13
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`adminer.volunti.cc.k32.chas-lab.dev`)
+      kind: Rule
+      services:
+        - name: adminer
+          port: 8080
+      middlewares:
+        - name: volunti-basic-auth
+  tls:
+    certResoler: letsencrypt

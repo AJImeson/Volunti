@@ -2,11 +2,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: frontend
+  name: volunti-frontend
   namespace: doe25-group-13
 spec:
   selector:
-    app: frontend
+    app: volunti-frontend
   type: ClusterIP
   ports:
   - name: http
