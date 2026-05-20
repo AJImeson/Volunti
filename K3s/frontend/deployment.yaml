@@ -13,6 +13,8 @@ spec:
       labels:
         app: volunti-frontend
     spec:
+      imagePullSecrets:
+        - name: registry-credentials
       containers:
       - name: volunti-frontend
         image: registry.chas-lab.dev/chas-challenge-2026/grupp-13/burgundy/frontend:latest
