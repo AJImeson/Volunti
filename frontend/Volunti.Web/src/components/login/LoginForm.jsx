@@ -38,7 +38,7 @@ export default function LoginForm() {
       else if (role === "OrgUser") {
         navigate("/org-user-dashboard");
       } else {
-        navigate("/volunteer-dashboard");
+        navigate("/missions");
     }
     } catch (error) {
       setErrorMsg(error.message);
