@@ -6,11 +6,17 @@ import {
   updateApplicationStatus,
 } from "../../services/jobService";
 import "./OrgDashboard.css";
-import { clearSession, inviteOrgMember } from "../../services/authService";
+import {
+  clearSession,
+  inviteOrgMember,
+  fetchCurrentOrganization,
+  uploadProfileImage,
+  getProfileImageUrl,
+} from "../../services/authService";
+import AvatarCropModal from "../profile/AvatarCropModal";
+import { useRef } from "react";
 import "../missions/MissionModal.css";
 
-
-// OrgAdmin Dashboard - full kontroll: publicera uppdrag, godkänn/avvisa ansökningar
 export default function OrgDashboard() {
   const navigate = useNavigate();
 
@@ -19,31 +25,27 @@ export default function OrgDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showInviteModal, setShowInviteModal] = useState(false);
-  // Toast är ett vanligt UI-mönster för notifikationer - namnet kommer från att det "poppar upp" som toast ur en brödrost
+
   const [toast, setToast] = useState(null);
   const [inviteEmail, setInviteEmail] = useState("");
   const [invitePassword, setInvitePassword] = useState("");
 
-  useEffect(() => {
-    loadDashboardData();
-  }, []);
-
-  // Auto-dismiss toast efter 3 sekunder
-  useEffect(() => {
-    if (!toast) return;
-    const timer = setTimeout(() => setToast(null), 3000);
-    return () => clearTimeout(timer);
-  }, [toast]);
+  const [organization, setOrganization] = useState(null);
+  const [pendingAvatarSrc, setPendingAvatarSrc] = useState(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [avatarError, setAvatarError] = useState("");
+  const avatarInputRef = useRef(null);
 
   const loadDashboardData = async () => {
     try {
-      setLoading(true);
-      const [jobsData, applicationsData] = await Promise.all([
+      const [jobsData, applicationsData, orgData] = await Promise.all([
         getMyJobs(),
         getMyApplications("Pending"),
+        fetchCurrentOrganization().catch(() => null),
       ]);
       setJobs(jobsData);
       setApplications(applicationsData);
+      setOrganization(orgData);
       setError(null);
     } catch (err) {
       console.error("Fel vid hämtning av dashboard-data:", err);
@@ -53,13 +55,26 @@ export default function OrgDashboard() {
     }
   };
 
+  useEffect(() => {
+    setTimeout(loadDashboardData, 0);
+  }, []);
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 3000);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
   const handleApplicationDecision = async (applicationId, decision) => {
     try {
       await updateApplicationStatus(applicationId, decision);
       await loadDashboardData();
     } catch (err) {
       console.error("Fel vid uppdatering av ansökan:", err);
-      setToast({ type: "error", message: "Kunde inte uppdatera ansökan. Försök igen." });
+      setToast({
+        type: "error",
+        message: "Kunde inte uppdatera ansökan. Försök igen.",
+      });
     }
   };
 
@@ -72,8 +87,54 @@ export default function OrgDashboard() {
       setToast({ type: "success", message: "Medarbetare tillagd!" });
     } catch (err) {
       console.error("Kunde inte bjuda in medarbetare. Försök igen.", err);
-      setToast({ type: "error", message: "Kunde inte bjuda in medarbetare. Försök igen." });
+      setToast({
+        type: "error",
+        message: "Kunde inte bjuda in medarbetare. Försök igen.",
+      });
     }
+  };
+
+  const handleAvatarClick = () => {
+    avatarInputRef.current?.click();
+  };
+
+  const handleAvatarFileSelected = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setPendingAvatarSrc(reader.result);
+    };
+    reader.readAsDataURL(file);
+
+    if (avatarInputRef.current) avatarInputRef.current.value = "";
+  };
+
+  const handleAvatarCropSave = async (blob) => {
+    setAvatarError("");
+    setIsUploadingAvatar(true);
+    try {
+      const file = new File([blob], "org-profile.jpg", { type: "image/jpeg" });
+      const result = await uploadProfileImage(file);
+      setOrganization((prev) => ({
+        ...prev,
+        profileImageUrl: result.profileImageUrl,
+      }));
+      setPendingAvatarSrc(null);
+      setToast({ type: "success", message: "Profilbild uppdaterad!" });
+    } catch (err) {
+      setAvatarError(
+        err.response?.data?.detail || err.message || "Uppladdning misslyckades",
+      );
+      setToast({ type: "error", message: "Kunde inte ladda upp bild." });
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  const handleAvatarCropCancel = () => {
+    setPendingAvatarSrc(null);
   };
 
   if (loading) {
@@ -94,7 +155,9 @@ export default function OrgDashboard() {
 
   return (
     <div className="org-dashboard-wrapper">
-      {toast && <div className={`toast toast-${toast.type}`}>{toast.message}</div>}
+      {toast && (
+        <div className={`toast toast-${toast.type}`}>{toast.message}</div>
+      )}
       {/* NAV HÄR */}
       <div className="org-dashboard-nav">
         <h1
@@ -213,7 +276,57 @@ export default function OrgDashboard() {
           )}
         </section>
       </div>
-
+      <div className="org-avatar-section">
+        <input
+          ref={avatarInputRef}
+          type="file"
+          accept=".jpg,.jpeg,.png"
+          style={{ display: "none" }}
+          onChange={handleAvatarFileSelected}
+        />
+        <div
+          className="org-avatar-container"
+          onClick={handleAvatarClick}
+          role="button"
+          tabIndex={0}
+          title={
+            organization?.profileImageUrl
+              ? "Klicka för att byta bild"
+              : "Klicka för att lägga till bild"
+          }
+        >
+          {organization?.profileImageUrl ? (
+            <img
+              src={getProfileImageUrl(organization.profileImageUrl)}
+              alt="Organisationsbild"
+              className="org-profile-img"
+            />
+          ) : (
+            <div className="org-avatar-placeholder">
+              <span>
+                Lägg till
+                <br />
+                bild
+              </span>
+            </div>
+          )}
+          {isUploadingAvatar && (
+            <div className="org-avatar-overlay">
+              <span>...</span>
+            </div>
+          )}
+        </div>
+        {organization && (
+          <div className="org-avatar-info">
+            <h2 className="org-avatar-name">{organization.orgName}</h2>
+            <p className="org-avatar-meta">
+              {organization.companyName}{" "}
+              {organization.municipality && `· ${organization.municipality}`}
+            </p>
+          </div>
+        )}
+        {avatarError && <p className="org-avatar-error">{avatarError}</p>}
+      </div>
       {showInviteModal && (
         <div
           className="modal-backdrop"
@@ -253,6 +366,13 @@ export default function OrgDashboard() {
             </div>
           </div>
         </div>
+      )}
+      {pendingAvatarSrc && (
+        <AvatarCropModal
+          imageSrc={pendingAvatarSrc}
+          onCancel={handleAvatarCropCancel}
+          onSave={handleAvatarCropSave}
+        />
       )}
     </div>
   );
