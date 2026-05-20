@@ -309,22 +309,28 @@ export default function MissionsPage() {
                 viewMode === "feed" ? "missions-feed" : "missions-list"
               }
             >
-              {filteredMissions.map((mission) =>
-                viewMode === "feed" ? (
-                  <FeedCard
-                    key={mission.id}
-                    mission={mission}
-                    onView={openDetails}
-                    onAccept={openAccepted}
-                  />
-                ) : (
-                  <ListCard
-                    key={mission.id}
-                    mission={mission}
-                    onView={openDetails}
-                    onAccept={openAccepted}
-                  />
-                ),
+              {filteredMissions.length === 0 ? (
+                <p className="no-missions-text">
+                  Finns inga uppdrag.
+                </p>
+              ) : (
+                filteredMissions.map((mission) =>
+                  viewMode === "feed" ? (
+                    <FeedCard
+                      key={mission.id}
+                      mission={mission}
+                      onView={openDetails}
+                      onAccept={openAccepted}
+                    />
+                  ) : (
+                    <ListCard
+                      key={mission.id}
+                      mission={mission}
+                      onView={openDetails}
+                      onAccept={openAccepted}
+                    />
+                  ),
+                )
               )}
             </div>
           </>
