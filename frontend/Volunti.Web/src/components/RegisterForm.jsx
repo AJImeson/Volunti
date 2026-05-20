@@ -439,7 +439,7 @@ export default function RegisterPage() {
         }
       }
 
-      navigate("/profile");
+      navigate("/missions");
     } catch (err) {
       setErrorMsg(err.message || "Något gick fel. Försök igen.");
       window.scrollTo(0, 0);
