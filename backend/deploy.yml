@@ -10,24 +10,34 @@ backend-deploy:
     - apt-get update && apt-get install -y curl
     - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
     - chmod +x kubectl && mv kubectl /usr/local/bin/
+   - mkdir -p ~/.kube
+      - echo "$KUBECONFIG_BASE64" | base64 -d > ~/.kube/config
+      - chmod 600 ~/.kube/config
   script:
     - python deploy.py backend
   environment:
     name: backend-production
-    url: https://api.volunti.cc.k3s.chas.lab-dev
-    on_stop: stop_review
+    url: https://api.volunti.cc.k3s.chas-lab.dev
+    on_stop: backend-stop
 
-stop_review:
+backend-stop:
   stage: cleanup
   image: python:3.12-slim
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+      when: manual
+    - if: '$CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH'
+      when: manual
   before_script:
     - apt-get update && apt-get install -y curl
     - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
     - chmod +x kubectl && mv kubectl /usr/local/bin/
+    - mkdir -p ~/.kube
+    - echo "$KUBECONFIG_BASE64" | base64 -d > ~/.kube/config
+    - chmod 600 ~/.kube/config
   script:
     - python delete.py
   environment:
     name: backend-production
     action: stop
-  when: manual 
   allow_failure: true
