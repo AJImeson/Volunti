@@ -42,4 +42,3 @@ spec:
           envFrom:
             - configMapRef:
                 name: backend-config
-                  key: Jwt__SigningKey
