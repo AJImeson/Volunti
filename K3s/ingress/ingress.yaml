@@ -39,11 +39,11 @@ spec:
               name: adminer
               port:
                 number: 80
-tls:
-  - hosts:
-      - volunti.cc.k3s.chas-lab.dev
-      - api.volunti.cc.k3s.chas-lab.dev
-      - adminer.volunti.cc.k3s.chas-lab.dev
+  tls:
+    - hosts:
+        - volunti.cc.k3s.chas-lab.dev
+        - api.volunti.cc.k3s.chas-lab.dev
+        - adminer.volunti.cc.k3s.chas-lab.dev
 ---
 
 
