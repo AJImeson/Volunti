@@ -1,4 +1,3 @@
-# https://kubernetes.io/docs/concepts/services-networking/ingress/
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -9,100 +8,53 @@ metadata:
     traefik.io/router.middlewares: doe25-group-13-secure-headers@kubernetescrd
 spec:
   rules:
-  - host: volunti.cc.k3s.chas-lab.dev
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: volunti-frontend
-            port:
-              number: 80
-  - host: api.volunti.cc.k3s.chas-lab.dev
-    http:
-      paths:
-        - path: /
-          pathType: Prefix
-          backend:
-            service:
-              name: volunti-backend
-              port:
-                number: 80
-  - host: adminer.volunti.cc.k3s.chas-lab.dev
-    http:
-      paths:
-        - path: /
-          pathType: Prefix
-          backend:
-            service:
-              name: adminer
-              port:
-                number: 80
+    - host: volunti.cc.k3s.chas-lab.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: volunti-frontend
+                port:
+                  number: 80
+    - host: api.volunti.cc.k3s.chas-lab.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: volunti-backend
+                port:
+                  number: 80
   tls:
     - hosts:
         - volunti.cc.k3s.chas-lab.dev
         - api.volunti.cc.k3s.chas-lab.dev
-        - adminer.volunti.cc.k3s.chas-lab.dev
+
 ---
 
-
-
-# apiVersion: traefik.io/v1alpha1
-# kind: IngressRoute
-# metadata:
-#   name: volunti-frontend
-#   namespace: doe25-group-13
-# spec:
-#   entryPoints:
-#     - websecure
-#   routes:
-#     - match: Host(`volunti.cc.k3s.chas-lab.dev`)
-#       kind: Rule
-#       services:
-#         - name: volunti-frontend
-#           port: 80
-#       middlewares:
-#         - name: secure-headers
-#   tls:
-#     certResolver: letsencrypt
-
-# ---
-
-# apiVersion: traefik.io/v1alpha1
-# kind: IngressRoute
-# metadata:
-#   name: volunti-backend
-#   namespace: doe25-group-13
-# spec:
-#   entryPoints:
-#     - websecure
-#   routes:
-#     - match: Host(`api.volunti.cc.k3s.chas-lab.dev`)
-#       kind: Rule
-#       services:
-#         - name: volunti-backend
-#           port: 80
-#   tls:
-#     certResolver: letsencrypt
-
-# ---
-
-# apiVersion: traefik.io/v1alpha1
-# kind: IngressRoute
-# metadata:
-#   name: adminer
-#   namespace: doe25-group-13
-# spec:
-#   entryPoints:
-#     - websecure
-#   routes:
-#     - match: Host(`adminer.volunti.cc.k3s.chas-lab.dev`)
-#       kind: Rule
-#       services:
-#         - name: adminer
-#           port: 8080
-#       middlewares:
-#         - name: volunti-basic-auth
-#   tls:
-#     certResolver: letsencrypt
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: volunti-adminer
+  namespace: doe25-group-13
+  annotations:
+    traefik.io/router.tls.certresolver: letsencrypt
+    traefik.io/router.middlewares: doe25-group-13-secure-headers@kubernetescrd,doe25-group-13-volunti-basic-auth@kubernetescrd
+spec:
+  rules:
+    - host: adminer.volunti.cc.k3s.chas-lab.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: adminer
+                port:
+                  number: 8080
+  tls:
+    - hosts:
+        - adminer.volunti.cc.k3s.chas-lab.dev
