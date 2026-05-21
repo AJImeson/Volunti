@@ -380,6 +380,30 @@
   font-size: 1rem;
 }
 
+.btn-applied {
+  padding: 1rem;
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+  border-radius: 12px;
+  font-weight: bold;
+  width: 100%;
+  cursor: not-allowed;
+  font-family: inherit;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.feed-actions .btn-applied,
+.list-actions .btn-applied {
+  flex: 1;
+  padding: 0.6rem;
+  font-size: 0.9rem;
+}
+
 /* ==========================================================================
    LIST-CARDS (enkel vy)
    ========================================================================== */

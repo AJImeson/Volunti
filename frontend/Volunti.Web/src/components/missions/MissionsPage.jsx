@@ -90,8 +90,6 @@ export default function MissionsPage() {
   }, []);
 
   useEffect(() => {
-    if (activeTab !== "ansokningar") return;
-
     let cancelled = false;
 
     getMyApplicationsAsVolunteer()
@@ -103,6 +101,7 @@ export default function MissionsPage() {
       .catch((err) => {
         if (cancelled) return;
         console.error("Kunde inte hämta ansökningar:", err);
+        // Bara visa fel om vi är på ansökningstabben
         setAppsError("Kunde inte ladda dina ansökningar.");
       })
       .finally(() => {
@@ -112,7 +111,7 @@ export default function MissionsPage() {
     return () => {
       cancelled = true;
     };
-  }, [activeTab]);
+  }, []);
 
   const openDetails = (mission) => {
     setActiveMission(mission);
@@ -123,6 +122,10 @@ export default function MissionsPage() {
     setApplyError("");
     try {
       await applyToJob(mission.id);
+      setApplications((prev) => [
+        ...prev,
+        { jobId: mission.id, status: "Pending", applicationId: Date.now() },
+      ]);
       setActiveMission(mission);
       setActiveModal("accepted");
     } catch (err) {
@@ -148,6 +151,8 @@ export default function MissionsPage() {
     setActiveModal(null);
     setTimeout(() => setActiveMission(null), 300);
   };
+
+  const appliedJobIds = new Set(applications.map((a) => a.jobId));
 
   const filteredMissions = missions.filter(
     (mission) =>
@@ -292,6 +297,7 @@ export default function MissionsPage() {
                         mission={mission}
                         onView={openDetails}
                         onAccept={openAccepted}
+                        hasApplied={appliedJobIds.has(mission.id)}
                       />
                     ) : (
                       <ListCard
@@ -299,6 +305,7 @@ export default function MissionsPage() {
                         mission={mission}
                         onView={openDetails}
                         onAccept={openAccepted}
+                        hasApplied={appliedJobIds.has(mission.id)}
                       />
                     ),
                   )
@@ -496,7 +503,7 @@ function PreviousHelpedCarousel({ onShowAll }) {
 /* ==========================================================================
    FEED CARD: stor vy
    ========================================================================== */
-function FeedCard({ mission, onView, onAccept }) {
+function FeedCard({ mission, onView, onAccept, hasApplied }) {
   const formatDateShort = (dateStr) => {
     if (!dateStr) return "";
     return new Date(dateStr).toLocaleDateString("sv-SE", {
@@ -592,9 +599,15 @@ function FeedCard({ mission, onView, onAccept }) {
           <button className="btn-outline-blue" onClick={() => onView(mission)}>
             Visa
           </button>
-          <button className="btn-primary" onClick={() => onAccept(mission)}>
-            Acceptera
-          </button>
+          {hasApplied ? (
+            <button className="btn-applied" disabled>
+              ✓ Ansökt
+            </button>
+          ) : (
+            <button className="btn-primary" onClick={() => onAccept(mission)}>
+              Acceptera
+            </button>
+          )}
         </div>
       </div>
 
@@ -715,7 +728,7 @@ function CategoryIcon() {
 /* ==========================================================================
    LIST CARD: kompakt vy
    ========================================================================== */
-function ListCard({ mission, onView, onAccept }) {
+function ListCard({ mission, onView, onAccept, hasApplied }) {
   return (
     <div className="list-card">
       <div
@@ -740,9 +753,15 @@ function ListCard({ mission, onView, onAccept }) {
           <button className="btn-outline-blue" onClick={() => onView(mission)}>
             Visa
           </button>
-          <button className="btn-primary" onClick={() => onAccept(mission)}>
-            Acceptera
-          </button>
+          {hasApplied ? (
+            <button className="btn-applied" disabled>
+              ✓ Ansökt
+            </button>
+          ) : (
+            <button className="btn-primary" onClick={() => onAccept(mission)}>
+              Acceptera
+            </button>
+          )}
         </div>
       </div>
     </div>
