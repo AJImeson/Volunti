@@ -38,7 +38,7 @@ def main():
     print(f"Deploying {COMPONENT}:{NAMESPACE}:{TAG}")
     apply_manifests(COMPONENT)
     create_image(COMPONENT)
-    rollout_pause(COMPONENT)
+    rollout_status(COMPONENT)
     print(f"Succesfully deployed {COMPONENT}")
 
 if __name__ == "__main__":
