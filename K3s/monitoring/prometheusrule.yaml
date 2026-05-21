@@ -11,9 +11,9 @@ spec:
       rules:
         - alert: voluntiBackendErrorAlert
           expr: |
-            sum(rate(http_requests_total{namespace="doe25-group-13",status=~"5..",handler!="/metrics"}[5m]))
+            sum(rate(http_requests_received_total{namespace="doe25-group-13",code=~"4..|5..",exported_endpoint!="/metrics"}[5m]))
               /
-            sum(rate(http_requests_total{namespace="doe25-group-13",handler!="/metrics"}[5m]))
+            sum(rate(http_requests_received_total{namespace="doe25-group-13",exported_endpoint!="/metrics"}[5m]))
               > 0.05
           for: 5m
           labels:
@@ -23,7 +23,7 @@ spec:
             description: "5% of all incoming requests are returning 5xx above for the last 5 minutes."
         - alert: voluntiWithoutTraffic
           expr: |
-            sum(rate(http_requests_total{namespace="doe25-group-13",handler!="/metrics"}[10m])) == 0
+            sum(rate(http_requests_total{namespace="doe25-group-13",exported_endpoint!="/metrics"}[10m])) == 0
           for: 15m
           labels:
             severity: info

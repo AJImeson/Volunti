@@ -20,7 +20,7 @@ data:
             "name": "namespace",
             "type": "query",
             "datasource": { "type": "prometheus", "uid": "prometheus" },
-            "query": "label_values(http_requests_total, namespace)",
+            "query": "label_values(http_requests_received_total, namespace)",
             "current": { "text": "doe25-group-13", "value": "doe25-group-13" },
             "refresh": 1,
             "includeAll": false
@@ -36,7 +36,7 @@ data:
           "datasource": { "type": "prometheus", "uid": "prometheus" },
           "targets": [
             {
-              "expr": "sum(rate(http_requests_total{namespace=\"$namespace\"}[1m])) by (code)",
+              "expr": "sum(rate(http_requests_received_total{namespace=\"$namespace\"}[1m])) by (code)",
               "legendFormat": "{{code}}",
               "refId": "A"
             }
@@ -53,7 +53,7 @@ data:
           "datasource": { "type": "prometheus", "uid": "prometheus" },
           "targets": [
             {
-              "expr": "sum(rate(http_requests_total{namespace=\"$namespace\",code=~\"5..\"}[5m])) / sum(rate(http_requests_total{namespace=\"$namespace\"}[5m])) * 100",
+              "expr": "sum(rate(http_requests_received_total{namespace=\"$namespace\",code=~\"4..|5..\"}[5m])) / sum(rate(http_requests_received_total{namespace=\"$namespace\"}[5m])) * 100",
               "refId": "A"
             }
           ],
