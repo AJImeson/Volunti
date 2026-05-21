@@ -16,6 +16,8 @@ def run_script(cmd, check=True):
 
 def apply_manifests(component):
     run_script(["kubectl", "apply", "-f", f"K3s/base/", "-n", NAMESPACE])
+    run_script(["kubectl", "apply", "-f", "K3s/database/", "-n", NAMESPACE])
+    run_script(["kubectl", "apply", "-f", "K3s/adminer/", "-n", NAMESPACE])
     run_script(["kubectl", "apply", "-f", f"K3s/{component}/", "-n", NAMESPACE])
     run_script(["kubectl", "apply", "-f", "K3s/ingress/", "-n", NAMESPACE])
 
