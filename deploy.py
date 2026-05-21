@@ -22,13 +22,13 @@ def apply_manifests(component):
 def create_image(component):
     image = f"{REGISTRY}/{component}:{TAG}"
     run_script(["kubectl", "set", "image",
-                f"deployment/{component}",
-                f"{component}={image}",
+                f"deployment/volunti-{component}",
+                f"volunti-{component}={image}",
                 "-n", NAMESPACE])
 
 def rollout_status(component):
     run_script(["kubectl", "rollout", "status",
-                f"deployment/{component}",
+                f"deployment/volunti-{component}",
                 "-n", NAMESPACE, "--timeout=120s"])
 
 def main():
