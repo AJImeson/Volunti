@@ -1,7 +1,11 @@
-//RoleProtectedRoute skyddar så att rätt roll har tillgång till rätt sida
-
 import React from "react";
-import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Outlet,
+  useLocation,
+} from "react-router-dom";
 import "./App.css";
 import ScrollToTop from "./components/ScrollToTop";
 import MarketingPage from "./components/marketing/MarketingPage";
@@ -28,38 +32,148 @@ import { OrgRegisterProvider } from "./components/context/OrgRegisterContext";
 import OrgDashboard from "./components/organization/OrgDashboard";
 import OrgUserDashboard from "./components/organization/OrgUserDashboard";
 import VolunteerDashboard from "./components/volunteer/VolunteerDashboard";
+import ComingSoonPage from "./components/placeholder/ComingSoonPage";
+import SchedulePage from "./components/schedule/SchedulePage";
+import AppLayout from "./components/AppLayout";
+
+function AnimatedRoutes() {
+  const location = useLocation();
+  return (
+    <div key={location.pathname} className="page-transition">
+      <Routes location={location}>
+        <Route path="/" element={<MarketingPage />} />
+        <Route path="/organizations" element={<OrganizationsPage />} />
+        <Route path="/find-missions" element={<FindMissionsPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/impact" element={<ImpactPage />} />
+        <Route path="/faq" element={<FaqPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/landing" element={<LandingPage />} />
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/register" element={<RegisterForm />} />
+
+        <Route
+          path="/missions"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <MissionsPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <Profile />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <SettingsPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/create-job"
+          element={
+            <ProtectedRoute>
+              <CreateJobForm />
+            </ProtectedRoute>
+          }
+        />
+        {/* En provider runt alla 4 steg så formData överlever navigering */}
+        <Route
+          element={
+            <OrgRegisterProvider>
+              <Outlet />
+            </OrgRegisterProvider>
+          }
+        >
+          <Route path="/org-register/1" element={<OrgRegister1 />} />
+          <Route path="/org-register/2" element={<OrgRegister2 />} />
+          <Route path="/org-register/3" element={<OrgRegister3 />} />
+          <Route path="/org-register/4" element={<OrgRegister4 />} />
+        </Route>
+        <Route
+          path="/org-dashboard"
+          element={
+            <RoleProtectedRoute allowedRoles={["OrgAdmin"]}>
+              <OrgDashboard />
+            </RoleProtectedRoute>
+          }
+        />
+        <Route
+          path="/org-user-dashboard"
+          element={
+            <RoleProtectedRoute allowedRoles={["OrgUser"]}>
+              <OrgUserDashboard />
+            </RoleProtectedRoute>
+          }
+        />
+        <Route
+          path="/volunteer-dashboard"
+          element={
+            <RoleProtectedRoute allowedRoles={["Volunteer"]}>
+              <VolunteerDashboard />
+            </RoleProtectedRoute>
+          }
+        />
+        <Route
+          path="/messages"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <ComingSoonPage
+                  title="Meddelanden"
+                  description="Här kommer du snart kunna chatta direkt med organisationer du arbetar med."
+                />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/schedule"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <SchedulePage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/create-post"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <ComingSoonPage
+                  title="Skapa inlägg"
+                  description="Här kommer du snart kunna lägga ut inlägg i nätverkstaben."
+                />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </div>
+  );
+}
 
 export default function App() {
   return (
     <BrowserRouter>
       <div className="app-container">
         <ScrollToTop />
-        <Routes>
-          <Route path="/" element={<MarketingPage />} />
-          <Route path="/organizations" element={<OrganizationsPage />} />
-          <Route path="/find-missions" element={<FindMissionsPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/impact" element={<ImpactPage />} />
-          <Route path="/faq" element={<FaqPage />} />
-          <Route path="/privacy" element={<PrivacyPage />} />
-          <Route path="/landing" element={<LandingPage />} />
-          <Route path="/login" element={<LoginForm />} />
-          <Route path="/register" element={<RegisterForm />} />
-          <Route path="/missions" element={<ProtectedRoute><MissionsPage /></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-          <Route path="/create-job" element={<ProtectedRoute><CreateJobForm /></ProtectedRoute>} />
-          {/* En provider runt alla 4 steg så formData överlever navigering (separata providers nollställer state) */}
-          <Route element={<OrgRegisterProvider><Outlet /></OrgRegisterProvider>}>
-            <Route path="/org-register/1" element={<OrgRegister1 />} />
-            <Route path="/org-register/2" element={<OrgRegister2 />} />
-            <Route path="/org-register/3" element={<OrgRegister3 />} />
-            <Route path="/org-register/4" element={<OrgRegister4 />} />
-          </Route>
-          <Route path="/org-dashboard" element={<RoleProtectedRoute allowedRoles={["OrgAdmin"]}><OrgDashboard /></RoleProtectedRoute>} />
-          <Route path="/org-user-dashboard" element={<RoleProtectedRoute allowedRoles={["OrgUser"]}><OrgUserDashboard /></RoleProtectedRoute>} />
-          <Route path="/volunteer-dashboard" element={<RoleProtectedRoute allowedRoles={["Volunteer"]}><VolunteerDashboard /></RoleProtectedRoute>} />
-        </Routes>
+        <AnimatedRoutes />
       </div>
     </BrowserRouter>
   );

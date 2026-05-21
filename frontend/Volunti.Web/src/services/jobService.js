@@ -70,3 +70,21 @@ export const getMyApplicationsAsVolunteer = async () => {
   });
   return response.data;
 };
+
+// Hämta volontärens tillgänglighet
+export const getMyAvailability = async () => {
+  const response = await axios.get(`${API_URL}/me/availability`, {
+    headers: authHeaders(),
+  });
+  return response.data;
+};
+
+// Uppdatera tillgänglighet
+export const updateMyAvailability = async (dates) => {
+  const response = await axios.put(
+    `${API_URL}/me/availability`,
+    { dates },
+    { headers: authHeaders() },
+  );
+  return response.data;
+};

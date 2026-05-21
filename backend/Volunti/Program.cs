@@ -170,5 +170,6 @@ JobEndpoints.RegisterEndpoints(app);
 VolunteerProfileEndpoints.RegisterEndpoints(app); 
 FileEndpoints.RegisterEndpoints(app);
 ApplicationEndpoints.RegisterEndpoints(app);
+ScheduleEndpoints.RegisterEndpoints(app);
 
 app.Run();

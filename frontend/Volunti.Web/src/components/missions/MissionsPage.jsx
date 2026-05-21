@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import "./MissionsPage.css";
 import { MissionDetailsModal, MissionAcceptedModal } from "./MissionModal";
 import { getProfileImageUrl } from "../../services/authService";
+import BottomNav from "../bottomnav/BottomNav";
 import {
   fetchAllJobs,
   applyToJob,
@@ -53,7 +53,6 @@ function formatRelativeTime(dateStr) {
 }
 
 export default function MissionsPage() {
-  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState("feed");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -161,47 +160,6 @@ export default function MissionsPage() {
       {/* TOPPMENY */}
       <div className="missions-top-nav">
         <h1 className="missions-logo">VOLUNTI</h1>
-        <div className="missions-nav-icons">
-          {/* <button className="dashboard-btn" onClick={() => navigate("/volunteer-dashboard")}>My Missions</button> */}
-          <button
-            className="icon-btn"
-            aria-label="Profil"
-            onClick={() => navigate("/profile")}
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
-          </button>
-          <button
-            className="icon-btn"
-            aria-label="Inställningar"
-            onClick={() => navigate("/settings")}
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="12" cy="12" r="3" />
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-            </svg>
-          </button>
-        </div>
       </div>
 
       {/* SÖKFÄLT */}
@@ -246,126 +204,139 @@ export default function MissionsPage() {
       </div>
       {/* HUVUDINNEHÅLL */}
       <div className="missions-content">
-        {/* UPPDRAG TAB */}
-        {activeTab === "uppdrag" && (
-          <>
-            {isLoading && (
-              <p
-                style={{ textAlign: "center", color: "#666", padding: "2rem" }}
-              >
-                Laddar uppdrag...
-              </p>
-            )}
-            {loadError && (
-              <p
-                style={{ textAlign: "center", color: "#d33", padding: "2rem" }}
-              >
-                {loadError}
-              </p>
-            )}
-            {applyError && (
-              <div
-                style={{
-                  textAlign: "center",
-                  color: "#d33",
-                  padding: "0.75rem",
-                  background: "#fee",
-                  borderRadius: 8,
-                  margin: "0 1rem 1rem 1rem",
-                }}
-              >
-                {applyError}
-              </div>
-            )}
-            {!isLoading && !loadError && missions.length === 0 && (
-              <p
-                style={{ textAlign: "center", color: "#666", padding: "2rem" }}
-              >
-                Inga uppdrag tillgängliga just nu.
-              </p>
-            )}
-
-            {viewMode === "feed" && (
-              <PreviousHelpedCarousel onShowAll={() => setViewMode("list")} />
-            )}
-
-            {/* HEADER FÖR LIST VYN*/}
-            {viewMode === "list" && (
-              <div
-                className="section-header"
-                style={{ marginBottom: "1.5rem" }}
-              >
-                <h2 className="section-title">Alla uppdrag</h2>
-                <button
-                  className="section-link"
-                  onClick={() => setViewMode("feed")}
+        <div className="tab-content-anim" key={activeTab}>
+          {/* UPPDRAG TAB */}
+          {activeTab === "uppdrag" && (
+            <>
+              {isLoading && (
+                <p
+                  style={{
+                    textAlign: "center",
+                    color: "#666",
+                    padding: "2rem",
+                  }}
                 >
-                  ‹ Tillbaka
-                </button>
-              </div>
-            )}
-
-            {/* MISSIONS LIST/FEED */}
-            <div
-              className={
-                viewMode === "feed" ? "missions-feed" : "missions-list"
-              }
-            >
-              {filteredMissions.length === 0 ? (
-                <p className="no-missions-text">
-                  Finns inga uppdrag.
+                  Laddar uppdrag...
                 </p>
-              ) : (
-                filteredMissions.map((mission) =>
-                  viewMode === "feed" ? (
-                    <FeedCard
-                      key={mission.id}
-                      mission={mission}
-                      onView={openDetails}
-                      onAccept={openAccepted}
-                    />
-                  ) : (
-                    <ListCard
-                      key={mission.id}
-                      mission={mission}
-                      onView={openDetails}
-                      onAccept={openAccepted}
-                    />
-                  ),
-                )
               )}
-            </div>
-          </>
-        )}
+              {loadError && (
+                <p
+                  style={{
+                    textAlign: "center",
+                    color: "#d33",
+                    padding: "2rem",
+                  }}
+                >
+                  {loadError}
+                </p>
+              )}
+              {applyError && (
+                <div
+                  style={{
+                    textAlign: "center",
+                    color: "#d33",
+                    padding: "0.75rem",
+                    background: "#fee",
+                    borderRadius: 8,
+                    margin: "0 1rem 1rem 1rem",
+                  }}
+                >
+                  {applyError}
+                </div>
+              )}
+              {!isLoading && !loadError && missions.length === 0 && (
+                <p
+                  style={{
+                    textAlign: "center",
+                    color: "#666",
+                    padding: "2rem",
+                  }}
+                >
+                  Inga uppdrag tillgängliga just nu.
+                </p>
+              )}
 
-        {/* MINA ANSÖKNINGAR TAB */}
-        {activeTab === "ansokningar" && (
-          <ApplicationsList
-            applications={applications}
-            isLoading={isLoadingApps}
-            error={appsError}
+              {viewMode === "feed" && (
+                <PreviousHelpedCarousel onShowAll={() => setViewMode("list")} />
+              )}
+
+              {/* HEADER FÖR LIST VYN*/}
+              {viewMode === "list" && (
+                <div
+                  className="section-header"
+                  style={{ marginBottom: "1.5rem" }}
+                >
+                  <h2 className="section-title">Alla uppdrag</h2>
+                  <button
+                    className="section-link"
+                    onClick={() => setViewMode("feed")}
+                  >
+                    ‹ Tillbaka
+                  </button>
+                </div>
+              )}
+
+              {/* MISSIONS LIST/FEED */}
+              <div
+                className={
+                  viewMode === "feed" ? "missions-feed" : "missions-list"
+                }
+              >
+                {filteredMissions.length === 0 ? (
+                  <p className="no-missions-text">Finns inga uppdrag.</p>
+                ) : (
+                  filteredMissions.map((mission) =>
+                    viewMode === "feed" ? (
+                      <FeedCard
+                        key={mission.id}
+                        mission={mission}
+                        onView={openDetails}
+                        onAccept={openAccepted}
+                      />
+                    ) : (
+                      <ListCard
+                        key={mission.id}
+                        mission={mission}
+                        onView={openDetails}
+                        onAccept={openAccepted}
+                      />
+                    ),
+                  )
+                )}
+              </div>
+            </>
+          )}
+
+          {/* MINA ANSÖKNINGAR TAB */}
+          {activeTab === "ansokningar" && (
+            <ApplicationsList
+              applications={applications}
+              isLoading={isLoadingApps}
+              error={appsError}
+            />
+          )}
+        </div>
+
+        {activeModal === "details" && (
+          <MissionDetailsModal
+            mission={activeMission}
+            onClose={closeModal}
+            onAccept={(m) => {
+              closeModal();
+              setTimeout(() => openAccepted(m), 200);
+            }}
           />
         )}
+
+        {activeModal === "accepted" && (
+          <MissionAcceptedModal
+            mission={activeMission}
+            onClose={closeModal}
+            onContact={(m) => console.log("Kontakta arrangör för:", m.title)}
+          />
+        )}
+        <BottomNav />
       </div>
-
-      {activeModal === "details" && (
-        <MissionDetailsModal
-          mission={activeMission}
-          onClose={closeModal}
-          onAccept={(m) => {
-            closeModal();
-            setTimeout(() => openAccepted(m), 200);
-          }}
-        />
-      )}
-
-      {activeModal === "accepted" && (
-        <MissionAcceptedModal
-          mission={activeMission}
-          onClose={closeModal}
-          onContact={(m) => console.log("Kontakta arrangör för:", m.title)}
-        />
-      )}
     </div>
   );
 }

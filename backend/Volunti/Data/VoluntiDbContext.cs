@@ -28,6 +28,8 @@ namespace Volunti.Data
         
         public DbSet<VolunteerExperience> VolunteerExperiences { get; set; }
         
+        public DbSet<VolunteerAvailability> VolunteerAvailabilities { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -111,6 +113,16 @@ namespace Volunti.Data
             modelBuilder.Entity<Job>()
                 .Property(j => j.Category)
                 .HasConversion<string>();
+                
+            modelBuilder.Entity<VolunteerAvailability>()
+                .HasIndex(va => new { va.VolunteerId, va.Date })
+                .IsUnique();
+
+            modelBuilder.Entity<VolunteerAvailability>()
+                .HasOne(va => va.Volunteer)
+                .WithMany()
+                .HasForeignKey(va => va.VolunteerId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
