@@ -17,21 +17,23 @@ def run_script(cmd, check=True):
 def apply_manifests(component):
     run_script(["kubectl", "apply", "-f", f"K3s/base/", "-n", NAMESPACE])
     run_script(["kubectl", "apply", "-f", f"K3s/{component}/", "-n", NAMESPACE])
+    run_script(["kubectl", "apply", "-f", "K3s/ingress/", "-n", NAMESPACE])
 
 def create_image(component):
-    image = f"{REGISTRY}/{component}:{TAG}"
+    image = f"{REGISTRY}/volunti-{component}:{TAG}"
     run_script(["kubectl", "set", "image",
-                f"deployment/{component}", f"{component}={image}",
+                f"deployment/volunti-{component}",
+                f"volunti-{component}={image}",
                 "-n", NAMESPACE])
 
-def rollout_pause(component):
-    run_script(["kubectl", "set", "image",
-                f"deployment/{component}", f"{component}={image}",
+def rollout_status(component):
+    run_script(["kubectl", "rollout", "status",
+                f"deployment/volunti-{component}",
                 "-n", NAMESPACE, "--timeout=120s"])
 
 def main():
     if not REGISTRY or not TAG:
-        print("Please set a REGISTRY_IMAGE and a CI_COMMIT_SHORT_SHA"), file=sys.stderr
+        print("Please set a REGISTRY_IMAGE and a CI_COMMIT_SHORT_SHA", file=sys.stderr)
         sys.exit(1)
     print(f"Deploying {COMPONENT}:{NAMESPACE}:{TAG}")
     apply_manifests(COMPONENT)
