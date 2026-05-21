@@ -64,6 +64,8 @@ builder.Services.AddAuthentication(options =>
     };
 });
 builder.Services.AddAuthorization();
+builder.Services.AddHealthChecks()
+    .AddSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")!); //for k3s
 
 // TODO: PRODUKTION - Lås CORS till specifik frontend-domän innan deploy
 // HUR: Byt ut AllowAnyOrigin() mot .WithOrigins("https://volunti.se") (eller riktiga frontend-URL:en)
@@ -154,6 +156,6 @@ FileEndpoints.RegisterEndpoints(app);
 ApplicationEndpoints.RegisterEndpoints(app);
 
 app.MapMetrics(); // For prometheus
-
+app.MapHealthChecks("/health"); // For k3s
 app.Run();
 
