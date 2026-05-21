@@ -32,5 +32,5 @@ spec:
     stsIncludeSubdomains: true
     forceSTSHeader: true
     contentTypeNosniff: true
-    browserXssFilter: true
     referrerPolicy: "same-origin"
+    contentSecurityPolicy: "default-src 'self'; script-src 'self'; object-src 'none'"
