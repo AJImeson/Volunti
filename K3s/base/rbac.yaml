@@ -1,0 +1,25 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: traefik-ingressroute-manager
+  namespace: doe15-group-13
+rules:
+  - apiGroups: ["traefik.io"]
+    resources: ["ingressroutes", "middleware"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: traefik-ingressroute-manager
+  namespace: doe15-group-13
+subjects:
+  - kind: ServiceAccount
+    name: group-13
+    namespace: doe15-group-13
+roleRef:
+  kind: Role
+  name: traefik-ingressroute-manager
+  apiGroups: rbac.authorization.k8s.io
