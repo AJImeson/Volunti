@@ -23,7 +23,7 @@ spec:
             description: "5% of all incoming requests are returning 5xx above for the last 5 minutes."
         - alert: voluntiWithoutTraffic
           expr: |
-            sum(rate(http_requests_total{namespace="doe25-group-13",exported_endpoint!="/metrics"}[10m])) == 0
+            sum(rate(http_requests_received_total{namespace="doe25-group-13",exported_endpoint!="/metrics"}[10m])) == 0
           for: 15m
           labels:
             severity: info
