@@ -10,6 +10,7 @@
   width: 100%;
   max-width: 420px;
   min-height: 100vh;
+  min-height: 100dvh;
   background-color: #2f44a5;
   margin: 0 auto;
   font-family: "Inter", sans-serif;
@@ -885,4 +886,130 @@
   font-size: 18px;
   font-weight: bold;
   border-radius: inherit;
+}
+
+@media (max-width: 767px) {
+  .profile-wrapper {
+    max-width: 100%;
+    box-shadow: none;
+    padding-bottom: 0;
+  }
+
+  .content-white {
+    padding-bottom: calc(80px + 50px);
+  }
+}
+
+@keyframes sectionExpand {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 1000px;
+  }
+}
+
+.add-tag-section,
+.file-upload-form,
+.experience-form {
+  animation: sectionExpand 0.3s ease-out;
+  overflow: hidden;
+}
+
+.tab-btn {
+  transition: all 0.2s ease;
+}
+
+.skill-tag,
+.preset-chip,
+.file-card,
+.exp-card {
+  transition: all 0.2s ease;
+}
+
+.skill-tag:hover,
+.preset-chip:hover {
+  transform: translateY(-1px);
+}
+
+@keyframes tagFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.skill-tag,
+.file-card,
+.exp-card {
+  animation: tagFadeIn 0.25s ease-out;
+}
+
+.mobile-only-actions {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .profile-wrapper {
+    max-width: 100%;
+    box-shadow: none;
+  }
+
+  .header-blue {
+    border-radius: 0;
+    padding: 2.5rem 3rem 1.5rem 3rem;
+  }
+
+  .volunti-logo {
+    font-size: 2rem;
+  }
+
+  .profile-card {
+    max-width: 760px;
+    margin: 1.5rem auto;
+    padding: 2rem;
+    gap: 2rem;
+  }
+
+  .profile-info h2 {
+    font-size: 2rem;
+  }
+
+  .tab-menu {
+    max-width: 760px;
+    margin: 1rem auto 0;
+    gap: 1rem;
+  }
+
+  .tab-btn {
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+  }
+
+  .content-white {
+    padding: 3rem;
+    max-width: 960px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .info-section {
+    margin-bottom: 2rem;
+  }
+
+  .info-section h3 {
+    font-size: 1.15rem;
+  }
+
+  .tags-container {
+    gap: 0.6rem;
+  }
 }
