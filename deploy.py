@@ -20,15 +20,15 @@ def apply_manifests(component):
     run_script(["kubectl", "apply", "-f", "K3s/ingress/", "-n", NAMESPACE])
 
 def create_image(component):
-    image = f"{REGISTRY}/volunti-{component}:{TAG}"
+    image = f"{REGISTRY}/{component}:{TAG}"
     run_script(["kubectl", "set", "image",
-                f"deployment/volunti-{component}",
-                f"volunti-{component}={image}",
+                f"deployment/{component}",
+                f"{component}={image}",
                 "-n", NAMESPACE])
 
 def rollout_status(component):
     run_script(["kubectl", "rollout", "status",
-                f"deployment/volunti-{component}",
+                f"deployment/{component}",
                 "-n", NAMESPACE, "--timeout=120s"])
 
 def main():
