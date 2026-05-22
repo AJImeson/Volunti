@@ -115,30 +115,23 @@ namespace Volunti.Endpoints
 
 
 
-            // Hämta alla ansökningar för inloggad volunteer
             app.MapGet("/applications/volunteer/mine", async (
                 VoluntiDbContext db,
                 HttpContext http) =>
             {
                 var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
                 if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
                     return Results.Unauthorized();
 
                 var volunteer = await db.Volunteers.FirstOrDefaultAsync(v => v.UserId == userId);
-
                 if (volunteer == null)
                     return Results.NotFound("Volontären hittades inte.");
 
                 var applications = await db.VolunteerApplications
                     .Include(a => a.Job)
                         .ThenInclude(j => j.Organization)
-
-                    .Where(a => a.VolunteerId == volunteer.Id)
-
                     .Where(a => a.VolunteerId == volunteer.Id)
                     .OrderByDescending(a => a.CreatedAt)
-
                     .ToListAsync();
 
                 return Results.Ok(applications.Select(a => new
@@ -148,12 +141,17 @@ namespace Volunti.Endpoints
                     createdAt = a.CreatedAt,
                     jobId = a.JobId,
                     jobTitle = a.Job.Title,
-
-                    city = a.Job.City,
-
+                    jobDescription = a.Job.Description,
+                    jobStartTime = a.Job.StartTime,
+                    jobEndTime = a.Job.EndTime,
+                    jobCity = a.Job.City,
+                    jobAddress = a.Job.Address,
+                    organizationName = a.Job.Organization != null
+                        ? (a.Job.Organization.OrgName ?? a.Job.Organization.CompanyName ?? "Okänd")
+                        : "Okänd"
                 }));
             })
             .RequireAuthorization(policy => policy.RequireRole("Volunteer"));
-        }
+                    }
     }
 }

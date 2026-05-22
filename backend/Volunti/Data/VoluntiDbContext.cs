@@ -28,6 +28,13 @@ namespace Volunti.Data
         
         public DbSet<VolunteerExperience> VolunteerExperiences { get; set; }
         
+        public DbSet<VolunteerAvailability> VolunteerAvailabilities { get; set; }
+
+        public DbSet<JobLike> JobLikes { get; set; }
+        public DbSet<JobComment> JobComments { get; set; }
+
+        public DbSet<JobCommentLike> JobCommentLikes { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -111,6 +118,67 @@ namespace Volunti.Data
             modelBuilder.Entity<Job>()
                 .Property(j => j.Category)
                 .HasConversion<string>();
+                
+            modelBuilder.Entity<VolunteerAvailability>()
+                .HasIndex(va => new { va.VolunteerId, va.Date })
+                .IsUnique();
+
+            modelBuilder.Entity<VolunteerAvailability>()
+                .HasOne(va => va.Volunteer)
+                .WithMany()
+                .HasForeignKey(va => va.VolunteerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<JobLike>()
+                .HasIndex(jl => new { jl.JobId, jl.UserId })
+                .IsUnique();
+
+            modelBuilder.Entity<JobLike>()
+                .HasOne(jl => jl.Job)
+                .WithMany()
+                .HasForeignKey(jl => jl.JobId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<JobLike>()
+                .HasOne(jl => jl.User)
+                .WithMany()
+                .HasForeignKey(jl => jl.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // JobComment
+            modelBuilder.Entity<JobComment>()
+                .HasOne(c => c.Job)
+                .WithMany()
+                .HasForeignKey(c => c.JobId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<JobComment>()
+                .HasOne(c => c.User)
+                .WithMany()
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<JobComment>()
+                .HasOne(c => c.ParentComment)
+                .WithMany(c => c.Replies)
+                .HasForeignKey(c => c.ParentCommentId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<JobCommentLike>()
+                .HasIndex(cl => new { cl.CommentId, cl.UserId })
+                .IsUnique();
+
+            modelBuilder.Entity<JobCommentLike>()
+                .HasOne(cl => cl.Comment)
+                .WithMany()
+                .HasForeignKey(cl => cl.CommentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<JobCommentLike>()
+                .HasOne(cl => cl.User)
+                .WithMany()
+                .HasForeignKey(cl => cl.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

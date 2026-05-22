@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import "./MissionsPage.css";
 import { MissionDetailsModal, MissionAcceptedModal } from "./MissionModal";
 import { getProfileImageUrl } from "../../services/authService";
+import BottomNav from "../bottomnav/BottomNav";
+import CommentModal from "./CommentModal";
 import {
   fetchAllJobs,
   applyToJob,
   getMyApplicationsAsVolunteer,
+  toggleJobLike,
+  getJobLikes,
 } from "../../services/jobService";
 
 // Konvertera Job från backend till mission format
@@ -53,7 +56,6 @@ function formatRelativeTime(dateStr) {
 }
 
 export default function MissionsPage() {
-  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState("feed");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -69,6 +71,9 @@ export default function MissionsPage() {
   const [applications, setApplications] = useState([]);
   const [isLoadingApps, setIsLoadingApps] = useState(true);
   const [appsError, setAppsError] = useState("");
+
+  const [commentMission, setCommentMission] = useState(null);
+  const [interactions, setInteractions] = useState({});
 
   useEffect(() => {
     let cancelled = false;
@@ -91,8 +96,6 @@ export default function MissionsPage() {
   }, []);
 
   useEffect(() => {
-    if (activeTab !== "ansokningar") return;
-
     let cancelled = false;
 
     getMyApplicationsAsVolunteer()
@@ -104,6 +107,7 @@ export default function MissionsPage() {
       .catch((err) => {
         if (cancelled) return;
         console.error("Kunde inte hämta ansökningar:", err);
+        // Bara visa fel om vi är på ansökningstabben
         setAppsError("Kunde inte ladda dina ansökningar.");
       })
       .finally(() => {
@@ -113,7 +117,31 @@ export default function MissionsPage() {
     return () => {
       cancelled = true;
     };
-  }, [activeTab]);
+  }, []);
+
+  useEffect(() => {
+    if (missions.length === 0) return;
+
+    let cancelled = false;
+    Promise.all(
+      missions.map((m) =>
+        getJobLikes(m.id)
+          .then((data) => ({ id: m.id, ...data }))
+          .catch(() => ({ id: m.id, count: 0, likedByMe: false })),
+      ),
+    ).then((results) => {
+      if (cancelled) return;
+      const map = {};
+      results.forEach((r) => {
+        map[r.id] = { likes: r.count, likedByMe: r.likedByMe, comments: 0 };
+      });
+      setInteractions(map);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [missions]);
 
   const openDetails = (mission) => {
     setActiveMission(mission);
@@ -124,6 +152,10 @@ export default function MissionsPage() {
     setApplyError("");
     try {
       await applyToJob(mission.id);
+      setApplications((prev) => [
+        ...prev,
+        { jobId: mission.id, status: "Pending", applicationId: Date.now() },
+      ]);
       setActiveMission(mission);
       setActiveModal("accepted");
     } catch (err) {
@@ -150,6 +182,62 @@ export default function MissionsPage() {
     setTimeout(() => setActiveMission(null), 300);
   };
 
+  const handleToggleLike = async (jobId) => {
+    setInteractions((prev) => {
+      const current = prev[jobId] || {
+        likes: 0,
+        likedByMe: false,
+        comments: 0,
+      };
+      const newLiked = !current.likedByMe;
+      return {
+        ...prev,
+        [jobId]: {
+          ...current,
+          likedByMe: newLiked,
+          likes: current.likes + (newLiked ? 1 : -1),
+        },
+      };
+    });
+    try {
+      const result = await toggleJobLike(jobId);
+      setInteractions((prev) => ({
+        ...prev,
+        [jobId]: {
+          ...(prev[jobId] || { comments: 0 }),
+          likedByMe: result.liked,
+          likes: result.count,
+        },
+      }));
+    } catch (err) {
+      console.error(err);
+      setInteractions((prev) => {
+        const current = prev[jobId];
+        if (!current) return prev;
+        return {
+          ...prev,
+          [jobId]: {
+            ...current,
+            likedByMe: !current.likedByMe,
+            likes: current.likes + (current.likedByMe ? 1 : -1),
+          },
+        };
+      });
+    }
+  };
+
+  const handleCommentCountChange = (jobId, newCount) => {
+    setInteractions((prev) => ({
+      ...prev,
+      [jobId]: {
+        ...(prev[jobId] || { likes: 0, likedByMe: false }),
+        comments: newCount,
+      },
+    }));
+  };
+
+  const appliedJobIds = new Set(applications.map((a) => a.jobId));
+
   const filteredMissions = missions.filter(
     (mission) =>
       mission.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -161,47 +249,6 @@ export default function MissionsPage() {
       {/* TOPPMENY */}
       <div className="missions-top-nav">
         <h1 className="missions-logo">VOLUNTI</h1>
-        <div className="missions-nav-icons">
-          {/* <button className="dashboard-btn" onClick={() => navigate("/volunteer-dashboard")}>My Missions</button> */}
-          <button
-            className="icon-btn"
-            aria-label="Profil"
-            onClick={() => navigate("/profile")}
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
-          </button>
-          <button
-            className="icon-btn"
-            aria-label="Inställningar"
-            onClick={() => navigate("/settings")}
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="12" cy="12" r="3" />
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-            </svg>
-          </button>
-        </div>
       </div>
 
       {/* SÖKFÄLT */}
@@ -246,126 +293,153 @@ export default function MissionsPage() {
       </div>
       {/* HUVUDINNEHÅLL */}
       <div className="missions-content">
-        {/* UPPDRAG TAB */}
-        {activeTab === "uppdrag" && (
-          <>
-            {isLoading && (
-              <p
-                style={{ textAlign: "center", color: "#666", padding: "2rem" }}
-              >
-                Laddar uppdrag...
-              </p>
-            )}
-            {loadError && (
-              <p
-                style={{ textAlign: "center", color: "#d33", padding: "2rem" }}
-              >
-                {loadError}
-              </p>
-            )}
-            {applyError && (
-              <div
-                style={{
-                  textAlign: "center",
-                  color: "#d33",
-                  padding: "0.75rem",
-                  background: "#fee",
-                  borderRadius: 8,
-                  margin: "0 1rem 1rem 1rem",
-                }}
-              >
-                {applyError}
-              </div>
-            )}
-            {!isLoading && !loadError && missions.length === 0 && (
-              <p
-                style={{ textAlign: "center", color: "#666", padding: "2rem" }}
-              >
-                Inga uppdrag tillgängliga just nu.
-              </p>
-            )}
-
-            {viewMode === "feed" && (
-              <PreviousHelpedCarousel onShowAll={() => setViewMode("list")} />
-            )}
-
-            {/* HEADER FÖR LIST VYN*/}
-            {viewMode === "list" && (
-              <div
-                className="section-header"
-                style={{ marginBottom: "1.5rem" }}
-              >
-                <h2 className="section-title">Alla uppdrag</h2>
-                <button
-                  className="section-link"
-                  onClick={() => setViewMode("feed")}
+        <div className="tab-content-anim" key={activeTab}>
+          {/* UPPDRAG TAB */}
+          {activeTab === "uppdrag" && (
+            <>
+              {isLoading && (
+                <p
+                  style={{
+                    textAlign: "center",
+                    color: "#666",
+                    padding: "2rem",
+                  }}
                 >
-                  ‹ Tillbaka
-                </button>
-              </div>
-            )}
-
-            {/* MISSIONS LIST/FEED */}
-            <div
-              className={
-                viewMode === "feed" ? "missions-feed" : "missions-list"
-              }
-            >
-              {filteredMissions.length === 0 ? (
-                <p className="no-missions-text">
-                  Finns inga uppdrag.
+                  Laddar uppdrag...
                 </p>
-              ) : (
-                filteredMissions.map((mission) =>
-                  viewMode === "feed" ? (
-                    <FeedCard
-                      key={mission.id}
-                      mission={mission}
-                      onView={openDetails}
-                      onAccept={openAccepted}
-                    />
-                  ) : (
-                    <ListCard
-                      key={mission.id}
-                      mission={mission}
-                      onView={openDetails}
-                      onAccept={openAccepted}
-                    />
-                  ),
-                )
               )}
-            </div>
-          </>
-        )}
+              {loadError && (
+                <p
+                  style={{
+                    textAlign: "center",
+                    color: "#d33",
+                    padding: "2rem",
+                  }}
+                >
+                  {loadError}
+                </p>
+              )}
+              {applyError && (
+                <div
+                  style={{
+                    textAlign: "center",
+                    color: "#d33",
+                    padding: "0.75rem",
+                    background: "#fee",
+                    borderRadius: 8,
+                    margin: "0 1rem 1rem 1rem",
+                  }}
+                >
+                  {applyError}
+                </div>
+              )}
+              {!isLoading && !loadError && missions.length === 0 && (
+                <p
+                  style={{
+                    textAlign: "center",
+                    color: "#666",
+                    padding: "2rem",
+                  }}
+                >
+                  Inga uppdrag tillgängliga just nu.
+                </p>
+              )}
 
-        {/* MINA ANSÖKNINGAR TAB */}
-        {activeTab === "ansokningar" && (
-          <ApplicationsList
-            applications={applications}
-            isLoading={isLoadingApps}
-            error={appsError}
+              {viewMode === "feed" && (
+                <PreviousHelpedCarousel onShowAll={() => setViewMode("list")} />
+              )}
+
+              {/* HEADER FÖR LIST VYN*/}
+              {viewMode === "list" && (
+                <div
+                  className="section-header"
+                  style={{ marginBottom: "1.5rem" }}
+                >
+                  <h2 className="section-title">Alla uppdrag</h2>
+                  <button
+                    className="section-link"
+                    onClick={() => setViewMode("feed")}
+                  >
+                    ‹ Tillbaka
+                  </button>
+                </div>
+              )}
+
+              {/* MISSIONS LIST/FEED */}
+              <div
+                className={
+                  viewMode === "feed" ? "missions-feed" : "missions-list"
+                }
+              >
+                {filteredMissions.length === 0 ? (
+                  <p className="no-missions-text">Finns inga uppdrag.</p>
+                ) : (
+                  filteredMissions.map((mission) =>
+                    viewMode === "feed" ? (
+                      <FeedCard
+                        key={mission.id}
+                        mission={mission}
+                        onView={openDetails}
+                        onAccept={openAccepted}
+                        hasApplied={appliedJobIds.has(mission.id)}
+                        interaction={interactions[mission.id]}
+                        onToggleLike={() => handleToggleLike(mission.id)}
+                        onOpenComments={() => setCommentMission(mission)}
+                      />
+                    ) : (
+                      <ListCard
+                        key={mission.id}
+                        mission={mission}
+                        onView={openDetails}
+                        onAccept={openAccepted}
+                        hasApplied={appliedJobIds.has(mission.id)}
+                      />
+                    ),
+                  )
+                )}
+              </div>
+            </>
+          )}
+
+          {/* MINA ANSÖKNINGAR TAB */}
+          {activeTab === "ansokningar" && (
+            <ApplicationsList
+              applications={applications}
+              isLoading={isLoadingApps}
+              error={appsError}
+            />
+          )}
+        </div>
+
+        {activeModal === "details" && (
+          <MissionDetailsModal
+            mission={activeMission}
+            onClose={closeModal}
+            onAccept={(m) => {
+              closeModal();
+              setTimeout(() => openAccepted(m), 200);
+            }}
           />
         )}
+
+        {activeModal === "accepted" && (
+          <MissionAcceptedModal
+            mission={activeMission}
+            onClose={closeModal}
+            onContact={(m) => console.log("Kontakta arrangör för:", m.title)}
+          />
+        )}
+        {commentMission && (
+          <CommentModal
+            mission={commentMission}
+            onClose={() => setCommentMission(null)}
+            onCountChange={(count) =>
+              handleCommentCountChange(commentMission.id, count)
+            }
+          />
+        )}
+        <BottomNav />
       </div>
-
-      {activeModal === "details" && (
-        <MissionDetailsModal
-          mission={activeMission}
-          onClose={closeModal}
-          onAccept={(m) => {
-            closeModal();
-            setTimeout(() => openAccepted(m), 200);
-          }}
-        />
-      )}
-
-      {activeModal === "accepted" && (
-        <MissionAcceptedModal
-          mission={activeMission}
-          onClose={closeModal}
-          onContact={(m) => console.log("Kontakta arrangör för:", m.title)}
-        />
-      )}
     </div>
   );
 }
@@ -525,7 +599,15 @@ function PreviousHelpedCarousel({ onShowAll }) {
 /* ==========================================================================
    FEED CARD: stor vy
    ========================================================================== */
-function FeedCard({ mission, onView, onAccept }) {
+function FeedCard({
+  mission,
+  onView,
+  onAccept,
+  hasApplied,
+  interaction,
+  onToggleLike,
+  onOpenComments,
+}) {
   const formatDateShort = (dateStr) => {
     if (!dateStr) return "";
     return new Date(dateStr).toLocaleDateString("sv-SE", {
@@ -621,22 +703,59 @@ function FeedCard({ mission, onView, onAccept }) {
           <button className="btn-outline-blue" onClick={() => onView(mission)}>
             Visa
           </button>
-          <button className="btn-primary" onClick={() => onAccept(mission)}>
-            Acceptera
-          </button>
+          {hasApplied ? (
+            <button className="btn-applied" disabled>
+              ✓ Ansökt
+            </button>
+          ) : (
+            <button className="btn-primary" onClick={() => onAccept(mission)}>
+              Acceptera
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Footer med likes + kommentarer (mockade) */}
+      {/* Footer med likes + kommentarer */}
       <div className="feed-card-footer">
-        <div className="feed-likes-info">
-          <span className="like-icon">👍</span>
-          <span>{mission.likes || 0}</span>
-        </div>
-        <div className="feed-comments-info">
-          <span className="comment-icon">💬</span>
-          <span>{mission.comments || 0} Kommentarer</span>
-        </div>
+        <button
+          type="button"
+          className={`feed-action-btn ${interaction?.likedByMe ? "liked" : ""}`}
+          onClick={onToggleLike}
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill={interaction?.likedByMe ? "currentColor" : "none"}
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+          </svg>
+          <span>{interaction?.likes || 0}</span>
+        </button>
+
+        <button
+          type="button"
+          className="feed-action-btn"
+          onClick={onOpenComments}
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          <span>{interaction?.comments || 0} Kommentarer</span>
+        </button>
       </div>
     </div>
   );
@@ -744,7 +863,7 @@ function CategoryIcon() {
 /* ==========================================================================
    LIST CARD: kompakt vy
    ========================================================================== */
-function ListCard({ mission, onView, onAccept }) {
+function ListCard({ mission, onView, onAccept, hasApplied }) {
   return (
     <div className="list-card">
       <div
@@ -769,9 +888,15 @@ function ListCard({ mission, onView, onAccept }) {
           <button className="btn-outline-blue" onClick={() => onView(mission)}>
             Visa
           </button>
-          <button className="btn-primary" onClick={() => onAccept(mission)}>
-            Acceptera
-          </button>
+          {hasApplied ? (
+            <button className="btn-applied" disabled>
+              ✓ Ansökt
+            </button>
+          ) : (
+            <button className="btn-primary" onClick={() => onAccept(mission)}>
+              Acceptera
+            </button>
+          )}
         </div>
       </div>
     </div>
