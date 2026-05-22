@@ -3,10 +3,13 @@ import "./MissionsPage.css";
 import { MissionDetailsModal, MissionAcceptedModal } from "./MissionModal";
 import { getProfileImageUrl } from "../../services/authService";
 import BottomNav from "../bottomnav/BottomNav";
+import CommentModal from "./CommentModal";
 import {
   fetchAllJobs,
   applyToJob,
   getMyApplicationsAsVolunteer,
+  toggleJobLike,
+  getJobLikes,
 } from "../../services/jobService";
 
 // Konvertera Job från backend till mission format
@@ -69,6 +72,9 @@ export default function MissionsPage() {
   const [isLoadingApps, setIsLoadingApps] = useState(true);
   const [appsError, setAppsError] = useState("");
 
+  const [commentMission, setCommentMission] = useState(null);
+  const [interactions, setInteractions] = useState({});
+
   useEffect(() => {
     let cancelled = false;
     fetchAllJobs()
@@ -90,8 +96,6 @@ export default function MissionsPage() {
   }, []);
 
   useEffect(() => {
-    if (activeTab !== "ansokningar") return;
-
     let cancelled = false;
 
     getMyApplicationsAsVolunteer()
@@ -103,6 +107,7 @@ export default function MissionsPage() {
       .catch((err) => {
         if (cancelled) return;
         console.error("Kunde inte hämta ansökningar:", err);
+        // Bara visa fel om vi är på ansökningstabben
         setAppsError("Kunde inte ladda dina ansökningar.");
       })
       .finally(() => {
@@ -112,7 +117,31 @@ export default function MissionsPage() {
     return () => {
       cancelled = true;
     };
-  }, [activeTab]);
+  }, []);
+
+  useEffect(() => {
+    if (missions.length === 0) return;
+
+    let cancelled = false;
+    Promise.all(
+      missions.map((m) =>
+        getJobLikes(m.id)
+          .then((data) => ({ id: m.id, ...data }))
+          .catch(() => ({ id: m.id, count: 0, likedByMe: false })),
+      ),
+    ).then((results) => {
+      if (cancelled) return;
+      const map = {};
+      results.forEach((r) => {
+        map[r.id] = { likes: r.count, likedByMe: r.likedByMe, comments: 0 };
+      });
+      setInteractions(map);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [missions]);
 
   const openDetails = (mission) => {
     setActiveMission(mission);
@@ -123,6 +152,10 @@ export default function MissionsPage() {
     setApplyError("");
     try {
       await applyToJob(mission.id);
+      setApplications((prev) => [
+        ...prev,
+        { jobId: mission.id, status: "Pending", applicationId: Date.now() },
+      ]);
       setActiveMission(mission);
       setActiveModal("accepted");
     } catch (err) {
@@ -148,6 +181,62 @@ export default function MissionsPage() {
     setActiveModal(null);
     setTimeout(() => setActiveMission(null), 300);
   };
+
+  const handleToggleLike = async (jobId) => {
+    setInteractions((prev) => {
+      const current = prev[jobId] || {
+        likes: 0,
+        likedByMe: false,
+        comments: 0,
+      };
+      const newLiked = !current.likedByMe;
+      return {
+        ...prev,
+        [jobId]: {
+          ...current,
+          likedByMe: newLiked,
+          likes: current.likes + (newLiked ? 1 : -1),
+        },
+      };
+    });
+    try {
+      const result = await toggleJobLike(jobId);
+      setInteractions((prev) => ({
+        ...prev,
+        [jobId]: {
+          ...(prev[jobId] || { comments: 0 }),
+          likedByMe: result.liked,
+          likes: result.count,
+        },
+      }));
+    } catch (err) {
+      console.error(err);
+      setInteractions((prev) => {
+        const current = prev[jobId];
+        if (!current) return prev;
+        return {
+          ...prev,
+          [jobId]: {
+            ...current,
+            likedByMe: !current.likedByMe,
+            likes: current.likes + (current.likedByMe ? 1 : -1),
+          },
+        };
+      });
+    }
+  };
+
+  const handleCommentCountChange = (jobId, newCount) => {
+    setInteractions((prev) => ({
+      ...prev,
+      [jobId]: {
+        ...(prev[jobId] || { likes: 0, likedByMe: false }),
+        comments: newCount,
+      },
+    }));
+  };
+
+  const appliedJobIds = new Set(applications.map((a) => a.jobId));
 
   const filteredMissions = missions.filter(
     (mission) =>
@@ -292,6 +381,10 @@ export default function MissionsPage() {
                         mission={mission}
                         onView={openDetails}
                         onAccept={openAccepted}
+                        hasApplied={appliedJobIds.has(mission.id)}
+                        interaction={interactions[mission.id]}
+                        onToggleLike={() => handleToggleLike(mission.id)}
+                        onOpenComments={() => setCommentMission(mission)}
                       />
                     ) : (
                       <ListCard
@@ -299,6 +392,7 @@ export default function MissionsPage() {
                         mission={mission}
                         onView={openDetails}
                         onAccept={openAccepted}
+                        hasApplied={appliedJobIds.has(mission.id)}
                       />
                     ),
                   )
@@ -333,6 +427,15 @@ export default function MissionsPage() {
             mission={activeMission}
             onClose={closeModal}
             onContact={(m) => console.log("Kontakta arrangör för:", m.title)}
+          />
+        )}
+        {commentMission && (
+          <CommentModal
+            mission={commentMission}
+            onClose={() => setCommentMission(null)}
+            onCountChange={(count) =>
+              handleCommentCountChange(commentMission.id, count)
+            }
           />
         )}
         <BottomNav />
@@ -496,7 +599,15 @@ function PreviousHelpedCarousel({ onShowAll }) {
 /* ==========================================================================
    FEED CARD: stor vy
    ========================================================================== */
-function FeedCard({ mission, onView, onAccept }) {
+function FeedCard({
+  mission,
+  onView,
+  onAccept,
+  hasApplied,
+  interaction,
+  onToggleLike,
+  onOpenComments,
+}) {
   const formatDateShort = (dateStr) => {
     if (!dateStr) return "";
     return new Date(dateStr).toLocaleDateString("sv-SE", {
@@ -592,22 +703,59 @@ function FeedCard({ mission, onView, onAccept }) {
           <button className="btn-outline-blue" onClick={() => onView(mission)}>
             Visa
           </button>
-          <button className="btn-primary" onClick={() => onAccept(mission)}>
-            Acceptera
-          </button>
+          {hasApplied ? (
+            <button className="btn-applied" disabled>
+              ✓ Ansökt
+            </button>
+          ) : (
+            <button className="btn-primary" onClick={() => onAccept(mission)}>
+              Acceptera
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Footer med likes + kommentarer (mockade) */}
+      {/* Footer med likes + kommentarer */}
       <div className="feed-card-footer">
-        <div className="feed-likes-info">
-          <span className="like-icon">👍</span>
-          <span>{mission.likes || 0}</span>
-        </div>
-        <div className="feed-comments-info">
-          <span className="comment-icon">💬</span>
-          <span>{mission.comments || 0} Kommentarer</span>
-        </div>
+        <button
+          type="button"
+          className={`feed-action-btn ${interaction?.likedByMe ? "liked" : ""}`}
+          onClick={onToggleLike}
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill={interaction?.likedByMe ? "currentColor" : "none"}
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+          </svg>
+          <span>{interaction?.likes || 0}</span>
+        </button>
+
+        <button
+          type="button"
+          className="feed-action-btn"
+          onClick={onOpenComments}
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          <span>{interaction?.comments || 0} Kommentarer</span>
+        </button>
       </div>
     </div>
   );
@@ -715,7 +863,7 @@ function CategoryIcon() {
 /* ==========================================================================
    LIST CARD: kompakt vy
    ========================================================================== */
-function ListCard({ mission, onView, onAccept }) {
+function ListCard({ mission, onView, onAccept, hasApplied }) {
   return (
     <div className="list-card">
       <div
@@ -740,9 +888,15 @@ function ListCard({ mission, onView, onAccept }) {
           <button className="btn-outline-blue" onClick={() => onView(mission)}>
             Visa
           </button>
-          <button className="btn-primary" onClick={() => onAccept(mission)}>
-            Acceptera
-          </button>
+          {hasApplied ? (
+            <button className="btn-applied" disabled>
+              ✓ Ansökt
+            </button>
+          ) : (
+            <button className="btn-primary" onClick={() => onAccept(mission)}>
+              Acceptera
+            </button>
+          )}
         </div>
       </div>
     </div>
