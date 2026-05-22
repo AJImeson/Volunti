@@ -88,15 +88,13 @@ builder.Services.AddCors(options =>
                 var allowedHosts = new[]
                 {
                     "https://volunti.se",
-                    "https://volunti.doe25.swarm.chas-lab.dev",
                     "https://volunti.cc.k3s.chas-lab.dev"
                 };
                 if (allowedHosts.Contains(origin)) return true;
                 
                 // Tillåt review-environments
                 var uri = new Uri(origin);
-                return uri.Host.EndsWith(".doe25.swarm.chas-lab.dev") ||
-                       uri.Host.EndsWith(".k3s.chas-lab.dev");
+                return uri.Host.EndsWith(".k3s.chas-lab.dev");
             })
             .AllowAnyHeader()
             .AllowAnyMethod();
