@@ -98,4 +98,4 @@
     - Structured K3s branch for future implementation of Kubernetes for a multi stack build - Mika
     - Debugging of the monitoring stack - Axel
 
-
+---
