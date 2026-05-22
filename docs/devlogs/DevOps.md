@@ -98,4 +98,26 @@
     - Structured K3s branch for future implementation of Kubernetes for a multi stack build - Mika
     - Debugging of the monitoring stack - Axel
 
+* 2026-05-11
 
+    - Started mapping out K3s scripts and - Mika
+    - Continous debugging and fixing of monitor stack - Axel
+
+* 2026-05-13
+
+    - Created base ingresses and secrets for database - Mika
+    - Monitoring succesfull in own stack - Axel
+
+* 2026-05-15
+
+    - Continous implementation of K3s, backend and frontend deployment - Axel & Mika
+    - Monitoring in K3s more sucessfull, connected and prometheus scraping - Axel
+
+* 2026-05-18
+
+    - Sealed secrets fixed for project - Mika
+    - Monitoring in K3s more or less completed, set more alerts and CPU for backend? 
+
+* 2026-05-20
+
+    - Application working in K8s cluster, need debugging - Axel & Mika 
