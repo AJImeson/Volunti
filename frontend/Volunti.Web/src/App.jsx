@@ -27,6 +27,7 @@ import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import { OrgRegisterProvider } from "./components/context/OrgRegisterContext";
 import OrgDashboard from "./components/organization/OrgDashboard";
 import OrgUserDashboard from "./components/organization/OrgUserDashboard";
+import VolunteerDashboard from "./components/volunteer/VolunteerDashboard";
 
 export default function App() {
   return (
@@ -57,6 +58,7 @@ export default function App() {
           </Route>
           <Route path="/org-dashboard" element={<RoleProtectedRoute allowedRoles={["OrgAdmin"]}><OrgDashboard /></RoleProtectedRoute>} />
           <Route path="/org-user-dashboard" element={<RoleProtectedRoute allowedRoles={["OrgUser"]}><OrgUserDashboard /></RoleProtectedRoute>} />
+          <Route path="/volunteer-dashboard" element={<RoleProtectedRoute allowedRoles={["Volunteer"]}><VolunteerDashboard /></RoleProtectedRoute>} />
         </Routes>
       </div>
     </BrowserRouter>

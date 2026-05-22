@@ -268,6 +268,7 @@ body {
   .phone-prefix {
     width: 80px;
     font-size: 0.9rem;
+    padding: 0.8rem 0;
   }
 }
 
@@ -333,22 +334,22 @@ body {
 .phone-input-group {
   display: flex;
   gap: 0.5rem;
-  width: 100%;
+  align-items: stretch;
 }
 
 .phone-prefix {
-  width: 90px;
-  display: flex;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--primary-blue);
+  background-color: var(--bg-white);
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--bg-white);
-  border: 1px solid var(--primary-blue);
-  border-radius: 8px;
-  font-weight: bold;
-  color: var(--text-dark);
-  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  box-sizing: border-box;
+  font-size: 1rem;
 }
-
 .phone-section {
   display: flex;
   flex-direction: column;
@@ -571,6 +572,19 @@ body {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   z-index: 100;
   overflow: hidden;
+
+  animation: dropdownSlideDown 0.25s ease-out;
+  transform-origin: top center;
+}
+@keyframes dropdownSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scaleY(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
 }
 
 .custom-dropdown-item {
@@ -622,7 +636,8 @@ body {
   width: 1.25em;
   height: 1.25em;
   border: 1.5px solid var(--primary-blue);
-  border-radius: 50%;
+  /* border-radius: 50%; */
+  border-radius: 3px;
   display: grid;
   place-content: center;
 }
@@ -632,7 +647,8 @@ body {
   content: "";
   width: 0.65em;
   height: 0.65em;
-  border-radius: 50%;
+  /* border-radius: 50%; */
+  border-radius: 2px;
   transform: scale(0);
   transition: 120ms transform ease-in-out;
   background-color: var(--primary-blue);
@@ -916,21 +932,19 @@ body {
 .feature-item {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.8rem;
+  gap: 0.5rem;
   color: var(--text-dark);
-  white-space: normal;
+  font-size: 0.9rem;
+  line-height: 1.3;
 }
 
 .feature-icon {
-  width: 1.25em;
-  height: 1.25em;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
   stroke: var(--primary-blue);
   fill: none;
   stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  flex-shrink: 0;
 }
 
 /* ==========================================================================
@@ -940,25 +954,31 @@ body {
 .password-wrapper {
   position: relative;
   width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper .text-input {
+  padding-right: 3rem;
+  width: 100%;
 }
 
 .password-toggle-btn {
   position: absolute;
-  right: 1rem;
+  right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0;
+  color: var(--gray-text);
+  padding: 0.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--primary-blue);
-  opacity: 0.7;
-  transition: opacity 0.2s;
+  z-index: 2;
+  line-height: 0;
 }
-
 .password-toggle-btn:hover {
   opacity: 1;
 }
@@ -976,8 +996,22 @@ body {
 }
 
 .input-error {
-  border: 2px solid #ef4444 !important;
-  background-color: #fef2f2 !important;
+  border-color: #d33 !important;
+  background-color: #fff5f5 !important;
+  animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
 }
 
 /* ==========================================================================
@@ -2333,4 +2367,45 @@ body {
   background: #fff;
   color: var(--primary-blue, #2b3da8);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+/* ==========================================================================
+   STEG TRANSITIONS
+   ========================================================================== */
+
+@keyframes stepSlideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes stepSlideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.step-content,
+.step-content-back {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.step-content {
+  animation: stepSlideInRight 0.35s ease-out;
+}
+
+.step-content-back {
+  animation: stepSlideInLeft 0.35s ease-out;
 }

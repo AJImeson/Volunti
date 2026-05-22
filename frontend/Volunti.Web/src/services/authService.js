@@ -114,7 +114,6 @@ export const registerVolunteer = async (formData) => {
   }
 };
 
-
 export const registerOrganization = async (formData) => {
   const payload = {
     email: formData.email,
@@ -129,21 +128,15 @@ export const registerOrganization = async (formData) => {
 
     categories: formData.branscher,
 
-    requiresDocumentation:
-      formData.dokumentation === "Ja",
+    requiresDocumentation: formData.dokumentation === "Ja",
 
-    notificationPreference:
-      formData.notificationLevel,
+    notificationPreference: formData.notificationLevel,
 
-    emailNotifications:
-      formData.emailNotification === "Ja",
+    emailNotifications: formData.emailNotification === "Ja",
   };
 
   try {
-    const { data } = await api.post(
-      "/register/organization",
-      payload,
-    );
+    const { data } = await api.post("/register/organization", payload);
 
     const profile = {
       email: data.email,
@@ -159,18 +152,12 @@ export const registerOrganization = async (formData) => {
 
     return profile;
   } catch (error) {
-    if (!error.response){
+    if (!error.response) {
       throw new Error("Kunde inte ansluta till servern.");
     }
-    throw new Error(
-      extractErrorMessage(
-        error,
-        "Registreringen misslyckades.",
-      ),
-    );
+    throw new Error(extractErrorMessage(error, "Registreringen misslyckades."));
   }
 };
-
 
 export const checkAvailability = async (email, phoneNumber) => {
   try {
@@ -234,6 +221,19 @@ export const fetchCurrentUserProfile = async () => {
   }
 };
 
+export const fetchCurrentOrganization = async () => {
+  try {
+    const { data } = await api.get("/me/organization");
+    return data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      throw new Error("Sessionen har gått ut. Logga in igen.");
+    }
+    throw new Error(
+      extractErrorMessage(error, "Kunde inte hämta organisationsdata."),
+    );
+  }
+};
 /* ==========================================================================
    PROFILBILD
    ========================================================================== */
@@ -367,6 +367,11 @@ export const addExperience = async (experience) => {
 
 export const removeExperience = async (id) => {
   await api.delete(`/me/experiences/${id}`);
+};
+
+export const fetchMyApplications = async () => {
+  const { data } = await api.get("/applications/volunteer/mine");
+  return data;
 };
 
 /* ==========================================================================

@@ -10,7 +10,7 @@ namespace Volunti.Endpoints
     {
         public static void RegisterEndpoints(WebApplication app)
         {
-            // GET /applications/mine - lista alla ansökningar för inloggad orgs jobb
+            // GET /applications/mine lista alla ansökningar för inloggad orgs jobb
             app.MapGet("/applications/mine", async (VoluntiDbContext db, HttpContext http, string? status) =>
             {
                 var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -30,7 +30,6 @@ namespace Volunti.Endpoints
                     .Include(a => a.Job)
                     .Include(a => a.Volunteer)
                     .Where(a => a.Job.OrganizationId == organization.OrganizationId);
-                // Valfri filter: ?status=Pending
                 if (!string.IsNullOrEmpty(status) && Enum.TryParse<ApplicationStatus>(status, true, out var parsedStatus))
                     query = query.Where(a => a.Status == parsedStatus);
                 var applications = await query.ToListAsync();
@@ -55,8 +54,17 @@ namespace Volunti.Endpoints
                 if (!int.TryParse(userIdClaim, out var userId)) return Results.Unauthorized();
                 var volunteer = await db.Volunteers.FirstOrDefaultAsync(v => v.UserId == userId);
                 if (volunteer == null) return Results.NotFound("Volontären hittades inte.");
+
                 var job = await db.Jobs.FindAsync(id);
                 if (job == null) return Results.NotFound("Jobbet hittades inte.");
+
+                // Kolla om volontären redan ansökt till detta jobb
+                var existing = await db.VolunteerApplications
+                    .FirstOrDefaultAsync(a => a.VolunteerId == volunteer.Id && a.JobId == job.JobId);
+
+                if (existing != null)
+                    return Results.Conflict(new { detail = "Du har redan ansökt till detta uppdrag." });
+
                 var application = new VolunteerApplication
                 {
                     VolunteerId = volunteer.Id,
@@ -74,7 +82,7 @@ namespace Volunti.Endpoints
                     VolunteerId = application.VolunteerId,
                     JobId = application.JobId
                 });
-            }).RequireAuthorization(policy => policy.RequireRole("Volunteer"));
+            }).RequireAuthorization(policy => policy.RequireRole("Volunteer")).RequireRateLimiting("write");
 
             // Endpoint för OrgAdmin att approve/reject application
             app.MapPut("/applications/{id}", async (int id, VoluntiDbContext db, HttpContext http, UpdateApplicationDto dto) =>
@@ -104,6 +112,48 @@ namespace Volunti.Endpoints
                 });
             })
             .RequireAuthorization(policy => policy.RequireRole("OrgAdmin"));
+
+
+
+            // Hämta alla ansökningar för inloggad volunteer
+            app.MapGet("/applications/volunteer/mine", async (
+                VoluntiDbContext db,
+                HttpContext http) =>
+            {
+                var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
+                    return Results.Unauthorized();
+
+                var volunteer = await db.Volunteers.FirstOrDefaultAsync(v => v.UserId == userId);
+
+                if (volunteer == null)
+                    return Results.NotFound("Volontären hittades inte.");
+
+                var applications = await db.VolunteerApplications
+                    .Include(a => a.Job)
+                        .ThenInclude(j => j.Organization)
+
+                    .Where(a => a.VolunteerId == volunteer.Id)
+
+                    .Where(a => a.VolunteerId == volunteer.Id)
+                    .OrderByDescending(a => a.CreatedAt)
+
+                    .ToListAsync();
+
+                return Results.Ok(applications.Select(a => new
+                {
+                    applicationId = a.Id,
+                    status = a.Status.ToString(),
+                    createdAt = a.CreatedAt,
+                    jobId = a.JobId,
+                    jobTitle = a.Job.Title,
+
+                    city = a.Job.City,
+
+                }));
+            })
+            .RequireAuthorization(policy => policy.RequireRole("Volunteer"));
         }
     }
 }

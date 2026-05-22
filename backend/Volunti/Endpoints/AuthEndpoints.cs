@@ -105,7 +105,7 @@ namespace Volunti.Endpoints
                     logger.LogError(e, "Registration failed for {Email}", dto.Email);
                     return Results.Problem("Registration failed. Please try again.", statusCode: 500);
                 }
-            });
+            }).RequireRateLimiting("auth"); 
 
             app.MapPost("/register/check-availability", async (
                 CheckAvailabilityDto dto,
@@ -183,7 +183,7 @@ namespace Volunti.Endpoints
                     logger.LogError(e, "Organization registration failed for {Email}", dto.Email);
                     return Results.Problem("Registration failed. Please try again.", statusCode: 500);
                 }
-            });
+            }).RequireRateLimiting("auth"); 
 
             app.MapPost("/login", async (LoginDto loginDto, SignInManager<AppUser> signInManager, UserManager<AppUser> userManager, ITokenService tokenService) =>
             {
@@ -203,7 +203,7 @@ namespace Volunti.Endpoints
                     Email = user.Email!,
                     Token = tokenService.CreateToken(user, roles)
                 });
-            });
+            }).RequireRateLimiting("auth"); 
 
             app.MapPost("/auth/forgot-password", async (ForgotPasswordDto dto, UserManager<AppUser> userManager, VoluntiDbContext db) =>
             {
@@ -232,7 +232,7 @@ namespace Volunti.Endpoints
                 //         I produktion ska tokenen ENDAST hamna i ägarens inkorg - det är så vi vet att det är
                 //         rätt person (eftersom bara de kan läsa sin egen e-post).
                 return Results.Ok(new { token }); // OBS: Endast för dev - tokenen returneras så man kan testa reset-flödet manuellt
-            });
+            }).RequireRateLimiting("auth"); 
 
             app.MapPost("/auth/reset-password", async (ResetPasswordDto dto, UserManager<AppUser> userManager, VoluntiDbContext db) =>
             {
@@ -253,7 +253,7 @@ namespace Volunti.Endpoints
                 await db.SaveChangesAsync();
 
                 return Results.Ok("Password reset successful");
-            });
+            }).RequireRateLimiting("auth");
 
             app.MapGet("/me", async (
                 ClaimsPrincipal claimsPrincipal,
@@ -290,6 +290,43 @@ namespace Volunti.Endpoints
                     notificationPreference = volunteer.NotificationPreference,
                     emailNotifications = volunteer.EmailNotifications,
                     isVerified = volunteer.IsVerified
+                });
+            }).RequireAuthorization();
+
+            app.MapGet("/me/organization", async (
+                ClaimsPrincipal claimsPrincipal,
+                UserManager<AppUser> userManager,
+                VoluntiDbContext db) =>
+            {
+                var userIdStr = userManager.GetUserId(claimsPrincipal);
+                if (userIdStr is null || !int.TryParse(userIdStr, out var userId))
+                    return Results.Unauthorized();
+
+                var user = await userManager.FindByIdAsync(userIdStr);
+                if (user is null) return Results.NotFound();
+
+                var organization = await db.Organizations.FirstOrDefaultAsync(o => o.UserId == userId);
+                if (organization is null)
+                {
+                    var membership = await db.OrganizationMembers
+                        .Include(m => m.Organization)
+                        .FirstOrDefaultAsync(m => m.UserId == userId);
+                    organization = membership?.Organization;
+                }
+
+                if (organization is null) return Results.NotFound("Organisation hittades inte");
+
+                return Results.Ok(new
+                {
+                    organizationId = organization.OrganizationId,
+                    orgName = organization.OrgName,
+                    companyName = organization.CompanyName,
+                    contactName = organization.ContactName,
+                    municipality = organization.Municipality,
+                    description = organization.Description,
+                    profileImageUrl = organization.ProfileImageUrl,
+                    website = organization.Website,
+                    email = user.Email
                 });
             }).RequireAuthorization();
         }

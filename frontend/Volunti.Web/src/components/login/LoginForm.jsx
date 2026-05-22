@@ -29,6 +29,7 @@ export default function LoginForm() {
       const user = await loginUser(email, password);
       const token = getToken(); // Get JWT token from authService
       const payload = JSON.parse(atob(token.split(".")[1])); // split the token and take the middle part and then parse from B64 to string
+      console.log(payload);
       const role = payload.role; // put the role, Volunteer, OrgAdmin, Orguser
       console.log("Inloggad som:", user);
       if (role === "OrgAdmin") {
