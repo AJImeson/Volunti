@@ -355,12 +355,48 @@
 
 .feed-card-footer {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 1rem;
   border-top: 1px solid var(--gray-border);
   padding-top: 0.6rem;
   font-size: 0.85rem;
+}
+
+.feed-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: none;
   color: var(--gray-text);
+  cursor: pointer;
+  padding: 0.3rem 0.5rem;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.feed-action-btn:hover {
+  background: var(--gray-light);
+  color: var(--primary-blue);
+}
+
+.feed-action-btn.liked {
+  color: #e11d48;
+}
+
+.feed-action-btn.liked:hover {
+  color: #be123c;
+}
+
+.feed-action-btn svg {
+  transition: transform 0.15s;
+}
+
+.feed-action-btn:active svg {
+  transform: scale(1.2);
 }
 
 .feed-likes-info {

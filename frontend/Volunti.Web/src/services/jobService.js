@@ -88,3 +88,62 @@ export const updateMyAvailability = async (dates) => {
   );
   return response.data;
 };
+
+/* ==========================================================================
+   LIKES
+   ========================================================================== */
+
+// Toggla like
+export const toggleJobLike = async (jobId) => {
+  const response = await axios.post(`${API_URL}/jobs/${jobId}/like`, null, {
+    headers: authHeaders(),
+  });
+  return response.data;
+};
+
+// Hämta antal likes + om jag har likat
+export const getJobLikes = async (jobId) => {
+  const response = await axios.get(`${API_URL}/jobs/${jobId}/likes`, {
+    headers: authHeaders(),
+  });
+  return response.data;
+};
+
+/* ==========================================================================
+   COMMENTS
+   ========================================================================== */
+
+// Hämta alla kommentarer för ett jobb
+export const getJobComments = async (jobId) => {
+  const response = await axios.get(`${API_URL}/jobs/${jobId}/comments`);
+  return response.data;
+};
+
+// Lägg till kommentar
+export const addJobComment = async (jobId, content, parentCommentId = null) => {
+  const response = await axios.post(
+    `${API_URL}/jobs/${jobId}/comments`,
+    { content, parentCommentId },
+    { headers: authHeaders() },
+  );
+  return response.data;
+};
+
+// Ta bort egen kommentar
+export const deleteJobComment = async (jobId, commentId) => {
+  const response = await axios.delete(
+    `${API_URL}/jobs/${jobId}/comments/${commentId}`,
+    { headers: authHeaders() },
+  );
+  return response.data;
+};
+
+// Toggla like på en kommentar
+export const toggleCommentLike = async (commentId) => {
+  const response = await axios.post(
+    `${API_URL}/comments/${commentId}/like`,
+    null,
+    { headers: authHeaders() },
+  );
+  return response.data;
+};
