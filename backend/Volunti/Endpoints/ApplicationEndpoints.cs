@@ -1,7 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 using Volunti.Data;
 using Volunti.DTOs.Job;
+using Volunti.Interfaces;
 using Volunti.Models;
 
 namespace Volunti.Endpoints
@@ -10,30 +11,16 @@ namespace Volunti.Endpoints
     {
         public static void RegisterEndpoints(WebApplication app)
         {
-            // GET /applications/mine lista alla ansökningar för inloggad orgs jobb
-            app.MapGet("/applications/mine", async (VoluntiDbContext db, HttpContext http, string? status) =>
+            app.MapGet("/applications/mine", async (IApplicationService appService, HttpContext http, string? status) =>
             {
                 var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
                     return Results.Unauthorized();
-                var organization = await db.Organizations.FirstOrDefaultAsync(o => o.UserId == userId);
-                if (organization == null)
-                {
-                    var membership = await db.OrganizationMembers
-                        .Include(m => m.Organization)
-                        .FirstOrDefaultAsync(m => m.UserId == userId);
-                    organization = membership?.Organization;
-                }
-                if (organization == null)
-                    return Results.NotFound("Användaren har ingen organisation.");
-                var query = db.VolunteerApplications
-                    .Include(a => a.Job)
-                    .Include(a => a.Volunteer)
-                    .Where(a => a.Job.OrganizationId == organization.OrganizationId);
-                if (!string.IsNullOrEmpty(status) && Enum.TryParse<ApplicationStatus>(status, true, out var parsedStatus))
-                    query = query.Where(a => a.Status == parsedStatus);
-                var applications = await query.ToListAsync();
-                return Results.Ok(applications.Select(a => new
+
+                var (success, applications, error) = await appService.GetByOrganizationAsync(userId, status);
+                if (!success) return Results.NotFound(error);
+
+                return Results.Ok(applications!.Select(a => new
                 {
                     applicationId = a.Id,
                     status = a.Status.ToString(),
@@ -46,127 +33,45 @@ namespace Volunti.Endpoints
             })
             .RequireAuthorization(policy => policy.RequireRole("OrgAdmin", "OrgUser"));
 
-            // Endpoint för voluntärer att söka uppdrag
-            app.MapPost("/jobs/{id}/apply", async (int id, VoluntiDbContext db, HttpContext http) =>
-            {
-                var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (userIdClaim == null) return Results.Unauthorized();
-                if (!int.TryParse(userIdClaim, out var userId)) return Results.Unauthorized();
-                var volunteer = await db.Volunteers.FirstOrDefaultAsync(v => v.UserId == userId);
-                if (volunteer == null) return Results.NotFound("Volontären hittades inte.");
-
-                var job = await db.Jobs.FindAsync(id);
-                if (job == null) return Results.NotFound("Jobbet hittades inte.");
-
-                // Kolla om volontären redan ansökt till detta jobb
-                var existing = await db.VolunteerApplications
-                    .FirstOrDefaultAsync(a => a.VolunteerId == volunteer.Id && a.JobId == job.JobId);
-
-                if (existing != null)
-                    return Results.Conflict(new { detail = "Du har redan ansökt till detta uppdrag." });
-
-                var application = new VolunteerApplication
-                {
-                    VolunteerId = volunteer.Id,
-                    JobId = job.JobId,
-                    Status = ApplicationStatus.Pending,
-                    CreatedAt = DateTime.UtcNow
-                };
-                db.VolunteerApplications.Add(application);
-                await db.SaveChangesAsync();
-                return Results.Created($"/jobs/{job.JobId}/apply", new ApplicationDto
-                {
-                    ApplicationId = application.Id,
-                    Status = application.Status,
-                    CreatedAt = application.CreatedAt,
-                    VolunteerId = application.VolunteerId,
-                    JobId = application.JobId
-                });
-            }).RequireAuthorization(policy => policy.RequireRole("Volunteer")).RequireRateLimiting("write");
-
-            // Endpoint för OrgAdmin att approve/reject application
-            app.MapPut("/applications/{id}", async (int id, VoluntiDbContext db, HttpContext http, UpdateApplicationDto dto) =>
-            {
-                var application = await db.VolunteerApplications.Include(a => a.Job).FirstOrDefaultAsync(a => a.Id == id);
-                if (application == null) return Results.NotFound("Ansökan hittades inte.");
-                var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (userIdClaim == null) return Results.Unauthorized();
-                if (!int.TryParse(userIdClaim, out var userId)) return Results.Unauthorized();
-                var organization = await db.Organizations.FirstOrDefaultAsync(o => o.UserId == userId);
-                if (organization == null) return Results.NotFound("Organizationen hittades inte.");
-                if (application.Job.OrganizationId != organization.OrganizationId)
-                    return Results.BadRequest("Du har inte behörighet att hantera denna ansökan.");
-                if (application.Status != ApplicationStatus.Pending)
-                    return Results.BadRequest("Ansökan är redan behandlad.");
-                if (dto.Status != ApplicationStatus.Approved && dto.Status != ApplicationStatus.Rejected)
-                    return Results.BadRequest("Status måste vara Approved eller Rejected.");
-                application.Status = dto.Status;
-                await db.SaveChangesAsync();
-
-                // När en volontär godkänns. Lägg till dom i alla orgs grupper automatiskt
-                if (dto.Status == ApplicationStatus.Approved)
-                {
-                    var volunteer = await db.Volunteers.FindAsync(application.VolunteerId);
-                    if (volunteer != null)
-                    {
-                        // Hitta alla grupper för denna org
-                        var orgGroups = await db.MessageGroups
-                            .Where(g => g.OrganizationId == organization.OrganizationId)
-                            .Select(g => g.Id)
-                            .ToListAsync();
-
-                        // Hitta vilka grupper användaren redan är med i
-                        var existingMemberships = await db.MessageGroupMembers
-                            .Where(m => m.UserId == volunteer.UserId && orgGroups.Contains(m.MessageGroupId))
-                            .Select(m => m.MessageGroupId)
-                            .ToListAsync();
-
-                        // Lägg till i grupper som dom ännu inte är med i
-                        foreach (var groupId in orgGroups.Except(existingMemberships))
-                        {
-                            db.MessageGroupMembers.Add(new MessageGroupMember
-                            {
-                                MessageGroupId = groupId,
-                                UserId = volunteer.UserId,
-                                Role = GroupMemberRole.Member
-                            });
-                        }
-                        await db.SaveChangesAsync();
-                    }
-                }
-                return Results.Ok(new ApplicationDto
-                {
-                    ApplicationId = application.Id,
-                    Status = application.Status,
-                    CreatedAt = application.CreatedAt,
-                    VolunteerId = application.VolunteerId,
-                    JobId = application.JobId
-                });
-            })
-            .RequireAuthorization(policy => policy.RequireRole("OrgAdmin"));
-
-
-
-            app.MapGet("/applications/volunteer/mine", async (
-                VoluntiDbContext db,
-                HttpContext http) =>
+            app.MapPost("/jobs/{id}/apply", async (int id, IApplicationService appService, HttpContext http) =>
             {
                 var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
                     return Results.Unauthorized();
 
-                var volunteer = await db.Volunteers.FirstOrDefaultAsync(v => v.UserId == userId);
-                if (volunteer == null)
-                    return Results.NotFound("Volontären hittades inte.");
+                var (success, dto, error) = await appService.ApplyAsync(id, userId);
+                if (!success)
+                    return error == "conflict"
+                        ? Results.Conflict(new { detail = "Du har redan ansökt till detta uppdrag." })
+                        : Results.NotFound(error);
 
-                var applications = await db.VolunteerApplications
-                    .Include(a => a.Job)
-                        .ThenInclude(j => j.Organization)
-                    .Where(a => a.VolunteerId == volunteer.Id)
-                    .OrderByDescending(a => a.CreatedAt)
-                    .ToListAsync();
+                return Results.Created($"/jobs/{id}/apply", dto);
+            }).RequireAuthorization(policy => policy.RequireRole("Volunteer")).RequireRateLimiting("write");
 
-                return Results.Ok(applications.Select(a => new
+            app.MapPut("/applications/{id}", async (int id, IApplicationService appService, HttpContext http, UpdateApplicationDto dto) =>
+            {
+                var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
+                    return Results.Unauthorized();
+
+                var (success, result, error) = await appService.UpdateStatusAsync(id, userId, dto);
+                if (!success)
+                    return error == "NotFound" ? Results.NotFound() : Results.BadRequest(error);
+
+                return Results.Ok(result);
+            })
+            .RequireAuthorization(policy => policy.RequireRole("OrgAdmin"));
+
+            app.MapGet("/applications/volunteer/mine", async (IApplicationService appService, HttpContext http) =>
+            {
+                var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
+                    return Results.Unauthorized();
+
+                var (success, applications, error) = await appService.GetByVolunteerAsync(userId);
+                if (!success) return Results.NotFound(error);
+
+                return Results.Ok(applications!.Select(a => new
                 {
                     applicationId = a.Id,
                     status = a.Status.ToString(),
@@ -185,7 +90,6 @@ namespace Volunti.Endpoints
             })
             .RequireAuthorization(policy => policy.RequireRole("Volunteer"));
 
-            // alla ansökningar för ett specifikt jobb
             app.MapGet("/jobs/{id}/applications", async (
                 int id,
                 VoluntiDbContext db,
@@ -200,7 +104,6 @@ namespace Volunti.Endpoints
                     .FirstOrDefaultAsync(j => j.JobId == id);
                 if (job == null) return Results.NotFound("Jobbet hittades inte.");
 
-                // Kolla att användaren tillhör orgen
                 var organization = await db.Organizations.FirstOrDefaultAsync(o => o.UserId == userId);
                 if (organization == null)
                 {
@@ -218,7 +121,6 @@ namespace Volunti.Endpoints
                         .ThenInclude(v => v.User)
                     .ToListAsync();
 
-                // Räkna ut tidigare volontär (om volontär har gjort jobb för denna org tidigare)
                 var volunteerIds = applications.Select(a => a.VolunteerId).ToList();
                 var previousJobs = await db.VolunteerApplications
                     .Where(a =>
@@ -244,7 +146,6 @@ namespace Volunti.Endpoints
             })
             .RequireAuthorization(policy => policy.RequireRole("OrgAdmin", "OrgUser"));
 
-            // godkänn flera samtidigt
             app.MapPost("/applications/bulk-approve", async (
                 BulkApproveDto dto,
                 VoluntiDbContext db,
@@ -282,7 +183,6 @@ namespace Volunti.Endpoints
                 }
                 await db.SaveChangesAsync();
 
-                // Auto tillägg till orgens grupper
                 var orgGroupIds = await db.MessageGroups
                     .Where(g => g.OrganizationId == organization.OrganizationId)
                     .Select(g => g.Id)
@@ -315,7 +215,6 @@ namespace Volunti.Endpoints
             })
             .RequireAuthorization(policy => policy.RequireRole("OrgAdmin", "OrgUser"));
 
-            // hämta full profil för en volontär 
             app.MapGet("/volunteers/{id}", async (
                 int id,
                 VoluntiDbContext db,
@@ -343,7 +242,6 @@ namespace Volunti.Endpoints
 
                 if (volunteer == null) return Results.NotFound();
 
-                // Verifiera att volontären har sökt något av orgens jobb
                 var hasApplied = await db.VolunteerApplications
                     .AnyAsync(a => a.VolunteerId == id && a.Job.OrganizationId == organization.OrganizationId);
 
