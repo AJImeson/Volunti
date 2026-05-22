@@ -88,7 +88,7 @@ builder.Services.AddCors(options =>
                 var allowedHosts = new[]
                 {
                     "https://volunti.se",
-                    "https://volunti.doe25.swarm.chas-lab.dev"
+                    "https://volunti.doe25.swarm.chas-lab.dev",
                     "https://volunti.cc.k3s.chas-lab.dev"
                 };
                 if (allowedHosts.Contains(origin)) return true;
