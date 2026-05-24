@@ -4,6 +4,7 @@ import {
   getMyJobs,
   getMyApplications,
   updateApplicationStatus,
+  deleteJob,
 } from "../../services/jobService";
 import "./OrgDashboard.css";
 import {
@@ -12,6 +13,7 @@ import {
   fetchCurrentOrganization,
   uploadProfileImage,
   getProfileImageUrl,
+  deleteOrganization,
 } from "../../services/authService";
 import AvatarCropModal from "../profile/AvatarCropModal";
 import { useRef } from "react";
@@ -49,7 +51,7 @@ export default function OrgDashboard() {
       setError(null);
     } catch (err) {
       console.error("Fel vid hämtning av dashboard-data:", err);
-      setError("Kunde inte ladda dashboarden. Försök igen.");
+      setError("Organizationen finns inte längre. Försök igen.");
     } finally {
       setLoading(false);
     }
@@ -137,6 +139,32 @@ export default function OrgDashboard() {
     setPendingAvatarSrc(null);
   };
 
+  const handleDeleteJob = async (jobId) => {
+    try {
+      await deleteJob(jobId);
+      await loadDashboardData();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeleteOrganization = async () => {
+  if (
+    !window.confirm(
+      "Är du säker? Organisationen och alla jobb tas bort."
+    )
+  ) return;
+
+  try {
+    await deleteOrganization(organization.organizationId);
+
+    clearSession();
+    navigate("/landing");
+  } catch (err) {
+    console.error(err);
+  }
+};
+
   if (loading) {
     return (
       <div className="org-dashboard-wrapper">
@@ -220,12 +248,22 @@ export default function OrgDashboard() {
             <ul className="org-dashboard-list">
               {jobs.map((job) => (
                 <li key={job.jobId} className="org-dashboard-job-item">
-                  <div>
-                    <h3 className="org-dashboard-item-title">{job.title}</h3>
-                    <p className="org-dashboard-item-meta">
-                      {job.city} · {job.category} · {job.status}
-                    </p>
+                  <div className="job-top-row">
+                    <h3 className="org-dashboard-item-title">
+                      {job.title}
+                    </h3>
+
+                    <button
+                      className="delete-job-btn"
+                      onClick={() => handleDeleteJob(job.jobId)}
+                    >
+                      Ta bort
+                    </button>
                   </div>
+
+                  <p className="org-dashboard-item-meta">
+                    {job.city} · {job.category} · {job.status}
+                  </p>
                 </li>
               ))}
             </ul>
@@ -323,6 +361,9 @@ export default function OrgDashboard() {
               {organization.companyName}{" "}
               {organization.municipality && `· ${organization.municipality}`}
             </p>
+              <button className="delete-org-btn" onClick={handleDeleteOrganization}>
+                Ta bort organization
+              </button>
           </div>
         )}
         {avatarError && <p className="org-avatar-error">{avatarError}</p>}
