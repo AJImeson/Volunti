@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./App.css";
 import LandingPage from "./components/LandingPage";
+import DeskLanding from "./components/DeskLanding/DeskLanding";
 import RegisterForm from "./components/RegisterForm";
 import Profile from "./components/profile/Profile";
 import LoginForm from "./components/login/LoginForm";
@@ -12,13 +13,16 @@ import OrgRegister4 from "./components/OrgRegister/OrgRegister4";
 import SettingsPage from "./components/settingspage/SettingsPage";
 
 export default function App() {
-  const [currentView, setCurrentView] = useState("landing");
+  const [currentView, setCurrentView] = useState("DeskLanding");
 
   console.log("App renderar view:", currentView);
 
   return (
     <div className="app-container">
+ 
       {currentView === "landing" && <LandingPage setView={setCurrentView} />}
+
+      {currentView === "DeskLanding" && <DeskLanding setView={setCurrentView} />}
 
       {currentView === "login" && <LoginForm setView={setCurrentView} />}
 
