@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   registerVolunteer,
   checkAvailability,
@@ -123,7 +124,8 @@ function PendingFileUploader({
   );
 }
 
-export default function RegisterPage({ setView }) {
+export default function RegisterPage() {
+  const navigate = useNavigate();
   /* ==========================================================================
      STATE OCH MINNE
      ========================================================================== */
@@ -135,6 +137,7 @@ export default function RegisterPage({ setView }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [slideDirection, setSlideDirection] = useState("forward");
   const [pendingFiles, setPendingFiles] = useState({
     certificates: [],
     recommendations: [],
@@ -372,6 +375,19 @@ export default function RegisterPage({ setView }) {
     return true;
   };
 
+  // Scrolla till första felaktiga fält
+  const scrollToFirstError = () => {
+    setTimeout(() => {
+      const firstError = document.querySelector(".input-error");
+      if (firstError) {
+        firstError.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }
+    }, 100);
+  };
+
   const handleNext = async () => {
     if (!validateStep()) return;
 
@@ -390,6 +406,7 @@ export default function RegisterPage({ setView }) {
         if (result.emailTaken) {
           setErrorMsg("Det finns redan ett konto med den här mejladressen.");
           setFieldErrors({ email: true, confirmEmail: true });
+          scrollToFirstError();
           return;
         }
         if (result.phoneTaken) {
@@ -403,6 +420,7 @@ export default function RegisterPage({ setView }) {
     }
 
     if (currentStep < 4) {
+      setSlideDirection("forward");
       setCurrentStep(currentStep + 1);
       window.scrollTo(0, 0);
       return;
@@ -437,10 +455,10 @@ export default function RegisterPage({ setView }) {
         }
       }
 
-      setView("profile");
+      navigate("/missions");
     } catch (err) {
       setErrorMsg(err.message || "Något gick fel. Försök igen.");
-      window.scrollTo(0, 0);
+      scrollToFirstError();
     } finally {
       setIsSubmitting(false);
     }
@@ -450,16 +468,15 @@ export default function RegisterPage({ setView }) {
     setErrorMsg("");
     setFieldErrors({});
     if (currentStep > 1) {
+      setSlideDirection("back");
       setCurrentStep(currentStep - 1);
     } else {
-      setView("landing");
+      navigate("/landing");
     }
   };
 
   const handleLogoClick = () => {
-    if (typeof setView === "function") {
-      setView("landing");
-    }
+    navigate("/landing");
   };
 
   /* ==========================================================================
@@ -556,8 +573,26 @@ export default function RegisterPage({ setView }) {
         >
           VOLUNTI
         </h1>
-        <button className="btn-nav-login" onClick={() => setView("login")}>
+        <button className="btn-nav-login" onClick={() => navigate("/login")}>
           Logga in
+        </button>
+      </div>
+
+      {/* --- VOLONTÄR / ORGANISATION --- */}
+      <div className="user-type-toggle">
+        <button
+          type="button"
+          className="user-type-btn active"
+          onClick={() => {}}
+        >
+          Volontär
+        </button>
+        <button
+          type="button"
+          className="user-type-btn"
+          onClick={() => navigate("/org-register/1")}
+        >
+          Organisation
         </button>
       </div>
 
@@ -603,7 +638,14 @@ export default function RegisterPage({ setView }) {
           STEG 1: PERSONUPPGIFTER
           ========================================================================== */}
         {currentStep === 1 && (
-          <>
+          <div
+            key="step1"
+            className={
+              slideDirection === "forward"
+                ? "step-content"
+                : "step-content-back"
+            }
+          >
             <input
               type="text"
               name="firstName"
@@ -703,14 +745,21 @@ export default function RegisterPage({ setView }) {
                   : renderIcon("eye-closed")}
               </button>
             </div>
-          </>
+          </div>
         )}
 
         {/* ==========================================================================
             STEG 2: KOMMUN OCH KÖRKORT
             ========================================================================== */}
         {currentStep === 2 && (
-          <>
+          <div
+            key="step2"
+            className={
+              slideDirection === "forward"
+                ? "step-content"
+                : "step-content-back"
+            }
+          >
             <div className="custom-dropdown-container">
               <div
                 className={`select-input ${isDropdownOpen ? "open" : ""} ${fieldErrors.kommun ? "input-error" : ""}`}
@@ -830,14 +879,21 @@ export default function RegisterPage({ setView }) {
               }
               buttonLabel="+ Lägg till"
             />
-          </>
+          </div>
         )}
 
         {/* ==========================================================================
             STEG 3: UPPDRAG OCH TILLGÄNGLIGHET
             ========================================================================== */}
         {currentStep === 3 && (
-          <>
+          <div
+            key="step3"
+            className={
+              slideDirection === "forward"
+                ? "step-content"
+                : "step-content-back"
+            }
+          >
             <h3 className="form-section-title" style={{ marginTop: 0 }}>
               Vad vill du hjälpa med?
             </h3>
@@ -912,14 +968,21 @@ export default function RegisterPage({ setView }) {
               />
               <span>Det spelar ingen roll</span>
             </label>
-          </>
+          </div>
         )}
 
         {/* ==========================================================================
             STEG 4: NOTIFIKATIONSINSTÄLLNINGAR
             ========================================================================== */}
         {currentStep === 4 && (
-          <>
+          <div
+            key="step4"
+            className={
+              slideDirection === "forward"
+                ? "step-content"
+                : "step-content-back"
+            }
+          >
             <div className="notification-section">
               <span className="notification-label">Rekommenderat</span>
               <div
@@ -1062,7 +1125,7 @@ export default function RegisterPage({ setView }) {
                 Nej, enbart via appen.
               </label>
             </div>
-          </>
+          </div>
         )}
 
         {/* ==========================================================================

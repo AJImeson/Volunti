@@ -78,7 +78,7 @@ export const registerVolunteer = async (formData) => {
     firstName: formData.firstName,
     lastName: formData.lastName,
     phoneNumber: normalizedPhone,
-    muncipilaity: formData.kommun,
+    municipality: formData.kommun,
     driverLicense: formData.korkort.join(","),
     availability: formData.availability.join(","),
     maxDistanceKm: formData.distanceAny ? 0 : Number(formData.distance),
@@ -96,7 +96,7 @@ export const registerVolunteer = async (formData) => {
       firstName: formData.firstName,
       lastName: formData.lastName,
       phoneNumber: normalizedPhone,
-      muncipilaity: formData.kommun,
+      municipality: formData.kommun,
       driverLicense: formData.korkort,
       availability: formData.availability,
       interests: formData.categories,
@@ -111,6 +111,51 @@ export const registerVolunteer = async (formData) => {
     throw new Error(
       extractErrorMessage(error, "Registreringen misslyckades. Försök igen."),
     );
+  }
+};
+
+export const registerOrganization = async (formData) => {
+  const payload = {
+    email: formData.email,
+    password: formData.password,
+
+    companyName: formData.foretagsnamn,
+    orgName: formData.organisationsnamn,
+    contactName: formData.namn,
+
+    municipality: formData.kommun,
+    description: formData.beskrivning,
+
+    categories: formData.branscher,
+
+    requiresDocumentation: formData.dokumentation === "Ja",
+
+    notificationPreference: formData.notificationLevel,
+
+    emailNotifications: formData.emailNotification === "Ja",
+  };
+
+  try {
+    const { data } = await api.post("/register/organization", payload);
+
+    const profile = {
+      email: data.email,
+      userName: data.userName,
+      companyName: formData.foretagsnamn,
+      orgName: formData.organisationsnamn,
+    };
+
+    saveSession({
+      token: data.token,
+      profile,
+    });
+
+    return profile;
+  } catch (error) {
+    if (!error.response) {
+      throw new Error("Kunde inte ansluta till servern.");
+    }
+    throw new Error(extractErrorMessage(error, "Registreringen misslyckades."));
   }
 };
 
@@ -176,6 +221,19 @@ export const fetchCurrentUserProfile = async () => {
   }
 };
 
+export const fetchCurrentOrganization = async () => {
+  try {
+    const { data } = await api.get("/me/organization");
+    return data;
+  } catch (error) {
+    if (error.response?.status === 401) {
+      throw new Error("Sessionen har gått ut. Logga in igen.");
+    }
+    throw new Error(
+      extractErrorMessage(error, "Kunde inte hämta organisationsdata."),
+    );
+  }
+};
 /* ==========================================================================
    PROFILBILD
    ========================================================================== */
@@ -311,6 +369,11 @@ export const removeExperience = async (id) => {
   await api.delete(`/me/experiences/${id}`);
 };
 
+export const fetchMyApplications = async () => {
+  const { data } = await api.get("/applications/volunteer/mine");
+  return data;
+};
+
 /* ==========================================================================
    SESSION
    ========================================================================== */
@@ -343,3 +406,9 @@ export const clearSession = () => {
 export const authFetch = api;
 
 export default api;
+
+/*Skick join till org user som OrgAdmin */
+export const inviteOrgMember = async (email, password) => {
+  const { data } = await api.post("/org/members", { email, password });
+  return data;
+};

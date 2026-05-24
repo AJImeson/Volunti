@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./Profile.css";
 import AvatarCropModal from "./AvatarCropModal";
+import { useNavigate } from "react-router-dom";
+import BottomNav from "../bottomnav/BottomNav";
 import {
   getCurrentUser,
   clearSession,
@@ -644,7 +646,8 @@ function ExperienceSection({
 /* ==========================================================================
    PROFILE
    ========================================================================== */
-const Profile = ({ setView }) => {
+const Profile = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("Bio");
   const [user, setUser] = useState(getCurrentUser());
   const [isLoading, setIsLoading] = useState(true);
@@ -665,7 +668,7 @@ const Profile = ({ setView }) => {
 
   useEffect(() => {
     if (!isLoggedIn()) {
-      queueMicrotask(() => setView?.("landing"));
+      queueMicrotask(() => navigate("/landing"));
       return;
     }
 
@@ -694,7 +697,7 @@ const Profile = ({ setView }) => {
         if (cancelled) return;
         console.error("Kunde inte hämta profil:", err);
         if (err.message?.includes("Sessionen")) {
-          setView?.("landing");
+          navigate("/landing");
         }
       })
       .finally(() => {
@@ -704,7 +707,7 @@ const Profile = ({ setView }) => {
     return () => {
       cancelled = true;
     };
-  }, [setView]);
+  }, [navigate]);
 
   /* ==========================================================================
      SKILLS
@@ -877,7 +880,6 @@ const Profile = ({ setView }) => {
     setAvatarError("");
     setIsUploadingAvatar(true);
     try {
-      // Konvertera blob till en File så uploadProfileImage kan hantera den
       const file = new File([blob], "profile.jpg", { type: "image/jpeg" });
       const result = await uploadProfileImage(file);
       setUser((prev) => ({ ...prev, profileImageUrl: result.profileImageUrl }));
@@ -915,35 +917,11 @@ const Profile = ({ setView }) => {
   const availability = user.availability || [];
   const driverLicense = user.driverLicense || [];
 
-  const handleHomeClick = () => {
-    if (typeof setView === "function") setView("missions");
-  };
-
   return (
     <div className="profile-wrapper">
       <header className="header-blue">
         <div className="top-nav">
           <h1 className="volunti-logo">VOLUNTI</h1>
-          <div
-            className="home-icon-container"
-            onClick={handleHomeClick}
-            role="button"
-            tabIndex={0}
-          >
-            <svg
-              width="28"
-              height="28"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="white"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-              <polyline points="9 22 9 12 15 12 15 22"></polyline>
-            </svg>
-          </div>
         </div>
 
         <div className="profile-card">
@@ -1027,7 +1005,7 @@ const Profile = ({ setView }) => {
           <div className="profile-info">
             <h2>{fullName}</h2>
             <div className="profile-stats">
-              <span>{user.muncipilaity || "–"}</span>
+              <span>{user.municipality || "–"}</span>
               <span className="separator">|</span>
               <span>Volontär</span>
             </div>
@@ -1058,180 +1036,184 @@ const Profile = ({ setView }) => {
       </header>
 
       <main className="content-white">
-        {activeTab === "Bio" && (
-          <>
-            <EditableTagSection
-              title="Skills & Kompetens"
-              items={skills}
-              onAdd={handleAddSkill}
-              onRemove={handleRemoveSkill}
-              emptyText="Inga skills tillagda än"
-              placeholder="T.ex. Snickeri, Tolkning..."
-              presetOptions={[
-                "Lärare",
-                "Spanska",
-                "Engelska",
-                "Matlagning",
-                "Dator",
-                "Bil",
-                "Första hjälpen",
-                "Social",
-                "Barn",
-              ]}
-            />
+        <div className="tab-content-anim" key={activeTab}>
+          {activeTab === "Bio" && (
+            <>
+              <EditableTagSection
+                title="Skills & Kompetens"
+                items={skills}
+                onAdd={handleAddSkill}
+                onRemove={handleRemoveSkill}
+                emptyText="Inga skills tillagda än"
+                placeholder="T.ex. Snickeri, Tolkning..."
+                presetOptions={[
+                  "Lärare",
+                  "Spanska",
+                  "Engelska",
+                  "Matlagning",
+                  "Dator",
+                  "Bil",
+                  "Första hjälpen",
+                  "Social",
+                  "Barn",
+                ]}
+              />
 
-            <EditableTagSection
-              title="Intressen"
-              items={interests}
-              onAdd={handleAddInterest}
-              onRemove={handleRemoveInterest}
-              emptyText="Inga intressen tillagda än"
-              placeholder="T.ex. Musik, Sport..."
-              presetOptions={[
-                "Skola",
-                "Äldreomsorg",
-                "Miljö",
-                "Barn och ungdom",
-                "Matutdelning",
-                "Djur",
-                "Administration",
-                "Digital hjälp",
-              ]}
-            />
+              <EditableTagSection
+                title="Intressen"
+                items={interests}
+                onAdd={handleAddInterest}
+                onRemove={handleRemoveInterest}
+                emptyText="Inga intressen tillagda än"
+                placeholder="T.ex. Musik, Sport..."
+                presetOptions={[
+                  "Skola",
+                  "Äldreomsorg",
+                  "Miljö",
+                  "Barn och ungdom",
+                  "Matutdelning",
+                  "Djur",
+                  "Administration",
+                  "Digital hjälp",
+                ]}
+              />
 
-            <section className="info-section">
-              <div className="section-header">
-                <h3>Tillgänglighet</h3>
-              </div>
-              <div className="tags-container">
-                {availability.length > 0 ? (
-                  availability.map((time) => (
-                    <span key={time} className="skill-tag">
-                      {time}
-                    </span>
-                  ))
-                ) : (
-                  <span style={{ color: "#999", fontSize: 14 }}>
-                    Inte angivet
-                  </span>
-                )}
-              </div>
-            </section>
-
-            <section className="info-section">
-              <div className="section-header">
-                <h3>Kontaktuppgifter</h3>
-              </div>
-              <div className="experience-list">
-                <div className="exp-card">
-                  <h4>Mejl</h4>
-                  <p>{user.email}</p>
+              <section className="info-section">
+                <div className="section-header">
+                  <h3>Tillgänglighet</h3>
                 </div>
-                {user.phoneNumber && (
+                <div className="tags-container">
+                  {availability.length > 0 ? (
+                    availability.map((time) => (
+                      <span key={time} className="skill-tag">
+                        {time}
+                      </span>
+                    ))
+                  ) : (
+                    <span style={{ color: "#999", fontSize: 14 }}>
+                      Inte angivet
+                    </span>
+                  )}
+                </div>
+              </section>
+
+              <section className="info-section">
+                <div className="section-header">
+                  <h3>Kontaktuppgifter</h3>
+                </div>
+                <div className="experience-list">
                   <div className="exp-card">
-                    <h4>Telefon</h4>
-                    <p>{user.phoneNumber}</p>
+                    <h4>Mejl</h4>
+                    <p>{user.email}</p>
                   </div>
-                )}
-              </div>
-            </section>
-          </>
-        )}
+                  {user.phoneNumber && (
+                    <div className="exp-card">
+                      <h4>Telefon</h4>
+                      <p>{user.phoneNumber}</p>
+                    </div>
+                  )}
+                </div>
+              </section>
+            </>
+          )}
 
-        {activeTab === "Licenser" && (
-          <>
-            <section className="info-section">
-              <div className="section-header">
-                <h3>Körkort</h3>
-              </div>
-              <div className="tags-container">
-                {driverLicense.length > 0 && !driverLicense.includes("Nej") ? (
-                  driverLicense.map((typ) => (
-                    <span key={typ} className="skill-tag">
-                      {typ}
+          {activeTab === "Licenser" && (
+            <>
+              <section className="info-section">
+                <div className="section-header">
+                  <h3>Körkort</h3>
+                </div>
+                <div className="tags-container">
+                  {driverLicense.length > 0 &&
+                  !driverLicense.includes("Nej") ? (
+                    driverLicense.map((typ) => (
+                      <span key={typ} className="skill-tag">
+                        {typ}
+                      </span>
+                    ))
+                  ) : (
+                    <span style={{ color: "#999", fontSize: 14 }}>
+                      Inget körkort
                     </span>
-                  ))
-                ) : (
-                  <span style={{ color: "#999", fontSize: 14 }}>
-                    Inget körkort
-                  </span>
-                )}
-              </div>
-            </section>
-
-            <ExperienceSection
-              experiences={experiences}
-              onAdd={handleAddExperience}
-              onRemove={handleRemoveExperience}
-              onUploadAttachment={handleExperienceAttachmentUpload}
-              onDownloadAttachment={handleFileDownload}
-            />
-
-            <FileSection
-              title="Intyg & Rekommendationer"
-              category="certificate"
-              files={certificates}
-              onUpload={handleCertificateUpload}
-              onRemove={handleCertificateRemove}
-              onDownload={handleFileDownload}
-              emptyText="Inga intyg tillagda än."
-            />
-          </>
-        )}
-
-        {activeTab === "Impact" && (
-          <>
-            <section className="info-section">
-              <div className="section-header">
-                <h3>Impact Tracking</h3>
-              </div>
-              <div className="impact-cards-grid">
-                <div className="impact-square-card">
-                  <span className="impact-val">0</span>
-                  <span className="impact-lab">Timmar</span>
+                  )}
                 </div>
-                <div className="impact-square-card">
-                  <span className="impact-val">0</span>
-                  <span className="impact-lab">Uppdrag</span>
-                </div>
-                <div className="impact-square-card">
-                  <span className="impact-val">0</span>
-                  <span className="impact-lab">Organisationer</span>
-                </div>
-              </div>
-              <p
-                style={{
-                  color: "#999",
-                  fontSize: 13,
-                  marginTop: 16,
-                  textAlign: "center",
-                }}
-              >
-                Du har inte slutfört några uppdrag än.
-              </p>
-            </section>
-          </>
-        )}
+              </section>
 
-        <button
-          onClick={() => {
-            clearSession();
-            if (setView) setView("landing");
-          }}
-          style={{
-            marginTop: 24,
-            padding: "10px 20px",
-            border: "1.5px solid #2F44A5",
-            borderRadius: 12,
-            background: "white",
-            color: "#2F44A5",
-            fontWeight: 600,
-            cursor: "pointer",
-            width: "100%",
-          }}
-        >
-          Logga ut
-        </button>
+              <ExperienceSection
+                experiences={experiences}
+                onAdd={handleAddExperience}
+                onRemove={handleRemoveExperience}
+                onUploadAttachment={handleExperienceAttachmentUpload}
+                onDownloadAttachment={handleFileDownload}
+              />
+
+              <FileSection
+                title="Intyg & Rekommendationer"
+                category="certificate"
+                files={certificates}
+                onUpload={handleCertificateUpload}
+                onRemove={handleCertificateRemove}
+                onDownload={handleFileDownload}
+                emptyText="Inga intyg tillagda än."
+              />
+            </>
+          )}
+
+          {activeTab === "Impact" && (
+            <>
+              <section className="info-section">
+                <div className="section-header">
+                  <h3>Impact Tracking</h3>
+                </div>
+                <div className="impact-cards-grid">
+                  <div className="impact-square-card">
+                    <span className="impact-val">0</span>
+                    <span className="impact-lab">Timmar</span>
+                  </div>
+                  <div className="impact-square-card">
+                    <span className="impact-val">0</span>
+                    <span className="impact-lab">Uppdrag</span>
+                  </div>
+                  <div className="impact-square-card">
+                    <span className="impact-val">0</span>
+                    <span className="impact-lab">Organisationer</span>
+                  </div>
+                </div>
+                <p
+                  style={{
+                    color: "#999",
+                    fontSize: 13,
+                    marginTop: 16,
+                    textAlign: "center",
+                  }}
+                >
+                  Du har inte slutfört några uppdrag än.
+                </p>
+              </section>
+            </>
+          )}
+          <div className="mobile-only-actions">
+            <button
+              onClick={() => {
+                clearSession();
+                navigate("/landing");
+              }}
+              style={{
+                marginTop: 24,
+                padding: "10px 20px",
+                border: "1.5px solid #2F44A5",
+                borderRadius: 12,
+                background: "white",
+                color: "#2F44A5",
+                fontWeight: 600,
+                cursor: "pointer",
+                width: "100%",
+              }}
+            >
+              Logga ut
+            </button>
+          </div>
+        </div>
       </main>
       {pendingAvatarSrc && (
         <AvatarCropModal
@@ -1240,6 +1222,7 @@ const Profile = ({ setView }) => {
           onSave={handleAvatarCropSave}
         />
       )}
+      <BottomNav />
     </div>
   );
 };

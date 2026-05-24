@@ -1,17 +1,25 @@
-using Volunti.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Scalar.AspNetCore;
-using Volunti.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
-using Volunti.Interfaces;
-using Volunti.Service;
+using Scalar.AspNetCore;
+using Volunti.Data;
 using Volunti.Endpoints;
+using Volunti.Interfaces;
+using Volunti.Models;
+using Volunti.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
+
+// Serialiserar enums som strängar i båda riktningar (POST tar emot "Cleaning", GET returnerar "Approved" istället för 0/1/2)
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+});
 
 builder.Services.AddDbContext<VoluntiDbContext>(options =>
 {
@@ -46,15 +54,34 @@ builder.Services.AddAuthentication(options =>
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
-        ValidIssuer = builder.Configuration["JWT:Issuer"],
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidateAudience = true,
-        ValidAudience = builder.Configuration["JWT:Audience"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(
-            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"] ?? throw new Exception("JWT:SigningKey missing"))
+            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new Exception("Jwt:Key missing"))
         )
     };
 });
+
+// Rate limiting begränsar antal requests per IP/användare under en tidsperiod - skyddar mot brute-force (t.ex. lösenordsgissning på /login) och spam (t.ex. massregistrering av konton)
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("auth", opt =>
+    {
+        opt.PermitLimit = 5;
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueLimit = 0;
+    });
+
+    options.AddFixedWindowLimiter("write", opt =>
+    {
+        opt.PermitLimit = 20;
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueLimit = 0;
+    });
+});
+
 builder.Services.AddAuthorization();
 
 // TODO: PRODUKTION - Lås CORS till specifik frontend-domän innan deploy
@@ -73,9 +100,21 @@ builder.Services.AddCors(options =>
         }
         else
         {
-            policy.WithOrigins("https://volunti.se")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
+            policy.SetIsOriginAllowed(origin =>
+            {
+                var allowedHosts = new[]
+                {
+                    "https://volunti.se",
+                    "https://volunti.doe25.swarm.chas-lab.dev"
+                };
+                if (allowedHosts.Contains(origin)) return true;
+                
+                // Tillåt review-environments
+                var uri = new Uri(origin);
+                return uri.Host.EndsWith(".doe25.swarm.chas-lab.dev");
+            })
+            .AllowAnyHeader()
+            .AllowAnyMethod();
         }
     });
 });
@@ -91,7 +130,11 @@ if (!Directory.Exists(wwwroot))
     Directory.CreateDirectory(wwwroot);
 }
 
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(wwwroot),
+    RequestPath = ""
+});
 
 var uploadsRoot = Path.Combine(builder.Environment.ContentRootPath, "uploads");
 if (!Directory.Exists(uploadsRoot))
@@ -119,11 +162,15 @@ if (!app.Environment.IsDevelopment())
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 AuthEndpoints.RegisterEndpoints(app);
 OrganizationEndpoints.RegisterEndpoints(app);
 JobEndpoints.RegisterEndpoints(app);
 VolunteerProfileEndpoints.RegisterEndpoints(app); 
 FileEndpoints.RegisterEndpoints(app);
+ApplicationEndpoints.RegisterEndpoints(app);
+ScheduleEndpoints.RegisterEndpoints(app);
+JobInteractionEndpoints.RegisterEndpoints(app);
 
 app.Run();

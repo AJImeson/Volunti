@@ -1,4 +1,3 @@
-
 namespace Volunti.Dtos.Job
 {
     public class JobDto
@@ -23,6 +22,14 @@ namespace Volunti.Dtos.Job
 
         public int? OrganizationId { get; set; }
 
+        public OrgSummaryDto? Organization { get; set; }
+    }
 
+    public class OrgSummaryDto
+    {
+        public int OrganizationId { get; set; }
+        public string OrgName { get; set; } = string.Empty;
+        public string? ContactName { get; set; }
+        public string? ProfileImageUrl { get; set; }
     }
 }

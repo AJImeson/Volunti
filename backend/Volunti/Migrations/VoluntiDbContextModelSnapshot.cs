@@ -279,6 +279,95 @@ namespace Volunti.Migrations
                     b.ToTable("Jobs");
                 });
 
+            modelBuilder.Entity("Volunti.Models.JobComment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("JobId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ParentCommentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("JobId");
+
+                    b.HasIndex("ParentCommentId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("JobComments");
+                });
+
+            modelBuilder.Entity("Volunti.Models.JobCommentLike", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CommentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("CommentId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("JobCommentLikes");
+                });
+
+            modelBuilder.Entity("Volunti.Models.JobLike", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("JobId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("JobId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("JobLikes");
+                });
+
             modelBuilder.Entity("Volunti.Models.Message", b =>
                 {
                     b.Property<int>("Id")
@@ -654,6 +743,28 @@ namespace Volunti.Migrations
                     b.ToTable("VolunteerApplications");
                 });
 
+            modelBuilder.Entity("Volunti.Models.VolunteerAvailability", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("VolunteerId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VolunteerId", "Date")
+                        .IsUnique();
+
+                    b.ToTable("VolunteerAvailabilities");
+                });
+
             modelBuilder.Entity("Volunti.Models.VolunteerExperience", b =>
                 {
                     b.Property<int>("Id")
@@ -884,6 +995,70 @@ namespace Volunti.Migrations
                     b.Navigation("Organization");
                 });
 
+            modelBuilder.Entity("Volunti.Models.JobComment", b =>
+                {
+                    b.HasOne("Volunti.Models.Job", "Job")
+                        .WithMany()
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Volunti.Models.JobComment", "ParentComment")
+                        .WithMany("Replies")
+                        .HasForeignKey("ParentCommentId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Volunti.Models.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Job");
+
+                    b.Navigation("ParentComment");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Volunti.Models.JobCommentLike", b =>
+                {
+                    b.HasOne("Volunti.Models.JobComment", "Comment")
+                        .WithMany()
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Volunti.Models.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Comment");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Volunti.Models.JobLike", b =>
+                {
+                    b.HasOne("Volunti.Models.Job", "Job")
+                        .WithMany()
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Volunti.Models.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Job");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Volunti.Models.Message", b =>
                 {
                     b.HasOne("Volunti.Models.AppUser", "Receiver")
@@ -997,6 +1172,17 @@ namespace Volunti.Migrations
                     b.Navigation("Volunteer");
                 });
 
+            modelBuilder.Entity("Volunti.Models.VolunteerAvailability", b =>
+                {
+                    b.HasOne("Volunti.Models.Volunteer", "Volunteer")
+                        .WithMany()
+                        .HasForeignKey("VolunteerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Volunteer");
+                });
+
             modelBuilder.Entity("Volunti.Models.VolunteerExperience", b =>
                 {
                     b.HasOne("Volunti.Models.Volunteer", "Volunteer")
@@ -1028,6 +1214,11 @@ namespace Volunti.Migrations
                     b.Navigation("PasswordResetTokens");
 
                     b.Navigation("Volunteer");
+                });
+
+            modelBuilder.Entity("Volunti.Models.JobComment", b =>
+                {
+                    b.Navigation("Replies");
                 });
 
             modelBuilder.Entity("Volunti.Models.Organization", b =>

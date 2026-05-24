@@ -1,8 +1,13 @@
 import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./LoginForm.css";
-import { loginUser } from "../../services/authService";
+import { loginUser, getToken } from "../../services/authService";
 
-export default function LoginForm({ setView }) {
+
+export default function LoginForm() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const sessionMessage = location.state?.message;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -22,8 +27,19 @@ export default function LoginForm({ setView }) {
 
     try {
       const user = await loginUser(email, password);
+      const token = getToken(); // Get JWT token from authService
+      const payload = JSON.parse(atob(token.split(".")[1])); // split the token and take the middle part and then parse from B64 to string
+      console.log(payload);
+      const role = payload.role; // put the role, Volunteer, OrgAdmin, Orguser
       console.log("Inloggad som:", user);
-      setView("missions");
+      if (role === "OrgAdmin") {
+        navigate("/org-dashboard");
+      } 
+      else if (role === "OrgUser") {
+        navigate("/org-user-dashboard");
+      } else {
+        navigate("/missions");
+    }
     } catch (error) {
       setErrorMsg(error.message);
     } finally {
@@ -32,9 +48,7 @@ export default function LoginForm({ setView }) {
   };
 
   const handleLogoClick = () => {
-    if (typeof setView === "function") {
-      setView("landing");
-    }
+    navigate("/");
   };
 
   const renderEyeIcon = (open) =>
@@ -76,7 +90,7 @@ export default function LoginForm({ setView }) {
         </h1>
         <button
           className="btn-nav-register"
-          onClick={() => setView("register")}
+          onClick={() => navigate("/register")}
         >
           Registrera dig
         </button>
@@ -95,6 +109,10 @@ export default function LoginForm({ setView }) {
         <h2 className="login-card-title">Logga in</h2>
 
         {errorMsg && <div className="error-msg-box">{errorMsg}</div>}
+
+        {sessionMessage && (
+          <div className="error-msg-box">{sessionMessage}</div>
+        )}
 
         <form onSubmit={handleLogin} className="login-form">
           <input

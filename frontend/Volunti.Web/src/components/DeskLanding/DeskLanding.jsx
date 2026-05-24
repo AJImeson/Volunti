@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; 
 import './DeskLanding.css';
 
 // Importera alla bilder från assets-mappen
@@ -8,7 +9,10 @@ import uiProfile from './assets/ui-profile.png';
 import uiList from './assets/ui-list.png';
 import uiCalendar from './assets/ui-calendar.png';
 
-const DeskLanding = ({ setView }) => {
+
+const DeskLanding = () => {
+  const navigate = useNavigate(); 
+
   // Data för sektionerna
   const whyCards = [
     { title: "På dina villkor", text: "Du bestämmer när du är tillgänglig. Ange ditt schema och få uppdrag som passar din vardag." },
@@ -80,7 +84,7 @@ const DeskLanding = ({ setView }) => {
               <li><a href="#hur-de-gar-till">Hur de går till</a></li>
             </ul>
           </nav>
-          <button className="btn btn-white-solid" onClick={() => setView('login')}>Logga in</button>
+          <button className="btn btn-white-solid" onClick={() => navigate('/login')}>Logga in</button>
         </div>
       </header>
 
@@ -91,8 +95,8 @@ const DeskLanding = ({ setView }) => {
             <h1>Gör skillnad<br/>nära dig</h1>
             <p>Volunti kopplar samman volontärer med organisationer som behöver hjälp. Hitta uppdrag, engagera dig och gör avtryck i ditt lokalsamhälle.</p>
             <div className="hero-btns">
-              <button className="btn btn-white-solid" onClick={() => setView('register')}>Kom igång gratis</button>
-              <button className="btn btn-outline" onClick={() => setView('login')}>Logga in</button>
+              <button className="btn btn-white-solid" onClick={() => navigate('/register')}>Kom igång gratis</button>
+              <button className="btn btn-outline" onClick={() => navigate('/login')}>Logga in</button>
             </div>
           </div>
           
@@ -186,8 +190,8 @@ const DeskLanding = ({ setView }) => {
             <p>Hitta uppdrag nära dig eller skapa egna uppdrag för din organisation</p>
           </div>
           <div className="cta-btns">
-            <button className="btn btn-white-solid" onClick={() => setView('register')}>Kom igång gratis</button>
-            <button className="btn btn-outline" onClick={() => setView('login')}>Logga in</button>
+            <button className="btn btn-white-solid" onClick={() => navigate('/register')}>Kom igång gratis</button>
+            <button className="btn btn-outline" onClick={() => navigate('/login')}>Logga in</button>
           </div>
         </div>
       </section>
@@ -301,8 +305,8 @@ const DeskLanding = ({ setView }) => {
           <div className="footer-middle">
             <p>Små insatser. Stor skillnad.</p>
             <div className="footer-btns">
-              <button className="btn btn-white-solid" onClick={() => setView('register')}>Kom igång gratis</button>
-              <button className="btn btn-outline" onClick={() => setView('login')}>Logga in</button>
+              <button className="btn btn-white-solid" onClick={() => navigate('/register')}>Kom igång gratis</button>
+              <button className="btn btn-outline" onClick={() => navigate('/login')}>Logga in</button>
             </div>
           </div>
           <div className="footer-bottom">
