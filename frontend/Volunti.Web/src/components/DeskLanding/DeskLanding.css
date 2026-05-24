@@ -1,0 +1,351 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+.landing-page {
+  font-family: 'Inter', sans-serif;
+  color: #101828;
+  background-color: #FAFBFC;
+  width: 100vw;
+  overflow-x: hidden;
+}
+
+.landing-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Typografi & Knappar */
+h1, h2, h3, h4 { margin: 0; }
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; padding: 0; margin: 0; }
+
+.btn {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn-white-solid {
+  background: white;
+  color: #2F44A5;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid white;
+  color: white;
+}
+
+/* Header */
+.landing-header {
+  background-color: #2F44A5;
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.nav-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-text {
+  font-size: 28px;
+  font-weight: 900;
+  color: #000;
+  letter-spacing: -1px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 30px;
+  color: white;
+  font-weight: 500;
+  font-size: 15px;
+}
+
+/* Hero Section */
+.hero {
+  background-color: #2F44A5;
+  color: white;
+  padding: 80px 0 120px;
+}
+
+.hero-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hero-text {
+  flex: 1;
+  max-width: 600px;
+}
+
+.hero-text h1 {
+  font-size: 64px;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 24px;
+}
+
+.hero-text p {
+  font-size: 18px;
+  line-height: 1.5;
+  margin-bottom: 40px;
+  opacity: 0.9;
+}
+
+.hero-btns {
+  display: flex;
+  gap: 15px;
+}
+
+/* Låtsas-telefon i Hero med Screenshot */
+.hero-graphics {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.placeholder-phone {
+  width: 320px;
+  height: 640px;
+  background: #000;
+  border-radius: 44px;
+  border: 12px solid #000;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+  overflow: hidden;
+}
+
+.dynamic-island {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 28px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 12px;
+}
+
+.camera-dot {
+  width: 10px;
+  height: 10px;
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 50%;
+}
+
+.phone-inner {
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  display: flex;
+  border-radius: 32px;
+  overflow: hidden;
+}
+
+.phone-screenshot-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Hur det fungerar */
+.how-it-works {
+  background: white;
+  margin-top: -60px;
+  border-top-left-radius: 50px;
+  border-top-right-radius: 50px;
+  padding: 80px 0;
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.section-title h2 {
+  font-size: 40px;
+  color: #2F44A5;
+  margin-bottom: 10px;
+}
+
+.section-title p { color: #667085; font-weight: 600; }
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.step-card {
+  background: white;
+  border: 1px solid #E4E7EC;
+  border-radius: 20px;
+  padding: 40px 30px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+}
+
+.step-num {
+  font-size: 48px;
+  font-weight: 800;
+  color: #2F44A5;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.step-card h3 { color: #2F44A5; margin-bottom: 10px; font-size: 20px; }
+.step-card p { color: #667085; font-size: 15px; line-height: 1.5; }
+
+/* Features Section */
+.features-section { padding: 80px 0; background: #F8FAFC; }
+.features-wrapper { 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  gap: 40px; 
+}
+
+.features-text { 
+  flex: 1; 
+  max-width: 450px; 
+}
+.features-text h2 { font-size: 38px; color: #2F44A5; margin-bottom: 20px; line-height: 1.2; }
+.features-text p { color: #667085; margin-bottom: 30px; font-size: 16px; line-height: 1.5; }
+
+.feature-list li {
+  display: flex; align-items: center; gap: 15px;
+  font-size: 16px; font-weight: 600; color: #101828; margin-bottom: 20px;
+}
+.check {
+  display: flex; justify-content: center; align-items: center;
+  width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid #2F44A5; color: #2F44A5; font-size: 14px;
+}
+
+
+.features-ui {
+  flex: 2.2; 
+  display: grid; 
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px; 
+  align-items: center;
+}
+
+.ui-image {
+  width: 100%;
+  aspect-ratio: 1 / 1; 
+  object-fit: cover; 
+  object-position: top;
+  border-radius: 16px; 
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08); 
+  display: block;
+}
+
+/* Varför Volunti */
+.why-volunti { padding: 80px 0; }
+.why-grid {
+  display: grid; 
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 20px;
+  margin-top: 40px;
+}
+.why-card {
+  background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+.why-card h3 { color: #2F44A5; font-size: 18px; margin-bottom: 15px; }
+.why-card p { color: #667085; font-size: 14px; line-height: 1.5; }
+
+/* Redo att göra skillnad CTA */
+.cta-banner { background: #2F44A5; padding: 60px 0; color: white; }
+.cta-content { display: flex; justify-content: space-between; align-items: center; }
+.cta-content h2 { font-size: 36px; margin-bottom: 10px; }
+.cta-content p { opacity: 0.9; }
+.cta-btns { display: flex; gap: 15px; }
+
+/* Berättelser från Communityt */
+.community-stories { padding: 80px 0; background: #F8FAFC; }
+.stories-wrapper { display: flex; gap: 40px; align-items: center; }
+.stories-text { flex: 1; }
+.stories-text h2 { font-size: 32px; color: #2F44A5; margin-bottom: 15px; }
+.stories-text p { color: #667085; }
+.stories-grid { flex: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.story-card { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+.story-author { display: flex; gap: 15px; align-items: center; margin-bottom: 15px; }
+.author-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-weight: 700; }
+.story-card p { font-size: 14px; color: #667085; font-style: italic; margin-bottom: 15px; }
+.story-stats { display: flex; gap: 15px; color: #98A2B3; font-size: 12px; }
+
+/* Volontärarbete på riktigt */
+.real-volunteering { padding: 80px 0; }
+.value-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 40px; }
+.value-card { background: white; padding: 40px 30px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; }
+.value-card h3 { color: #2F44A5; margin-bottom: 15px; }
+.value-card p { color: #667085; font-size: 14px; line-height: 1.6; }
+
+/* Hitta Nästa Uppdrag */
+.find-missions { padding: 80px 0; background: #F8FAFC; }
+.filter-tags { 
+  display: flex; 
+  justify-content: center; 
+  flex-wrap: wrap; 
+  gap: 10px; 
+  margin-top: 30px;
+  margin-bottom: 50px; 
+}
+.tag { padding: 10px 20px; border-radius: 8px; border: 1px solid #D0D5DD; background: white; cursor: pointer; font-weight: 600; color: #344054; }
+.tag.active { background: #2F44A5; color: white; border-color: #2F44A5; }
+
+.mission-cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+.mission-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+.mission-header { display: flex; gap: 15px; align-items: center; margin-bottom: 20px; }
+
+.org-logo-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #D92D20;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #ffffff;
+}
+
+.mission-header h4 { font-size: 16px; margin-bottom: 4px; }
+.org-name { color: #667085; font-size: 13px; }
+.mission-info { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px; color: #667085; margin-bottom: 20px; }
+.mission-tags { display: flex; gap: 10px; margin-bottom: 20px; }
+.m-tag { border: 1px solid #D0D5DD; padding: 6px 12px; border-radius: 20px; font-size: 12px; color: #344054; }
+.mission-desc { font-size: 13px; color: #667085; line-height: 1.5; margin-bottom: 30px; }
+.mission-card-btns { display: flex; gap: 15px; }
+.btn-granska, .btn-redigera { flex: 1; padding: 10px; border-radius: 12px; font-weight: 600; cursor: pointer; }
+.btn-granska { background: #2F44A5; color: white; border: none; }
+.btn-redigera { background: white; border: 1.5px solid #2F44A5; color: #2F44A5; }
+
+/* Footer */
+.landing-footer { background: #2F44A5; color: white; padding: 60px 0 20px; }
+.footer-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+.footer-logo { font-size: 32px; font-weight: 900; color: #000; letter-spacing: -1px; }
+.footer-links { display: flex; gap: 30px; font-size: 15px; }
+.footer-middle { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 40px; margin-bottom: 20px; }
+.footer-middle p { font-size: 18px; font-weight: 500; }
+.footer-btns { display: flex; gap: 15px; }
+.footer-bottom { font-size: 14px; opacity: 0.8; }
