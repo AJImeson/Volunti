@@ -412,3 +412,13 @@ export const inviteOrgMember = async (email, password) => {
   const { data } = await api.post("/org/members", { email, password });
   return data;
 };
+
+export const deleteJob = async (jobId) => {
+  const { data } = await api.delete(`/jobs/${jobId}`);
+  return data;
+};
+
+export const deleteOrganization = async (organizationId) => {
+  const { data } = await api.delete(`/organizations/${organizationId}`);
+  return data;
+};

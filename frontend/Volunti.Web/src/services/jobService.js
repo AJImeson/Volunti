@@ -88,3 +88,15 @@ export const updateMyAvailability = async (dates) => {
   );
   return response.data;
 };
+
+// Ta bort ett jobb
+export const deleteJob = async (jobId) => {
+  const response = await axios.delete(
+    `${API_URL}/jobs/${jobId}`,
+    {
+      headers: authHeaders(),
+    }
+  );
+
+  return response.data;
+};
