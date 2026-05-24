@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volunti.Data;
 
@@ -11,9 +12,11 @@ using Volunti.Data;
 namespace Volunti.Migrations
 {
     [DbContext(typeof(VoluntiDbContext))]
-    partial class VoluntiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260522130853_AddJobLikesAndComments")]
+    partial class AddJobLikesAndComments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -312,33 +315,6 @@ namespace Volunti.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("JobComments");
-                });
-
-            modelBuilder.Entity("Volunti.Models.JobCommentLike", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CommentId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("CommentId", "UserId")
-                        .IsUnique();
-
-                    b.ToTable("JobCommentLikes");
                 });
 
             modelBuilder.Entity("Volunti.Models.JobLike", b =>
@@ -1017,25 +993,6 @@ namespace Volunti.Migrations
                     b.Navigation("Job");
 
                     b.Navigation("ParentComment");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Volunti.Models.JobCommentLike", b =>
-                {
-                    b.HasOne("Volunti.Models.JobComment", "Comment")
-                        .WithMany()
-                        .HasForeignKey("CommentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Volunti.Models.AppUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Comment");
 
                     b.Navigation("User");
                 });

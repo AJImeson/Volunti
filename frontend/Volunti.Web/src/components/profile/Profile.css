@@ -8,7 +8,6 @@
 
 .profile-wrapper {
   width: 100%;
-  max-width: 420px;
   min-height: 100vh;
   min-height: 100dvh;
   background-color: #2f44a5;
@@ -16,26 +15,26 @@
   font-family: "Inter", sans-serif;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 }
 
 .header-blue {
-  padding: 50px 35px 25px;
+  padding: 1.5rem 1rem 1rem 1rem;
   color: white;
 }
 
 .top-nav {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
-  margin-bottom: 25px;
+  margin-bottom: 1rem;
 }
 
 .volunti-logo {
-  font-size: 36px;
-  font-weight: 800;
+  font-size: 1.8rem;
+  font-weight: 900;
   letter-spacing: -1px;
   color: #000000;
+  margin: 0;
 }
 
 .home-icon-container {
@@ -890,8 +889,6 @@
 
 @media (max-width: 767px) {
   .profile-wrapper {
-    max-width: 100%;
-    box-shadow: none;
     padding-bottom: 0;
   }
 
@@ -958,18 +955,9 @@
 }
 
 @media (min-width: 768px) {
-  .profile-wrapper {
-    max-width: 100%;
-    box-shadow: none;
-  }
-
   .header-blue {
     border-radius: 0;
-    padding: 2.5rem 3rem 1.5rem 3rem;
-  }
-
-  .volunti-logo {
-    font-size: 2rem;
+    padding: 1.5rem 1rem 1.5rem 1rem;
   }
 
   .profile-card {
@@ -1011,5 +999,26 @@
 
   .tags-container {
     gap: 0.6rem;
+  }
+
+  .avatar-section {
+    gap: 1.25rem;
+  }
+
+  .cv-button-group {
+    position: static;
+    bottom: auto;
+    left: auto;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+
+  .cv-error-text {
+    position: static;
+    bottom: auto;
+    left: auto;
+    text-align: center;
+    background: transparent;
+    color: #fca5a5;
   }
 }
