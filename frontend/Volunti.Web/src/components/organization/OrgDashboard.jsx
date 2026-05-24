@@ -140,6 +140,9 @@ export default function OrgDashboard() {
   };
 
   const handleDeleteJob = async (jobId) => {
+    if (!window.confirm("Är du säker på att du vill ta bort jobbet?")){
+      return;
+    }
     try {
       await deleteJob(jobId);
       await loadDashboardData();
