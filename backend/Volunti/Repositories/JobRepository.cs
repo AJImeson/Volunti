@@ -16,15 +16,9 @@ namespace Volunti.Repositories
         public Task<Job?> GetByIdAsync(int id) =>
             db.Jobs.FindAsync(id).AsTask();
 
-        public async Task AddAsync(Job job)
-        {
-            db.Jobs.Add(job);
-        }
+        public void Add(Job job) => db.Jobs.Add(job);
 
-        public async Task RemoveAsync(Job job)
-        {
-            db.Jobs.Remove(job);
-        }
+        public void Remove(Job job) => db.Jobs.Remove(job);
 
         public Task SaveChangesAsync() =>
             db.SaveChangesAsync();

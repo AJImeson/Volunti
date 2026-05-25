@@ -17,9 +17,9 @@ namespace Volunti.Repositories
         public Task<bool> LikedByUserAsync(int jobId, int userId) =>
             db.JobLikes.AnyAsync(jl => jl.JobId == jobId && jl.UserId == userId);
 
-        public async Task AddLikeAsync(JobLike like) => db.JobLikes.Add(like);
+        public void AddLike(JobLike like) => db.JobLikes.Add(like);
 
-        public async Task RemoveLikeAsync(JobLike like) => db.JobLikes.Remove(like);
+        public void RemoveLike(JobLike like) => db.JobLikes.Remove(like);
 
         // Comments
         public Task<List<JobComment>> GetCommentsByJobAsync(int jobId) =>
@@ -43,15 +43,12 @@ namespace Volunti.Repositories
                 .Include(c => c.User).ThenInclude(u => u.Organization)
                 .FirstOrDefaultAsync(c => c.Id == commentId);
 
-        public async Task AddCommentAsync(JobComment comment) => db.JobComments.Add(comment);
+        public void AddComment(JobComment comment) => db.JobComments.Add(comment);
 
-        public async Task RemoveCommentAsync(JobComment comment) => db.JobComments.Remove(comment);
+        public void RemoveComment(JobComment comment) => db.JobComments.Remove(comment);
 
-        public Task RemoveCommentsRangeAsync(IEnumerable<JobComment> comments)
-        {
+        public void RemoveCommentsRange(IEnumerable<JobComment> comments) =>
             db.JobComments.RemoveRange(comments);
-            return Task.CompletedTask;
-        }
 
         // Comment likes
         public Task<JobCommentLike?> GetCommentLikeAsync(int commentId, int userId) =>
@@ -76,9 +73,9 @@ namespace Volunti.Repositories
             return ids.ToHashSet();
         }
 
-        public async Task AddCommentLikeAsync(JobCommentLike like) => db.JobCommentLikes.Add(like);
+        public void AddCommentLike(JobCommentLike like) => db.JobCommentLikes.Add(like);
 
-        public async Task RemoveCommentLikeAsync(JobCommentLike like) => db.JobCommentLikes.Remove(like);
+        public void RemoveCommentLike(JobCommentLike like) => db.JobCommentLikes.Remove(like);
 
         public Task SaveChangesAsync() => db.SaveChangesAsync();
     }

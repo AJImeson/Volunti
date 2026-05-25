@@ -35,7 +35,7 @@ namespace Volunti.Service
             if (existing is null)
             {
                 existing = new VolunteerSkill { Title = normalizedTitle, Description = string.Empty };
-                await volunteerRepo.AddSkillAsync(existing);
+                volunteerRepo.AddSkill(existing);
                 await volunteerRepo.SaveChangesAsync();
             }
 
@@ -88,7 +88,7 @@ namespace Volunti.Service
             if (existing is null)
             {
                 existing = new VolunteerInterest { Title = normalizedTitle, Description = "Tillagt av användare" };
-                await volunteerRepo.AddInterestAsync(existing);
+                volunteerRepo.AddInterest(existing);
                 await volunteerRepo.SaveChangesAsync();
             }
 
@@ -165,7 +165,7 @@ namespace Volunti.Service
                 HoursTotal = dto.HoursTotal
             };
 
-            await volunteerRepo.AddExperienceAsync(experience);
+            volunteerRepo.AddExperience(experience);
             await volunteerRepo.SaveChangesAsync();
 
             return (true, new
@@ -197,7 +197,7 @@ namespace Volunti.Service
                 await fileRepo.RemoveFileAsync(att);
             }
 
-            await volunteerRepo.RemoveExperienceAsync(experience);
+            volunteerRepo.RemoveExperience(experience);
             await volunteerRepo.SaveChangesAsync();
             return (true, null);
         }

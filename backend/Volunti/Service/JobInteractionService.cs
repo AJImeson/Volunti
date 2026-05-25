@@ -16,12 +16,12 @@ namespace Volunti.Service
             bool liked;
             if (existing != null)
             {
-                await interactionRepo.RemoveLikeAsync(existing);
+                interactionRepo.RemoveLike(existing);
                 liked = false;
             }
             else
             {
-                await interactionRepo.AddLikeAsync(new JobLike { JobId = jobId, UserId = userId });
+                interactionRepo.AddLike(new JobLike { JobId = jobId, UserId = userId });
                 liked = true;
             }
 
@@ -90,7 +90,7 @@ namespace Volunti.Service
                 CreatedAt = DateTime.UtcNow
             };
 
-            await interactionRepo.AddCommentAsync(comment);
+            interactionRepo.AddComment(comment);
             await interactionRepo.SaveChangesAsync();
 
             var saved = await interactionRepo.GetCommentByIdAsync(comment.Id);
@@ -125,9 +125,9 @@ namespace Volunti.Service
                 return (false, "Forbidden");
 
             if (comment.Replies.Any())
-                await interactionRepo.RemoveCommentsRangeAsync(comment.Replies);
+                interactionRepo.RemoveCommentsRange(comment.Replies);
 
-            await interactionRepo.RemoveCommentAsync(comment);
+            interactionRepo.RemoveComment(comment);
             await interactionRepo.SaveChangesAsync();
             return (true, null);
         }
@@ -142,12 +142,12 @@ namespace Volunti.Service
             bool liked;
             if (existing != null)
             {
-                await interactionRepo.RemoveCommentLikeAsync(existing);
+                interactionRepo.RemoveCommentLike(existing);
                 liked = false;
             }
             else
             {
-                await interactionRepo.AddCommentLikeAsync(new JobCommentLike { CommentId = commentId, UserId = userId });
+                interactionRepo.AddCommentLike(new JobCommentLike { CommentId = commentId, UserId = userId });
                 liked = true;
             }
 

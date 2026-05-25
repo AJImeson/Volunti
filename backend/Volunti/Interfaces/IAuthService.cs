@@ -11,5 +11,6 @@ namespace Volunti.Interfaces
         Task<(bool success, string? token, string? error)> ForgotPasswordAsync(ForgotPasswordDto dto);
         Task<(bool success, string? error)> ResetPasswordAsync(ResetPasswordDto dto);
         Task<object?> GetMeAsync(int userId);
+        Task<object?> GetMyOrganizationAsync(int userId);
     }
 }

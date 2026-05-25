@@ -6,15 +6,15 @@ namespace Volunti.Interfaces
     {
         Task<Volunteer?> GetByUserIdAsync(int userId, bool includeSkills = false, bool includeInterests = false);
         Task<VolunteerSkill?> GetSkillByTitleAsync(string title);
-        Task AddSkillAsync(VolunteerSkill skill);
+        void AddSkill(VolunteerSkill skill);
         Task<VolunteerInterest?> GetInterestByTitleAsync(string title);
-        Task AddInterestAsync(VolunteerInterest interest);
+        void AddInterest(VolunteerInterest interest);
         Task<List<VolunteerExperience>> GetExperiencesByVolunteerIdAsync(int volunteerId);
-        Task AddExperienceAsync(VolunteerExperience experience);
+        void AddExperience(VolunteerExperience experience);
         Task<VolunteerExperience?> GetExperienceByIdAsync(int experienceId, int volunteerId);
-        Task RemoveExperienceAsync(VolunteerExperience experience);
+        void RemoveExperience(VolunteerExperience experience);
         Task<bool> PhoneNumberExistsAsync(string phoneNumber);
-        Task AddAsync(Volunteer volunteer);
+        void Add(Volunteer volunteer);
         Task SaveChangesAsync();
     }
 }

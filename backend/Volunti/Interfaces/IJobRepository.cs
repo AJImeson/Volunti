@@ -7,8 +7,8 @@ namespace Volunti.Interfaces
         Task<List<Job>> GetAllAsync();
         Task<List<Job>> GetByOrganizationIdAsync(int organizationId);
         Task<Job?> GetByIdAsync(int id);
-        Task AddAsync(Job job);
-        Task RemoveAsync(Job job);
+        void Add(Job job);
+        void Remove(Job job);
         Task SaveChangesAsync();
     }
 }

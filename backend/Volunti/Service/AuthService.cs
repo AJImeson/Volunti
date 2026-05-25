@@ -50,7 +50,7 @@ namespace Volunti.Service
                         else
                         {
                             var newInterest = new VolunteerInterest { Title = interestName, Description = interestName };
-                            await volunteerRepo.AddInterestAsync(newInterest);
+                            volunteerRepo.AddInterest(newInterest);
                             interests.Add(newInterest);
                         }
                     }
@@ -75,7 +75,7 @@ namespace Volunti.Service
                     VolunteerInterests = interests
                 };
 
-                await volunteerRepo.AddAsync(volunteer);
+                volunteerRepo.Add(volunteer);
                 await volunteerRepo.SaveChangesAsync();
 
                 var roles = await userManager.GetRolesAsync(appUser);
@@ -222,6 +222,36 @@ namespace Volunti.Service
             storedToken.UsedAt = DateTime.UtcNow;
             await db.SaveChangesAsync();
             return (true, null);
+        }
+
+        public async Task<object?> GetMyOrganizationAsync(int userId)
+        {
+            var user = await userManager.FindByIdAsync(userId.ToString());
+            if (user is null) return null;
+
+            var organization = await db.Organizations.FirstOrDefaultAsync(o => o.UserId == userId);
+            if (organization is null)
+            {
+                var membership = await db.OrganizationMembers
+                    .Include(m => m.Organization)
+                    .FirstOrDefaultAsync(m => m.UserId == userId);
+                organization = membership?.Organization;
+            }
+
+            if (organization is null) return null;
+
+            return new
+            {
+                organizationId = organization.OrganizationId,
+                orgName = organization.OrgName,
+                companyName = organization.CompanyName,
+                contactName = organization.ContactName,
+                municipality = organization.Municipality,
+                description = organization.Description,
+                profileImageUrl = organization.ProfileImageUrl,
+                website = organization.Website,
+                email = user.Email
+            };
         }
 
         public async Task<object?> GetMeAsync(int userId)

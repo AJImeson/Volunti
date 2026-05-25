@@ -45,7 +45,7 @@ namespace Volunti.Service
                 CreatedAt = DateTime.UtcNow
             };
 
-            await appRepo.AddAsync(application);
+            appRepo.Add(application);
             await appRepo.SaveChangesAsync();
 
             return (true, new ApplicationDto

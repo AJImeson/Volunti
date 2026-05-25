@@ -19,20 +19,11 @@ namespace Volunti.Repositories
         public Task<Organization?> GetWithJobsAsync(int id) =>
             db.Organizations.Include(o => o.Jobs).FirstOrDefaultAsync(o => o.OrganizationId == id);
 
-        public async Task AddMemberAsync(OrganizationMember member)
-        {
-            db.OrganizationMembers.Add(member);
-        }
+        public void AddMember(OrganizationMember member) => db.OrganizationMembers.Add(member);
 
-        public async Task RemoveAsync(Organization org)
-        {
-            db.Organizations.Remove(org);
-        }
+        public void Remove(Organization org) => db.Organizations.Remove(org);
 
-        public async Task RemoveJobsRangeAsync(IEnumerable<Job> jobs)
-        {
-            db.Jobs.RemoveRange(jobs);
-        }
+        public void RemoveJobsRange(IEnumerable<Job> jobs) => db.Jobs.RemoveRange(jobs);
 
         public Task SaveChangesAsync() =>
             db.SaveChangesAsync();

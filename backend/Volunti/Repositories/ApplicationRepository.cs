@@ -36,10 +36,8 @@ namespace Volunti.Repositories
         public Task<bool> ExistsAsync(int volunteerId, int jobId) =>
             db.VolunteerApplications.AnyAsync(a => a.VolunteerId == volunteerId && a.JobId == jobId);
 
-        public async Task AddAsync(VolunteerApplication application)
-        {
+        public void Add(VolunteerApplication application) =>
             db.VolunteerApplications.Add(application);
-        }
 
         public Task SaveChangesAsync() => db.SaveChangesAsync();
     }

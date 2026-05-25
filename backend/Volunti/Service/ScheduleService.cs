@@ -22,7 +22,7 @@ namespace Volunti.Service
                 return (false, null, "Volontären hittades inte.");
 
             var existing = await scheduleRepo.GetByVolunteerAsync(volunteer.Id);
-            await scheduleRepo.RemoveRangeAsync(existing);
+            scheduleRepo.RemoveRange(existing);
 
             var today = DateTime.UtcNow.Date;
             var distinctDates = dates
@@ -31,7 +31,7 @@ namespace Volunti.Service
                 .Distinct()
                 .ToList();
 
-            await scheduleRepo.AddRangeAsync(distinctDates.Select(d => new VolunteerAvailability
+            scheduleRepo.AddRange(distinctDates.Select(d => new VolunteerAvailability
             {
                 VolunteerId = volunteer.Id,
                 Date = d

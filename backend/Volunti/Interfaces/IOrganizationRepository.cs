@@ -8,9 +8,9 @@ namespace Volunti.Interfaces
         Task<Organization?> GetByIdAsync(int id);
         Task<Organization?> GetByUserIdAsync(int userId);
         Task<Organization?> GetWithJobsAsync(int id);
-        Task AddMemberAsync(OrganizationMember member);
-        Task RemoveAsync(Organization org);
-        Task RemoveJobsRangeAsync(IEnumerable<Job> jobs);
+        void AddMember(OrganizationMember member);
+        void Remove(Organization org);
+        void RemoveJobsRange(IEnumerable<Job> jobs);
         Task SaveChangesAsync();
     }
 }

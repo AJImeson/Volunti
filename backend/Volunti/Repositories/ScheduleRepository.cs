@@ -13,17 +13,11 @@ namespace Volunti.Repositories
                 .OrderBy(va => va.Date)
                 .ToListAsync();
 
-        public Task RemoveRangeAsync(List<VolunteerAvailability> items)
-        {
+        public void RemoveRange(List<VolunteerAvailability> items) =>
             db.VolunteerAvailabilities.RemoveRange(items);
-            return Task.CompletedTask;
-        }
 
-        public Task AddRangeAsync(List<VolunteerAvailability> items)
-        {
+        public void AddRange(List<VolunteerAvailability> items) =>
             db.VolunteerAvailabilities.AddRange(items);
-            return Task.CompletedTask;
-        }
 
         public Task SaveChangesAsync() => db.SaveChangesAsync();
     }

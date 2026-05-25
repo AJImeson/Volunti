@@ -18,18 +18,12 @@ namespace Volunti.Repositories
         public Task<VolunteerSkill?> GetSkillByTitleAsync(string title) =>
             db.VolunteerSkills.FirstOrDefaultAsync(s => s.Title.ToLower() == title.ToLower());
 
-        public async Task AddSkillAsync(VolunteerSkill skill)
-        {
-            db.VolunteerSkills.Add(skill);
-        }
+        public void AddSkill(VolunteerSkill skill) => db.VolunteerSkills.Add(skill);
 
         public Task<VolunteerInterest?> GetInterestByTitleAsync(string title) =>
             db.VolunteerInterests.FirstOrDefaultAsync(i => i.Title.ToLower() == title.ToLower());
 
-        public async Task AddInterestAsync(VolunteerInterest interest)
-        {
-            db.VolunteerInterests.Add(interest);
-        }
+        public void AddInterest(VolunteerInterest interest) => db.VolunteerInterests.Add(interest);
 
         public Task<List<VolunteerExperience>> GetExperiencesByVolunteerIdAsync(int volunteerId) =>
             db.VolunteerExperiences
@@ -37,26 +31,17 @@ namespace Volunti.Repositories
                 .OrderByDescending(e => e.StartDate)
                 .ToListAsync();
 
-        public async Task AddExperienceAsync(VolunteerExperience experience)
-        {
-            db.VolunteerExperiences.Add(experience);
-        }
+        public void AddExperience(VolunteerExperience experience) => db.VolunteerExperiences.Add(experience);
 
         public Task<VolunteerExperience?> GetExperienceByIdAsync(int experienceId, int volunteerId) =>
             db.VolunteerExperiences.FirstOrDefaultAsync(e => e.Id == experienceId && e.VolunteerId == volunteerId);
 
-        public async Task RemoveExperienceAsync(VolunteerExperience experience)
-        {
-            db.VolunteerExperiences.Remove(experience);
-        }
+        public void RemoveExperience(VolunteerExperience experience) => db.VolunteerExperiences.Remove(experience);
 
         public Task<bool> PhoneNumberExistsAsync(string phoneNumber) =>
             db.Volunteers.AnyAsync(v => v.PhoneNumber == phoneNumber);
 
-        public async Task AddAsync(Volunteer volunteer)
-        {
-            db.Volunteers.Add(volunteer);
-        }
+        public void Add(Volunteer volunteer) => db.Volunteers.Add(volunteer);
 
         public Task SaveChangesAsync() =>
             db.SaveChangesAsync();

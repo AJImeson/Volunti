@@ -28,7 +28,7 @@ namespace Volunti.Service
             if (!roleResult.Succeeded)
                 return (false, null, null, string.Join(", ", roleResult.Errors.Select(e => e.Description)));
 
-            await orgRepo.AddMemberAsync(new OrganizationMember
+            orgRepo.AddMember(new OrganizationMember
             {
                 UserId = newUser.Id,
                 OrganizationId = org.OrganizationId,
@@ -47,8 +47,8 @@ namespace Volunti.Service
             if (!isAdmin && organization.UserId != userId)
                 return (false, "Du har inte behörighet att ta bort denna organization.");
 
-            await orgRepo.RemoveJobsRangeAsync(organization.Jobs);
-            await orgRepo.RemoveAsync(organization);
+            orgRepo.RemoveJobsRange(organization.Jobs);
+            orgRepo.Remove(organization);
             await orgRepo.SaveChangesAsync();
             return (true, null);
         }

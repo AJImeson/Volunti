@@ -8,7 +8,7 @@ namespace Volunti.Interfaces
         Task<List<VolunteerApplication>> GetByVolunteerAsync(int volunteerId);
         Task<VolunteerApplication?> GetByIdWithJobAsync(int id);
         Task<bool> ExistsAsync(int volunteerId, int jobId);
-        Task AddAsync(VolunteerApplication application);
+        void Add(VolunteerApplication application);
         Task SaveChangesAsync();
     }
 }

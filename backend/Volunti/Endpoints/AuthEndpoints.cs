@@ -77,7 +77,18 @@ namespace Volunti.Endpoints
                 return result is null ? Results.NotFound() : Results.Ok(result);
             }).RequireAuthorization();
 
-            
+            app.MapGet("/me/organization", async (
+                ClaimsPrincipal claimsPrincipal,
+                UserManager<AppUser> userManager,
+                IAuthService authService) =>
+            {
+                var userIdStr = userManager.GetUserId(claimsPrincipal);
+                if (userIdStr is null || !int.TryParse(userIdStr, out var userId))
+                    return Results.Unauthorized();
+
+                var result = await authService.GetMyOrganizationAsync(userId);
+                return result is null ? Results.NotFound("Organisation hittades inte") : Results.Ok(result);
+            }).RequireAuthorization();
         }
     }
 }

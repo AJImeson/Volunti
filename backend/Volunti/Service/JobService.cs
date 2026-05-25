@@ -57,7 +57,7 @@ namespace Volunti.Service
                 Status = JobStatus.Open
             };
 
-            await jobRepo.AddAsync(job);
+            jobRepo.Add(job);
             await jobRepo.SaveChangesAsync();
             return (true, job, null);
         }
@@ -73,7 +73,7 @@ namespace Volunti.Service
             if (!isAdmin && (organization == null || job.OrganizationId != organization.OrganizationId))
                 return (false, "Du har inte behörighet att ta bort detta jobb.");
 
-            await jobRepo.RemoveAsync(job);
+            jobRepo.Remove(job);
             await jobRepo.SaveChangesAsync();
             return (true, null);
         }
