@@ -59,7 +59,8 @@ namespace Volunti.Endpoints
                 VoluntiDbContext db,
                 HttpContext http) =>
             {
-                var count = await db.JobLikes.CountAsync(jl => jl.JobId == id);
+                var likeCount = await db.JobLikes.CountAsync(jl => jl.JobId == id);
+                var commentCount = await db.JobComments.CountAsync(c => c.JobId == id);
 
                 bool likedByMe = false;
                 var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -69,7 +70,7 @@ namespace Volunti.Endpoints
                         .AnyAsync(jl => jl.JobId == id && jl.UserId == userId);
                 }
 
-                return Results.Ok(new { count, likedByMe });
+                return Results.Ok(new { count = likeCount, likedByMe, commentCount });
             });
 
             /* ==========================================================================

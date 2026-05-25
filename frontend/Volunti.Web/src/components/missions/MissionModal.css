@@ -205,6 +205,69 @@
   display: none;
 }
 
+/* Profilbild i mission-org-avatar */
+.mission-org-avatar {
+  overflow: hidden;
+  background-color: var(--gray-border);
+}
+
+.mission-org-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* Titel ovanför meta */
+.mission-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0 0 0.75rem 0;
+}
+
+/* Beskrivning vänsterställd */
+.mission-description {
+  text-align: left;
+  font-size: 0.9rem;
+  color: var(--gray-text);
+  line-height: 1.5;
+  margin: 0.75rem 0;
+}
+
+/* Likes-rad ikoner och text */
+.mission-likes-text,
+.mission-comments-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--gray-text);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.mission-likes-text.liked {
+  color: #e11d48;
+}
+
+/* Ansökt-knapp inuti modal */
+.modal-actions .btn-applied {
+  padding: 1rem;
+  background: #eef1f8;
+  color: #5a6892;
+  border: 1px solid #c8d1e6;
+  border-radius: 12px;
+  font-weight: bold;
+  width: 100%;
+  cursor: not-allowed;
+  font-family: inherit;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
 /* ==========================================================================
    MODAL ACTIONS 
    ========================================================================== */

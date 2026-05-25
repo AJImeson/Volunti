@@ -127,13 +127,22 @@ export default function MissionsPage() {
       missions.map((m) =>
         getJobLikes(m.id)
           .then((data) => ({ id: m.id, ...data }))
-          .catch(() => ({ id: m.id, count: 0, likedByMe: false })),
+          .catch(() => ({
+            id: m.id,
+            count: 0,
+            likedByMe: false,
+            commentCount: 0,
+          })),
       ),
     ).then((results) => {
       if (cancelled) return;
       const map = {};
       results.forEach((r) => {
-        map[r.id] = { likes: r.count, likedByMe: r.likedByMe, comments: 0 };
+        map[r.id] = {
+          likes: r.count,
+          likedByMe: r.likedByMe,
+          comments: r.commentCount || 0,
+        };
       });
       setInteractions(map);
     });
@@ -419,6 +428,8 @@ export default function MissionsPage() {
               closeModal();
               setTimeout(() => openAccepted(m), 200);
             }}
+            interaction={interactions[activeMission?.id]}
+            hasApplied={appliedJobIds.has(activeMission?.id)}
           />
         )}
 

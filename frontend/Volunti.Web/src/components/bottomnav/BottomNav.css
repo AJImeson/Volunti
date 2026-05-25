@@ -84,4 +84,27 @@
     width: 24px;
     height: 24px;
   }
+
+  .bottom-nav-icon-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bottom-nav-badge {
+    position: absolute;
+    top: -6px;
+    right: -10px;
+    background: #e11d48;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.05rem 0.35rem;
+    border-radius: 999px;
+    min-width: 18px;
+    text-align: center;
+    border: 2px solid white;
+    line-height: 1.2;
+  }
 }
