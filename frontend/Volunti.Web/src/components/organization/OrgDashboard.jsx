@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../missions/MissionsPage.css";
 import "./OrgDashboard.css";
-import { getMyJobs } from "../../services/jobService";
+import { getMyJobs, deleteJob } from "../../services/jobService";
 import {
   fetchCurrentOrganization,
   getProfileImageUrl,
@@ -35,8 +35,6 @@ export default function OrgDashboard() {
     } catch (err) {
       console.error(err);
       setError("Kunde inte ladda dashboarden. Försök igen.");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -61,6 +59,19 @@ export default function OrgDashboard() {
       cancelled = true;
     };
   }, []);
+
+  const handleDeleteJob = async (jobId) => {
+    if (!window.confirm("Är du säker på att du vill ta bort uppdraget?")) {
+      return;
+    }
+    try {
+      await deleteJob(jobId);
+      setJobs((prev) => prev.filter((j) => j.jobId !== jobId));
+    } catch (err) {
+      console.error(err);
+      alert("Kunde inte ta bort uppdraget.");
+    }
+  };
 
   const filteredJobs = jobs.filter((j) =>
     j.title?.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -137,6 +148,7 @@ export default function OrgDashboard() {
               organization={organization}
               onGranska={() => setGranskaJobId(job.jobId)}
               onRedigera={() => navigate(`/edit-job/${job.jobId}`)}
+              onDelete={() => handleDeleteJob(job.jobId)}
             />
           ))}
         </div>
@@ -160,6 +172,8 @@ export default function OrgDashboard() {
           onClose={() => setProfileVolunteerId(null)}
         />
       )}
+
+      <BottomNav />
     </div>
   );
 }
@@ -167,7 +181,7 @@ export default function OrgDashboard() {
 /* ==========================================================================
    JOB CARD - samma stil som FeedCard på MissionsPage
    ========================================================================== */
-function OrgJobCard({ job, organization, onGranska, onRedigera }) {
+function OrgJobCard({ job, organization, onGranska, onRedigera, onDelete }) {
   const fmtDate = (dateStr) => {
     if (!dateStr) return "";
     return new Date(dateStr).toLocaleDateString("sv-SE", {
@@ -222,6 +236,29 @@ function OrgJobCard({ job, organization, onGranska, onRedigera }) {
           <p className="org-name">{organization?.orgName || "Organisation"}</p>
           <p className="org-time">{formatTimeAgo(job.createdOn)}</p>
         </div>
+        <button
+          className="orgdash-delete-btn"
+          onClick={onDelete}
+          title="Ta bort uppdrag"
+          aria-label="Ta bort uppdrag"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6" />
+            <path d="M10 11v6" />
+            <path d="M14 11v6" />
+            <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+          </svg>
+        </button>
       </div>
 
       {/* Titel + beskrivning */}
@@ -275,7 +312,6 @@ function OrgJobCard({ job, organization, onGranska, onRedigera }) {
           </button>
         </div>
       </div>
-      <BottomNav />
     </div>
   );
 }

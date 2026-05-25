@@ -10,6 +10,7 @@ import ImpactPage from "./components/marketing/ImpactPage";
 import FaqPage from "./components/marketing/FaqPage";
 import PrivacyPage from "./components/marketing/PrivacyPage";
 import LandingPage from "./components/LandingPage";
+import DeskLanding from "./components/DeskLanding/DeskLanding";
 import RegisterForm from "./components/RegisterForm";
 import Profile from "./components/profile/Profile";
 import LoginForm from "./components/login/LoginForm";
@@ -45,6 +46,9 @@ function AnimatedRoutes() {
         <Route path="/faq" element={<FaqPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/landing" element={<LandingPage />} />
+
+        <Route path="/desk-landing" element={<DeskLanding />} />
+
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
 

@@ -39,6 +39,7 @@ namespace Volunti.Endpoints
             {
                 var jobs = await db.Jobs
                     .Include(j => j.Organization)
+                    .Where(j => j.Status == JobStatus.Open)
                     .ToListAsync();
                 return Results.Ok(jobs.Select(j => j.ToJobDto()));
             });
