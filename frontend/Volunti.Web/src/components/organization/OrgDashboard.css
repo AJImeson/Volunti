@@ -916,3 +916,34 @@
   font-weight: 600;
   cursor: pointer;
 }
+
+.orgdash-delete-btn {
+  background: var(--bg-white);
+  border: 1px solid var(--gray-border);
+  color: var(--gray-text);
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.orgdash-delete-btn:hover {
+  background: #fee;
+  color: #d33;
+  border-color: #fcc;
+}
+
+.orgdash-delete-btn:active {
+  transform: scale(0.95);
+}
+
+.orgdash-delete-btn svg {
+  width: 16px;
+  height: 16px;
+}
