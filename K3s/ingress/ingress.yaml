@@ -18,7 +18,7 @@ spec:
                 name: volunti-frontend
                 port:
                   number: 80
-    - host: api.volunti.cc.k3s.chas-lab.dev
+    - host: volunti-api.cc.k3s.chas-lab.dev
       http:
         paths:
           - path: /
@@ -31,7 +31,7 @@ spec:
   tls:
     - hosts:
         - volunti.cc.k3s.chas-lab.dev
-        - api.volunti.cc.k3s.chas-lab.dev
+        - volunti-api.cc.k3s.chas-lab.dev
 
 ---
 

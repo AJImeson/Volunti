@@ -40,7 +40,7 @@ spec:
                   name: jwt-key
                   key: Jwt__SigningKey
             - name: Jwt__Issuer
-              value: "https://api.volunti.cc.k3s.chas-lab.dev"
+              value: "https://volunti-api.cc.k3s.chas-lab.dev"
             - name: Jwt__Audience
               value: "https://volunti.cc.k3s.chas-lab.dev"
           envFrom:
