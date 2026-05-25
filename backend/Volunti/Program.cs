@@ -10,6 +10,7 @@ using Volunti.Endpoints;
 using Volunti.Interfaces;
 using Volunti.Models;
 using Volunti.Service;
+using Volunti.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
