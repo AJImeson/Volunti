@@ -28,6 +28,8 @@ namespace Volunti.Service
                 if (await volunteerRepo.PhoneNumberExistsAsync(dto.PhoneNumber!))
                     return (false, null, "Det finns redan ett konto med det här telefonnumret.");
 
+                await using var transaction = await db.Database.BeginTransactionAsync();
+
                 var appUser = new AppUser { UserName = dto.Email, Email = dto.Email };
                 var createdUser = await userManager.CreateAsync(appUser, dto.Password!);
                 if (!createdUser.Succeeded)
@@ -77,6 +79,7 @@ namespace Volunti.Service
 
                 volunteerRepo.Add(volunteer);
                 await volunteerRepo.SaveChangesAsync();
+                await transaction.CommitAsync();
 
                 var roles = await userManager.GetRolesAsync(appUser);
                 return (true, new NewUserDto
@@ -99,6 +102,8 @@ namespace Volunti.Service
             {
                 if (string.IsNullOrWhiteSpace(dto.Email))
                     return (false, null, "Email krävs.");
+
+                await using var transaction = await db.Database.BeginTransactionAsync();
 
                 var appUser = new AppUser { UserName = dto.Email.ToLower(), Email = dto.Email.ToLower() };
                 var createdUser = await userManager.CreateAsync(appUser, dto.Password!);
@@ -126,6 +131,7 @@ namespace Volunti.Service
                     Categories = dto.Categories != null ? string.Join(",", dto.Categories) : string.Empty
                 });
                 await db.SaveChangesAsync();
+                await transaction.CommitAsync();
 
                 var roles = await userManager.GetRolesAsync(appUser);
                 return (true, new NewUserDto
