@@ -36,6 +36,32 @@ namespace Volunti.Repositories
         public Task<bool> ExistsAsync(int volunteerId, int jobId) =>
             db.VolunteerApplications.AnyAsync(a => a.VolunteerId == volunteerId && a.JobId == jobId);
 
+        public Task<List<VolunteerApplication>> GetByJobAsync(int jobId) =>
+            db.VolunteerApplications
+                .Where(a => a.JobId == jobId)
+                .Include(a => a.Volunteer).ThenInclude(v => v.User)
+                .ToListAsync();
+
+        public Task<List<VolunteerApplication>> GetByIdsForOrgAsync(List<int> ids, int organizationId) =>
+            db.VolunteerApplications
+                .Include(a => a.Job)
+                .Include(a => a.Volunteer)
+                .Where(a => ids.Contains(a.Id) && a.Job.OrganizationId == organizationId && a.Status == ApplicationStatus.Pending)
+                .ToListAsync();
+
+        public Task<List<int>> GetApprovedVolunteerIdsByOrgAsync(List<int> volunteerIds, int jobId, int organizationId) =>
+            db.VolunteerApplications
+                .Where(a =>
+                    volunteerIds.Contains(a.VolunteerId) &&
+                    a.JobId != jobId &&
+                    a.Status == ApplicationStatus.Approved &&
+                    a.Job.OrganizationId == organizationId)
+                .Select(a => a.VolunteerId)
+                .ToListAsync();
+
+        public Task<bool> HasVolunteerAppliedToOrgAsync(int volunteerId, int organizationId) =>
+            db.VolunteerApplications.AnyAsync(a => a.VolunteerId == volunteerId && a.Job.OrganizationId == organizationId);
+
         public void Add(VolunteerApplication application) =>
             db.VolunteerApplications.Add(application);
 

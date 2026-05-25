@@ -13,5 +13,6 @@ namespace Volunti.Interfaces
         Task<(bool found, object? experiences)> GetExperiencesAsync(int userId);
         Task<(bool success, object? experience, string? error)> AddExperienceAsync(AddExperienceDto dto, int userId);
         Task<(bool success, string? error)> RemoveExperienceAsync(int experienceId, int userId, string contentRootPath);
+        Task<(bool success, object? data, string? error)> GetApplicantProfileAsync(int volunteerId, int orgUserId);
     }
 }

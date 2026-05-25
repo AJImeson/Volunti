@@ -6,7 +6,9 @@ namespace Volunti.Service
 {
     public class VolunteerProfileService(
         IVolunteerRepository volunteerRepo,
-        IFileRepository fileRepo) : IVolunteerProfileService
+        IFileRepository fileRepo,
+        IApplicationRepository appRepo,
+        IOrganizationRepository orgRepo) : IVolunteerProfileService
     {
         public async Task<(bool found, IEnumerable<object>? skills)> GetSkillsAsync(int userId)
         {
@@ -200,6 +202,48 @@ namespace Volunti.Service
             volunteerRepo.RemoveExperience(experience);
             await volunteerRepo.SaveChangesAsync();
             return (true, null);
+        }
+
+        public async Task<(bool success, object? data, string? error)> GetApplicantProfileAsync(int volunteerId, int orgUserId)
+        {
+            var org = await orgRepo.GetByUserIdAsync(orgUserId);
+            if (org == null)
+                return (false, null, "Forbidden");
+
+            var volunteer = await volunteerRepo.GetByIdAsync(volunteerId, includeSkills: true, includeInterests: true);
+            if (volunteer == null)
+                return (false, null, "NotFound");
+
+            if (!await appRepo.HasVolunteerAppliedToOrgAsync(volunteerId, org.OrganizationId))
+                return (false, null, "Forbidden");
+
+            var experiences = await volunteerRepo.GetExperiencesByVolunteerIdAsync(volunteerId);
+
+            return (true, new
+            {
+                id = volunteer.Id,
+                firstName = volunteer.FirstName,
+                lastName = volunteer.LastName,
+                bio = volunteer.Bio,
+                municipality = volunteer.Municipality,
+                driverLicense = volunteer.DriverLicense?.Split(",", StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>(),
+                availability = volunteer.Availability?.Split(",", StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>(),
+                profileImageUrl = volunteer.ProfileImageUrl,
+                email = volunteer.User?.Email,
+                phoneNumber = volunteer.PhoneNumber,
+                skills = volunteer.VolunteerSkills.Select(s => new { id = s.Id, title = s.Title }),
+                interests = volunteer.VolunteerInterests.Select(i => new { id = i.Id, title = i.Title }),
+                experiences = experiences.Select(e => new
+                {
+                    id = e.Id,
+                    title = e.Title,
+                    organization = e.Organization,
+                    startDate = e.StartDate,
+                    endDate = e.EndDate,
+                    description = e.Description,
+                    hoursTotal = e.HoursTotal
+                })
+            }, null);
         }
     }
 }

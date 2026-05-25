@@ -15,6 +15,14 @@ namespace Volunti.Repositories
             return query.FirstOrDefaultAsync(v => v.UserId == userId);
         }
 
+        public Task<Volunteer?> GetByIdAsync(int volunteerId, bool includeSkills = false, bool includeInterests = false)
+        {
+            var query = db.Volunteers.Include(v => v.User).AsQueryable();
+            if (includeSkills) query = query.Include(v => v.VolunteerSkills);
+            if (includeInterests) query = query.Include(v => v.VolunteerInterests);
+            return query.FirstOrDefaultAsync(v => v.Id == volunteerId);
+        }
+
         public Task<VolunteerSkill?> GetSkillByTitleAsync(string title) =>
             db.VolunteerSkills.FirstOrDefaultAsync(s => s.Title.ToLower() == title.ToLower());
 

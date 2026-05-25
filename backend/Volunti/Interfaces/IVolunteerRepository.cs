@@ -5,6 +5,7 @@ namespace Volunti.Interfaces
     public interface IVolunteerRepository
     {
         Task<Volunteer?> GetByUserIdAsync(int userId, bool includeSkills = false, bool includeInterests = false);
+        Task<Volunteer?> GetByIdAsync(int volunteerId, bool includeSkills = false, bool includeInterests = false);
         Task<VolunteerSkill?> GetSkillByTitleAsync(string title);
         void AddSkill(VolunteerSkill skill);
         Task<VolunteerInterest?> GetInterestByTitleAsync(string title);

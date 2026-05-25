@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Volunti.Data;
 using Volunti.DTOs.Job;
 using Volunti.Interfaces;
 using Volunti.Models;
@@ -8,7 +10,8 @@ namespace Volunti.Service
         IApplicationRepository appRepo,
         IOrganizationRepository orgRepo,
         IVolunteerRepository volunteerRepo,
-        IJobRepository jobRepo) : IApplicationService
+        IJobRepository jobRepo,
+        VoluntiDbContext db) : IApplicationService
     {
         public async Task<(bool success, List<VolunteerApplication>? data, string? error)> GetByOrganizationAsync(int userId, string? status)
         {
@@ -98,6 +101,87 @@ namespace Volunti.Service
 
             var applications = await appRepo.GetByVolunteerAsync(volunteer.Id);
             return (true, applications, null);
+        }
+
+        public async Task<(bool success, object? data, string? error)> GetByJobAsync(int jobId, int userId)
+        {
+            var org = await orgRepo.GetByUserIdAsync(userId);
+            if (org == null)
+                return (false, null, "Forbidden");
+
+            var job = await jobRepo.GetByIdAsync(jobId);
+            if (job == null)
+                return (false, null, "NotFound");
+
+            if (job.OrganizationId != org.OrganizationId)
+                return (false, null, "Forbidden");
+
+            var applications = await appRepo.GetByJobAsync(jobId);
+            var volunteerIds = applications.Select(a => a.VolunteerId).ToList();
+            var previousIds = await appRepo.GetApprovedVolunteerIdsByOrgAsync(volunteerIds, jobId, org.OrganizationId);
+            var previousSet = new HashSet<int>(previousIds);
+
+            var result = applications.Select(a => new
+            {
+                applicationId = a.Id,
+                status = a.Status.ToString(),
+                createdAt = a.CreatedAt,
+                volunteerId = a.VolunteerId,
+                volunteerUserId = a.Volunteer.UserId,
+                volunteerName = $"{a.Volunteer.FirstName} {a.Volunteer.LastName}".Trim(),
+                volunteerImageUrl = a.Volunteer.ProfileImageUrl,
+                isPreviousVolunteer = previousSet.Contains(a.VolunteerId)
+            });
+
+            return (true, result, null);
+        }
+
+        public async Task<(bool success, int count, string? error)> BulkApproveAsync(List<int> applicationIds, int userId)
+        {
+            if (applicationIds == null || applicationIds.Count == 0)
+                return (false, 0, "Inga ansökningar valda.");
+
+            var org = await orgRepo.GetByUserIdAsync(userId);
+            if (org == null)
+                return (false, 0, "Forbidden");
+
+            var applications = await appRepo.GetByIdsForOrgAsync(applicationIds, org.OrganizationId);
+
+            foreach (var application in applications)
+                application.Status = ApplicationStatus.Approved;
+
+            await appRepo.SaveChangesAsync();
+
+            // TODO: Flytta till IMessageGroupRepository när ett sådant finns
+            var orgGroupIds = await db.MessageGroups
+                .Where(g => g.OrganizationId == org.OrganizationId)
+                .Select(g => g.Id)
+                .ToListAsync();
+
+            if (orgGroupIds.Any())
+            {
+                foreach (var application in applications)
+                {
+                    var volunteerUserId = application.Volunteer.UserId;
+                    var existingGroupIds = await db.MessageGroupMembers
+                        .Where(m => m.UserId == volunteerUserId && orgGroupIds.Contains(m.MessageGroupId))
+                        .Select(m => m.MessageGroupId)
+                        .ToListAsync();
+
+                    foreach (var groupId in orgGroupIds.Except(existingGroupIds))
+                    {
+                        db.MessageGroupMembers.Add(new MessageGroupMember
+                        {
+                            MessageGroupId = groupId,
+                            UserId = volunteerUserId,
+                            Role = GroupMemberRole.Member
+                        });
+                    }
+                }
+                await db.SaveChangesAsync();
+            }
+
+            return (true, applications.Count, null);
         }
     }
 }
