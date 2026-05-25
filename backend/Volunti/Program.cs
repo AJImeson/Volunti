@@ -15,6 +15,8 @@ using Volunti.Endpoints;
 using Volunti.Interfaces;
 using Volunti.Models;
 using Volunti.Service;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -71,22 +73,29 @@ builder.Services.AddAuthentication(options =>
 
 // Rate limiting begränsar antal requests per IP/användare under en tidsperiod - skyddar mot brute-force (t.ex. lösenordsgissning på /login) och spam (t.ex. massregistrering av konton)
 builder.Services.AddRateLimiter(options =>
-{
-    options.AddFixedWindowLimiter("auth", opt =>
-    {
-        opt.PermitLimit = 5;
-        opt.Window = TimeSpan.FromMinutes(1);
-        opt.QueueLimit = 0;
-    });
+  {
+      options.AddPolicy("auth", context =>
+      {
+          var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+          return RateLimitPartition.GetFixedWindowLimiter(ip, _ => new FixedWindowRateLimiterOptions
+          {
+              PermitLimit = 5,
+              Window = TimeSpan.FromMinutes(1),
+              QueueLimit = 0
+          });
+      });
 
-    options.AddFixedWindowLimiter("write", opt =>
-    {
-        opt.PermitLimit = 20;
-        opt.Window = TimeSpan.FromMinutes(1);
-        opt.QueueLimit = 0;
-    });
-});
-
+      options.AddPolicy("write", context =>
+      {
+          var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+          return RateLimitPartition.GetFixedWindowLimiter(ip, _ => new FixedWindowRateLimiterOptions
+          {
+              PermitLimit = 20,
+              Window = TimeSpan.FromMinutes(1),
+              QueueLimit = 0
+          });
+      });
+  });
 builder.Services.AddAuthorization();
 builder.Services.AddHealthChecks()
     .AddSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")!); //for k3s
@@ -129,6 +138,11 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
+
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 //Profilbild
 var wwwroot = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
