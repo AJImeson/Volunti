@@ -1,8 +1,7 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import "./CreateJobForm.css";
-import { createJob } from "../../services/jobService";
-
+import { createJob, getJobById, updateJob } from "../../services/jobService";
 
 const REQUIREMENTS = [
   { id: "backgroundCheck", label: "Belastningsregister krävs" },
@@ -12,9 +11,6 @@ const REQUIREMENTS = [
   { id: "swedishFluency", label: "Flytande svenska" },
 ];
 
-{
-  /* Svenska namn mappar till engelska som finns i backend */
-}
 const CATEGORIES = [
   { value: "Gardening", label: "Miljö" },
   { value: "AnimalCare", label: "Djur" },
@@ -38,20 +34,64 @@ const EMPTY_FORM = {
   requirements: [],
 };
 
+function toLocalInput(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 export default function CreateJobForm() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const isEditMode = Boolean(id);
+
   const [formData, setFormData] = useState(EMPTY_FORM);
   const [fieldErrors, setFieldErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingJob, setIsLoadingJob] = useState(isEditMode);
   const [serverError, setServerError] = useState("");
 
-  const toggleRequirement = (id) => {
+  // Ladda befintligt jobb i redigeringsläge
+  useEffect(() => {
+    if (!isEditMode) return;
+
+    let cancelled = false;
+    getJobById(id)
+      .then((job) => {
+        if (cancelled) return;
+        setFormData({
+          title: job.title || "",
+          description: job.description || "",
+          category: job.category || "",
+          startTime: toLocalInput(job.startTime),
+          endTime: toLocalInput(job.endTime),
+          address: job.address || "",
+          city: job.city || "",
+          isUrgent: job.isUrgent || false,
+          requirements: job.requirements || [],
+        });
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        console.error(err);
+        setServerError("Kunde inte ladda uppdraget.");
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingJob(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [id, isEditMode]);
+
+  const toggleRequirement = (reqId) => {
     setFormData((prev) => ({
       ...prev,
-      requirements: prev.requirements.includes(id)
-        ? prev.requirements.filter((r) => r !== id)
-        : [...prev.requirements, id],
+      requirements: prev.requirements.includes(reqId)
+        ? prev.requirements.filter((r) => r !== reqId)
+        : [...prev.requirements, reqId],
     }));
   };
 
@@ -91,10 +131,18 @@ export default function CreateJobForm() {
     setIsLoading(true);
     setServerError("");
     try {
-      await createJob(formData);
+      if (isEditMode) {
+        await updateJob(id, formData);
+      } else {
+        await createJob(formData);
+      }
       setSubmitted(true);
     } catch (err) {
-      setServerError(err.response?.data || "Något gick fel, försök igen.");
+      setServerError(
+        err.response?.data?.detail ||
+          err.response?.data ||
+          "Något gick fel, försök igen.",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -106,23 +154,44 @@ export default function CreateJobForm() {
     setSubmitted(false);
   };
 
+  if (isLoadingJob) {
+    return (
+      <div className="create-job-wrapper">
+        <div className="create-job-card">
+          <p style={{ textAlign: "center", padding: "2rem" }}>
+            Laddar uppdrag...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (submitted) {
     return (
       <div className="create-job-wrapper">
         <div className="create-job-card">
           <div className="create-job-success">
             <div className="create-job-success-icon">✓</div>
-            <h2>Uppdraget är skapat!</h2>
+            <h2>
+              {isEditMode
+                ? "Uppdraget har uppdaterats!"
+                : "Uppdraget är skapat!"}
+            </h2>
             <p>
-              Det kommer att publiceras så snart funktionen är kopplad till
-              backend.
+              {isEditMode
+                ? "Ändringarna har sparats."
+                : "Volontärer kan nu se och ansöka till uppdraget."}
             </p>
-            <button className="btn-primary" onClick={handleReset}>
-              Skapa nytt uppdrag
-            </button>
-           {/* navigate(-1) navigerar tillbaka till föregående sida, vilket är org dashboard */}
-            <button className="btn-outline-blue" onClick={() => navigate(-1)}> 
-              Tillbaka
+            {!isEditMode && (
+              <button className="btn-primary" onClick={handleReset}>
+                Skapa nytt uppdrag
+              </button>
+            )}
+            <button
+              className="btn-outline-blue"
+              onClick={() => navigate("/org-dashboard")}
+            >
+              Tillbaka till dashboarden
             </button>
           </div>
         </div>
@@ -133,9 +202,13 @@ export default function CreateJobForm() {
   return (
     <div className="create-job-wrapper">
       <div className="create-job-card">
-        <h2 className="create-job-title">Publicera nytt uppdrag</h2>
+        <h2 className="create-job-title">
+          {isEditMode ? "Redigera uppdrag" : "Publicera nytt uppdrag"}
+        </h2>
         <p className="create-job-subtitle">
-          Fyll i information om uppdraget du söker volontärer till.
+          {isEditMode
+            ? "Uppdatera information om uppdraget."
+            : "Fyll i information om uppdraget du söker volontärer till."}
         </p>
 
         <form onSubmit={handleSubmit} className="create-job-form" noValidate>
@@ -289,7 +362,13 @@ export default function CreateJobForm() {
               Avbryt
             </button>
             <button type="submit" className="btn-primary" disabled={isLoading}>
-              {isLoading ? "Publicerar..." : "Publicera uppdrag"}
+              {isLoading
+                ? isEditMode
+                  ? "Sparar..."
+                  : "Publicerar..."
+                : isEditMode
+                  ? "Spara ändringar"
+                  : "Publicera uppdrag"}
             </button>
           </div>
         </form>

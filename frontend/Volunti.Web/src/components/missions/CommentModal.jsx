@@ -17,6 +17,8 @@ export default function CommentModal({ mission, onClose, onCountChange }) {
   const [isPosting, setIsPosting] = useState(false);
   const [replyingTo, setReplyingTo] = useState(null);
 
+  const [expandedReplies, setExpandedReplies] = useState(new Set());
+
   const currentUser = getCurrentUser();
   const inputRef = useRef(null);
 
@@ -72,6 +74,7 @@ export default function CommentModal({ mission, onClose, onCountChange }) {
               ? { ...c, replies: [...(c.replies || []), newComment] }
               : c,
           );
+          setExpandedReplies((p) => new Set(p).add(parentIdToSend));
         } else {
           next = [newComment, ...prev];
         }
@@ -91,6 +94,15 @@ export default function CommentModal({ mission, onClose, onCountChange }) {
     } finally {
       setIsPosting(false);
     }
+  };
+
+  const toggleReplies = (commentId) => {
+    setExpandedReplies((prev) => {
+      const next = new Set(prev);
+      if (next.has(commentId)) next.delete(commentId);
+      else next.add(commentId);
+      return next;
+    });
   };
 
   const handleDelete = async (commentId, isReply = false, parentId = null) => {
@@ -250,20 +262,39 @@ export default function CommentModal({ mission, onClose, onCountChange }) {
                 fmtTime={fmtTime}
               />
               {c.replies?.length > 0 && (
-                <div className="comment-replies">
-                  {c.replies.map((r) => (
-                    <CommentItem
-                      key={r.id}
-                      comment={r}
-                      isReply
-                      parentId={c.id}
-                      onReply={() => handleReplyToReply(r, c.id)}
-                      onDelete={handleDelete}
-                      onToggleLike={() => handleToggleLike(r.id, true, c.id)}
-                      currentUserId={currentUser?.id}
-                      fmtTime={fmtTime}
-                    />
-                  ))}
+                <div className="comment-replies-wrap">
+                  <button
+                    type="button"
+                    className="comment-toggle-replies"
+                    onClick={() => toggleReplies(c.id)}
+                  >
+                    <span className="comment-toggle-line"></span>
+                    {expandedReplies.has(c.id)
+                      ? `Dölj svar`
+                      : `Visa ${c.replies.length} ${
+                          c.replies.length === 1 ? "svar" : "svar"
+                        }`}
+                  </button>
+
+                  {expandedReplies.has(c.id) && (
+                    <div className="comment-replies">
+                      {c.replies.map((r) => (
+                        <CommentItem
+                          key={r.id}
+                          comment={r}
+                          isReply
+                          parentId={c.id}
+                          onReply={() => handleReplyToReply(r, c.id)}
+                          onDelete={handleDelete}
+                          onToggleLike={() =>
+                            handleToggleLike(r.id, true, c.id)
+                          }
+                          currentUserId={currentUser?.id}
+                          fmtTime={fmtTime}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

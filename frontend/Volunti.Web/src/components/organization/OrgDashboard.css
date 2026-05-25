@@ -1,23 +1,35 @@
-/* Wrapper - staplar nav och kort vertikalt */
-.org-dashboard-wrapper {
+/* ==========================================================================
+   MISSIONS PAGE WRAPPER
+   ========================================================================== */
+
+.missions-wrapper {
   min-height: 100vh;
+  min-height: 100dvh;
   background-color: var(--primary-blue);
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
-/* Nav - full bredd, blå bakgrund */
-.org-dashboard-nav {
-  width: 100%;
+@media (max-width: 767px) {
+  .missions-content {
+    padding-bottom: calc(120px + 4rem);
+  }
+
+  .missions-feed > :last-child,
+  .applications-list > :last-child {
+    margin-bottom: 4rem;
+  }
+}
+
+.missions-top-nav {
   background-color: var(--primary-blue);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 1rem;
+  padding: 1.5rem 1rem 1rem 1rem;
 }
 
-.org-dashboard-logo {
+.missions-logo {
   font-size: 1.8rem;
   font-weight: 900;
   color: #000000;
@@ -25,248 +37,741 @@
   letter-spacing: -1px;
 }
 
-.org-dashboard-nav-icons {
+.missions-nav-icons {
   display: flex;
   gap: 0.5rem;
 }
 
-/* Kort - vit bakgrund, centrerat, med luft från nav */
-.org-dashboard-card {
-  background: var(--bg-white);
-  border-radius: 16px;
-  padding: 2.5rem 2rem;
-  width: 100%;
-  max-width: 900px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-}
-
-.org-dashboard-title {
-  font-size: 1.6rem;
-  font-weight: 800;
-  color: var(--text-dark);
-  margin: 0 0 0.4rem;
-}
-
-.org-dashboard-subtitle {
-  font-size: 0.95rem;
-  color: var(--gray-text);
-  margin: 0 0 2rem;
-}
-
-.org-dashboard-section {
-  margin-bottom: 2.5rem;
-}
-
-.org-dashboard-section-header {
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-light);
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 8px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
-  gap: 1rem;
-  flex-wrap: wrap;
+  justify-content: center;
+  transition: background-color 0.2s;
 }
 
-.org-dashboard-section-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--primary-blue);
-  margin-bottom: 0.5rem;
-}
-
-.org-dashboard-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.org-dashboard-job-item {
-  padding: 1rem;
-  border: 1px solid var(--gray-border);
-  border-radius: 8px;
-  background-color: var(--gray-light);
-}
-
-.org-dashboard-app-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  border: 1px solid var(--gray-border);
-  border-radius: 8px;
-  background-color: var(--gray-light);
-  flex-wrap: wrap;
-}
-
-.org-dashboard-app-info {
-  flex: 1;
-  min-width: 200px;
-}
-
-.org-dashboard-app-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.org-dashboard-item-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text-dark);
-  margin: 0 0 0.25rem;
-}
-
-.org-dashboard-item-meta {
-  font-size: 0.85rem;
-  color: var(--gray-text);
-  margin: 0;
-}
-
-.org-dashboard-empty {
-  font-size: 0.95rem;
-  color: var(--gray-text);
-  margin: 0;
-  padding: 1rem;
-  background-color: var(--gray-light);
-  border-radius: 8px;
-  text-align: center;
-}
-
-.org-dashboard-message,
-.org-dashboard-error {
-  font-size: 1rem;
-  color: var(--text-dark);
-  text-align: center;
-  margin-top: 3rem;
-}
-
-.org-dashboard-error {
-  color: #dc2626;
-}
-
-.org-dashboard-info-note {
-  font-size: 0.85rem;
-  color: var(--gray-text);
-  font-style: italic;
-  margin-bottom: 0.5rem;
-}
-
-.org-dashboard-wrapper .text-input {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--gray-border);
-  border-radius: 8px;
-  font-size: 1rem;
-  margin-bottom: 1rem;
-  display: block;
-}
-
-.toast {
-  position: fixed;
-  top: 1.5rem;
-  right: 1.5rem;
-  padding: 1rem 1.5rem;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 9999;
-}
-
-.toast-success {
-  background-color: #16a34a;
-}
-
-.toast-error {
-  background-color: #dc2626;
+.icon-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* ==========================================================================
-   ORG AVATAR
+   SÖK
    ========================================================================== */
 
-.org-avatar-section {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--gray-border);
+.missions-search-section {
+  background-color: var(--primary-blue);
+  padding: 0 1rem 1.5rem 1rem;
 }
 
-.org-avatar-container {
+.search-input-wrapper {
   position: relative;
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  overflow: hidden;
-  cursor: pointer;
-  flex-shrink: 0;
-  border: 3px solid var(--primary-blue);
-  background: var(--gray-light);
-  transition: transform 0.15s ease;
-}
-
-.org-avatar-container:hover {
-  transform: scale(1.03);
-}
-
-.org-profile-img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
-.org-avatar-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  font-size: 0.75rem;
-  color: var(--gray-text);
-  font-weight: 500;
-}
-
-.org-avatar-overlay {
+.search-icon {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.5rem;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray-text);
+  pointer-events: none;
 }
 
-.org-avatar-info {
+.search-input {
+  width: 100%;
+  padding: 0.9rem 1rem 0.9rem 3rem;
+  border-radius: 12px;
+  border: none;
+  font-size: 1rem;
+  background-color: var(--bg-white);
+  color: var(--text-dark);
+}
+
+.search-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+/* ==========================================================================
+   HUVUDINNEHÅLL
+   ========================================================================== */
+
+.missions-content {
+  flex: 1;
+  background-color: var(--bg-white);
+  border-radius: 30px 30px 0 0;
+  padding: 1.5rem;
+  margin-top: 0;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+/* ==========================================================================
+   "TIDIGARE HJÄLPT" SEKTION
+   ========================================================================== */
+
+.previous-section {
+  margin-bottom: 2rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-blue);
+  margin: 0;
+}
+
+.section-link {
+  background: none;
+  border: none;
+  color: var(--primary-blue);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.section-link:hover {
+  opacity: 0.8;
+}
+
+/* ==========================================================================
+   CAROUSEL FÖR "TIDIGARE HJÄLPT"
+   ========================================================================== */
+
+.carousel-viewport {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
+}
+
+.carousel-viewport:active {
+  cursor: grabbing;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  width: 100%;
+}
+
+.carousel-page {
+  flex: 0 0 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.dots-indicator .dot {
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition:
+    background-color 0.3s,
+    transform 0.2s;
+}
+
+.dots-indicator .dot:hover {
+  transform: scale(1.3);
+}
+
+.previous-card {
+  aspect-ratio: 1;
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  -webkit-user-drag: none;
+}
+
+.previous-card:hover {
+  transform: scale(1.02);
+}
+
+.dots-indicator {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--gray-border);
+}
+
+.dot.active {
+  background-color: var(--primary-blue);
+}
+
+/* ==========================================================================
+   FEED-CARDS
+   ========================================================================== */
+
+.missions-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.feed-card {
+  background-color: var(--bg-white);
+  border-radius: 16px;
+  border: 1px solid var(--gray-border);
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.feed-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.org-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: var(--gray-border);
+  flex-shrink: 0;
+}
+
+.org-info {
   flex: 1;
 }
 
-.org-avatar-name {
-  font-size: 1.3rem;
+.org-name {
   font-weight: 700;
   color: var(--text-dark);
-  margin: 0 0 0.25rem 0;
+  margin: 0;
+  font-size: 0.95rem;
 }
 
-.org-avatar-meta {
-  font-size: 0.9rem;
+.org-time {
+  font-size: 0.8rem;
   color: var(--gray-text);
+  margin: 0.1rem 0 0 0;
+}
+
+.feed-card-body {
+  padding: 0;
+}
+
+.feed-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0 0 0.2rem 0;
+}
+
+.feed-description {
+  font-size: 0.85rem;
+  color: var(--gray-text);
+  line-height: 1.4;
+  margin: 0 0 0.75rem 0;
+}
+
+.feed-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+  text-align: left;
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-dark);
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.meta-icon {
+  color: var(--text-dark);
+  flex-shrink: 0;
+}
+
+.feed-pills {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.feed-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.7rem;
+  border: 1.5px solid var(--primary-blue);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary-blue);
+  background: transparent;
+}
+
+/* Knappar */
+.feed-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.feed-actions .btn-outline-blue,
+.feed-actions .btn-primary {
+  flex: 1;
+  padding: 0.6rem;
+  font-size: 0.9rem;
+}
+
+.feed-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-top: 1px solid var(--gray-border);
+  padding-top: 0.6rem;
+  font-size: 0.85rem;
+}
+
+.feed-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: none;
+  color: var(--gray-text);
+  cursor: pointer;
+  padding: 0.3rem 0.5rem;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.feed-action-btn:hover {
+  background: var(--gray-light);
+  color: var(--primary-blue);
+}
+
+.feed-action-btn.liked {
+  color: #e11d48;
+}
+
+.feed-action-btn.liked:hover {
+  color: #be123c;
+}
+
+.feed-action-btn svg {
+  transition: transform 0.15s;
+}
+
+.feed-action-btn:active svg {
+  transform: scale(1.2);
+}
+
+.feed-likes-info {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.feed-comments-info {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.like-icon,
+.comment-icon {
+  font-size: 1rem;
+}
+
+.btn-applied {
+  padding: 1rem;
+  background: #eef1f8;
+  color: #5a6892;
+  border: 1px solid #c8d1e6;
+  border-radius: 12px;
+  font-weight: bold;
+  width: 100%;
+  cursor: not-allowed;
+  font-family: inherit;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.feed-actions .btn-applied,
+.list-actions .btn-applied {
+  flex: 1;
+  padding: 0.6rem;
+  font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   LIST-CARDS (enkel vy)
+   ========================================================================== */
+
+.list-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: var(--text-light);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 0.5rem;
+}
+
+.list-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-light);
   margin: 0;
 }
 
-.org-avatar-error {
-  color: #dc2626;
+.missions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.list-card {
+  background-color: var(--bg-white);
+  border-radius: 16px;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--gray-border);
+  overflow: hidden;
+}
+
+.list-card-image {
+  width: 110px;
+  height: auto;
+  min-height: 100%;
+  border-radius: 0;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+
+.list-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem 0.75rem 0.75rem 0;
+}
+
+.list-title-text {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0 0 0.4rem 0;
+  line-height: 1.3;
+}
+
+.list-description {
+  font-size: 0.8rem;
+  color: var(--gray-text);
+  line-height: 1.4;
+  margin: 0 0 0.5rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.list-meta {
+  margin-bottom: 0.75rem;
+}
+
+.list-meta p {
+  font-size: 0.75rem;
+  color: var(--text-dark);
+  margin: 0.1rem 0;
+}
+
+.list-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+.list-actions .btn-outline-blue,
+.list-actions .btn-primary {
+  flex: 1;
+  padding: 0.5rem;
   font-size: 0.85rem;
+}
+
+.list-blue-header {
+  background-color: var(--primary-blue);
+  padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+.list-blue-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+/* ==========================================================================
+   TABS - Uppdrag / Mina ansökningar
+   ========================================================================== */
+.missions-tabs {
+  display: flex;
+  gap: 1rem;
+  padding: 0 1rem 1.5rem 1rem;
+  background: var(--primary-blue);
+  justify-content: center;
+}
+
+.tab-pill {
+  padding: 0.55rem 1.5rem;
+  background: transparent;
+  color: white;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 110px;
+}
+
+.tab-pill.active {
+  border-color: white;
+}
+
+.tab-pill:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.1);
+}
+/* ==========================================================================
+   APPLICATIONS LIST
+   ========================================================================== */
+.applications-list {
+  padding: 1rem;
+}
+
+.application-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.application-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.application-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.2rem 0;
+  color: #222;
+}
+
+.application-card-org {
+  font-size: 0.9rem;
+  color: #666;
   margin: 0;
+}
+
+.application-card-meta {
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.application-card-meta p {
+  margin: 0.3rem 0;
+}
+
+.application-card-desc {
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #eee;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-approved {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-rejected {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.no-missions-text {
+  text-align: center;
+  color: #151515;
+  padding: 2rem;
+  font-size: 1.5rem;
+}
+
+/* ==========================================================================
+   RESPONSIVT - TABLET & DESKTOP
+   ========================================================================== */
+
+@media (min-width: 768px) {
+  .missions-top-nav,
+  .missions-search-section,
+  .missions-content {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+
+  .missions-content > * {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .missions-feed {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .missions-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .list-card {
+    flex-direction: column;
+  }
+
+  .list-card-image {
+    width: 100%;
+    height: 180px;
+    min-height: 180px;
+  }
+
+  .list-card-body {
+    padding: 1rem;
+  }
+
+  .feed-title {
+    font-size: 1.3rem;
+  }
+
+  .feed-description {
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 1100px) {
+  .missions-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* OrgDashboard återanvänder MissionsPage.css. Bara org-specifika tillägg här. */
+
+.orgdash-header-bar {
+  padding: 0 1rem 1.25rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-light);
+  background: var(--primary-blue);
+}
+
+.orgdash-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.orgdash-create-btn {
+  padding: 0.55rem 1.1rem;
+  background: var(--bg-white);
+  color: var(--primary-blue);
+  border: none;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.orgdash-create-btn:hover {
+  opacity: 0.92;
+}
+
+@media (min-width: 768px) {
+  .orgdash-header-bar {
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
 }

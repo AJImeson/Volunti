@@ -26,5 +26,19 @@ namespace Volunti.Models
 
         public int UserId { get; set; }
         public AppUser User { get; set; }
+
+        // Profile
+        public string? Bio { get; set; }
+        public string? Areas { get; set; }              
+        public string? TargetGroup { get; set; }        
+        public string? Requirements { get; set; }       
+        public string? Activities { get; set; }         
+
+        // Verifiering
+        public DateTime? VerifiedAt { get; set; }
+        public string? ContactPersonName { get; set; }
+        public string? ContactPersonEmail { get; set; }
+        public string? ContactPersonPhone { get; set; }
+        public DateTime? ContactPersonAddedAt { get; set; }
     }
 }

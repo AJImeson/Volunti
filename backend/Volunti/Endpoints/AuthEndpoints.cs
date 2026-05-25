@@ -293,42 +293,7 @@ namespace Volunti.Endpoints
                 });
             }).RequireAuthorization();
 
-            app.MapGet("/me/organization", async (
-                ClaimsPrincipal claimsPrincipal,
-                UserManager<AppUser> userManager,
-                VoluntiDbContext db) =>
-            {
-                var userIdStr = userManager.GetUserId(claimsPrincipal);
-                if (userIdStr is null || !int.TryParse(userIdStr, out var userId))
-                    return Results.Unauthorized();
-
-                var user = await userManager.FindByIdAsync(userIdStr);
-                if (user is null) return Results.NotFound();
-
-                var organization = await db.Organizations.FirstOrDefaultAsync(o => o.UserId == userId);
-                if (organization is null)
-                {
-                    var membership = await db.OrganizationMembers
-                        .Include(m => m.Organization)
-                        .FirstOrDefaultAsync(m => m.UserId == userId);
-                    organization = membership?.Organization;
-                }
-
-                if (organization is null) return Results.NotFound("Organisation hittades inte");
-
-                return Results.Ok(new
-                {
-                    organizationId = organization.OrganizationId,
-                    orgName = organization.OrgName,
-                    companyName = organization.CompanyName,
-                    contactName = organization.ContactName,
-                    municipality = organization.Municipality,
-                    description = organization.Description,
-                    profileImageUrl = organization.ProfileImageUrl,
-                    website = organization.Website,
-                    email = user.Email
-                });
-            }).RequireAuthorization();
+            
         }
     }
 }

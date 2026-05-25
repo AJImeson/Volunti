@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volunti.Data;
 
@@ -11,9 +12,11 @@ using Volunti.Data;
 namespace Volunti.Migrations
 {
     [DbContext(typeof(VoluntiDbContext))]
-    partial class VoluntiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260523175330_AddMessageGroups")]
+    partial class AddMessageGroups
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -577,15 +580,6 @@ namespace Volunti.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrganizationId"));
 
-                    b.Property<string>("Activities")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Areas")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Bio")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Categories")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -596,18 +590,6 @@ namespace Volunti.Migrations
 
                     b.Property<string>("ContactName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ContactPersonAddedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ContactPersonEmail")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContactPersonName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContactPersonPhone")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
@@ -636,23 +618,14 @@ namespace Volunti.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Requirements")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("RequiresDocumentation")
                         .HasColumnType("bit");
 
                     b.Property<int?>("RoleId")
                         .HasColumnType("int");
 
-                    b.Property<string>("TargetGroup")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("UserId")
                         .HasColumnType("int");
-
-                    b.Property<DateTime?>("VerifiedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Website")
                         .IsRequired()
