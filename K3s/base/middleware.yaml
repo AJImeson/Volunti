@@ -21,4 +21,3 @@ spec:
     forceSTSHeader: true
     contentTypeNosniff: true
     referrerPolicy: "same-origin"
-    contentSecurityPolicy: "default-src 'self'; script-src 'self'; object-src 'none'; connect-src 'self' https://api.volunti.cc.k3s.chas-lab.dev"
