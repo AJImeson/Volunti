@@ -6,11 +6,10 @@ const OrgRegisterContext = createContext();
 export const OrgRegisterProvider = ({ children }) => {
   const [formData, setFormData] = useState({
     foretagsnamn: "",
-    organisationsnamn: "",
+    organisationsnummer: "",
     email: "",
     confirmEmail: "",
     password: "",
-    namn: "",
 
     kommun: "",
     beskrivning: "",

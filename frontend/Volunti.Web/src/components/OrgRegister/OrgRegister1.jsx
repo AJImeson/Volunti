@@ -67,15 +67,15 @@ const OrgRegister1 = () => {
           value={formData.foretagsnamn}
           onChange={handleChange}
           className="text-input"
-          placeholder="Företagsnamn *"
+          placeholder="Organisationsnamn *"
         />
         <input
           type="text"
-          name="organisationsnamn"
-          value={formData.organisationsnamn}
+          name="organisationsnummer"
+          value={formData.organisationsnummer}
           onChange={handleChange}
           className="text-input"
-          placeholder="Organisationsnamn *"
+          placeholder="Organisationsnummer *"
         />
         <input
           type="email"
@@ -103,14 +103,6 @@ const OrgRegister1 = () => {
           className="text-input"
           placeholder="Lösenord *"
           autoComplete="new-password"
-        />
-        <input
-          type="text"
-          name="namn"
-          value={formData.namn}
-          onChange={handleChange}
-          className="text-input"
-          placeholder="Namn *"
         />
 
         {/* --- NAVIGERINGSKNAPPAR --- */}
