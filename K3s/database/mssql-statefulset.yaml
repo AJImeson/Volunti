@@ -37,7 +37,7 @@ spec:
           mountPath: /var/opt/mssql
   volumeClaimTemplates:
   - metadata:
-      name: ${PREFIX}mssql-data
+      name: mssql-data
     spec:
       storageClassName: local-path
       accessModes:
