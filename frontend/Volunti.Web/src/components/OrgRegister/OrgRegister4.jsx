@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useOrgRegister } from "../context/OrgRegisterContext";
 import { registerOrganization } from "../../services/authService";
@@ -6,12 +6,18 @@ import { registerOrganization } from "../../services/authService";
 const OrgRegister4 = () => {
   const navigate = useNavigate();
   const { formData, setFormData } = useOrgRegister();
+  const [errorMsg, setErrorMsg] = useState("");
+
   const handleRegister = async () => {
+    if (!formData.emailNotification) {
+      setErrorMsg("Välj ett alternativ för e-postnotifieringar.");
+      return;
+    }
     try {
-      await registerOrganization (formData);
-      navigate("/org-dashboard"); // var "/profile"  
+      await registerOrganization(formData);
+      navigate("/org-dashboard");
     } catch (error) {
-      alert(error.message);
+      setErrorMsg(error.message);
     }
   };
   
@@ -258,6 +264,12 @@ const OrgRegister4 = () => {
         </div>
 
         {/* --- NAVIGERINGSKNAPPAR --- */}
+        {errorMsg && (
+          <p style={{ color: "red", fontSize: "0.875rem", marginTop: "0.5rem" }}>
+            {errorMsg}
+          </p>
+        )}
+
         <div className="input-row" style={{ marginTop: "2rem" }}>
           <button
             className="btn-outline-blue"
@@ -266,7 +278,7 @@ const OrgRegister4 = () => {
             Föregående
           </button>
           <button className="btn-primary" onClick={handleRegister}>
-            Kom igång
+            Registrera
           </button>
         </div>
       </div>

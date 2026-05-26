@@ -6,7 +6,16 @@ const OrgRegister2 = () => {
   const navigate = useNavigate();
   const { formData, setFormData } = useOrgRegister();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleNext = () => {
+    if (!formData.kommun) {
+      setErrorMsg("Välj en kommun för att fortsätta.");
+      return;
+    }
+    navigate("/org-register/3");
+  };
+
   return (
     <div className="auth-wrapper">
       {/* --- TOPPMENY --- */}
@@ -102,6 +111,12 @@ const OrgRegister2 = () => {
         />
 
         {/* --- NAVIGERINGSKNAPPAR --- */}
+        {errorMsg && (
+          <p style={{ color: "red", fontSize: "0.875rem", marginTop: "0.5rem" }}>
+            {errorMsg}
+          </p>
+        )}
+
         <div className="input-row" style={{ marginTop: "2rem" }}>
           <button
             className="btn-outline-blue"
@@ -109,10 +124,7 @@ const OrgRegister2 = () => {
           >
             Föregående
           </button>
-          <button
-            className="btn-primary"
-            onClick={() => navigate("/org-register/3")}
-          >
+          <button className="btn-primary" onClick={handleNext}>
             Nästa
           </button>
         </div>
