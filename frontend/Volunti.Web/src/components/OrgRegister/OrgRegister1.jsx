@@ -5,9 +5,23 @@ import { useOrgRegister } from "../context/OrgRegisterContext";
 const OrgRegister1 = () => {
   const navigate = useNavigate();
   const { formData, setFormData } = useOrgRegister();
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleNext = () => {
+    if (formData.email !== formData.confirmEmail) {
+      setErrorMsg("E-postadresserna stämmer inte överens.");
+      return;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      setErrorMsg("Lösenorden stämmer inte överens.");
+      return;
+    }
+    setErrorMsg("");
+    navigate("/org-register/2");
   };
 
   return (
@@ -104,6 +118,22 @@ const OrgRegister1 = () => {
           placeholder="Lösenord *"
           autoComplete="new-password"
         />
+        <input
+          type="password"
+          name="confirmPassword"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          className="text-input"
+          placeholder="Bekräfta lösenord *"
+          autoComplete="new-password"
+        />
+
+        {/* --- FELMEDDELANDE --- */}
+        {errorMsg && (
+          <p style={{ color: "red", fontSize: "0.875rem", marginTop: "0.5rem" }}>
+            {errorMsg}
+          </p>
+        )}
 
         {/* --- NAVIGERINGSKNAPPAR --- */}
         <div className="input-row" style={{ marginTop: "2rem" }}>
@@ -115,7 +145,7 @@ const OrgRegister1 = () => {
           </button>
           <button
             className="btn-primary"
-            onClick={() => navigate("/org-register/2")}
+            onClick={handleNext}
           >
             Nästa
           </button>

@@ -10,6 +10,7 @@ export const OrgRegisterProvider = ({ children }) => {
     email: "",
     confirmEmail: "",
     password: "",
+    confirmPassword: "",
 
     kommun: "",
     beskrivning: "",
