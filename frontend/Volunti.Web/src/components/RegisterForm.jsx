@@ -670,7 +670,7 @@ export default function RegisterPage() {
               value={formData.email}
               onChange={handleChange}
               className={`text-input ${fieldErrors.email ? "input-error" : ""}`}
-              placeholder="Mejl *"
+              placeholder="E-postadress *"
               autoComplete="email"
             />
             <input
@@ -679,7 +679,7 @@ export default function RegisterPage() {
               value={formData.confirmEmail}
               onChange={handleChange}
               className={`text-input ${fieldErrors.confirmEmail ? "input-error" : ""}`}
-              placeholder="Bekräfta mejladress *"
+              placeholder="Bekräfta e-postadress *"
               autoComplete="off"
             />
 
@@ -1101,7 +1101,7 @@ export default function RegisterPage() {
             </div>
 
             <h3 className="form-section-title">
-              Vill du bli notifierad via mejl?*
+              Vill du bli notifierad via e-post?*
             </h3>
             <div className="radio-group">
               <label className="radio-label">

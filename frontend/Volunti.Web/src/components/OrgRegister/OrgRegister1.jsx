@@ -5,9 +5,23 @@ import { useOrgRegister } from "../context/OrgRegisterContext";
 const OrgRegister1 = () => {
   const navigate = useNavigate();
   const { formData, setFormData } = useOrgRegister();
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleNext = () => {
+    if (formData.email !== formData.confirmEmail) {
+      setErrorMsg("E-postadresserna stämmer inte överens.");
+      return;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      setErrorMsg("Lösenorden stämmer inte överens.");
+      return;
+    }
+    setErrorMsg("");
+    navigate("/org-register/2");
   };
 
   return (
@@ -67,15 +81,15 @@ const OrgRegister1 = () => {
           value={formData.foretagsnamn}
           onChange={handleChange}
           className="text-input"
-          placeholder="Företagsnamn *"
+          placeholder="Organisationsnamn *"
         />
         <input
           type="text"
-          name="organisationsnamn"
-          value={formData.organisationsnamn}
+          name="organisationsnummer"
+          value={formData.organisationsnummer}
           onChange={handleChange}
           className="text-input"
-          placeholder="Organisationsnamn *"
+          placeholder="Organisationsnummer *"
         />
         <input
           type="email"
@@ -83,7 +97,7 @@ const OrgRegister1 = () => {
           value={formData.email}
           onChange={handleChange}
           className="text-input"
-          placeholder="Mejl *"
+          placeholder="E-postadress *"
           autoComplete="email"
         />
         <input
@@ -92,7 +106,7 @@ const OrgRegister1 = () => {
           value={formData.confirmEmail}
           onChange={handleChange}
           className="text-input"
-          placeholder="Bekräfta mejladress *"
+          placeholder="Bekräfta e-postadress *"
           autoComplete="off"
         />
         <input
@@ -105,13 +119,21 @@ const OrgRegister1 = () => {
           autoComplete="new-password"
         />
         <input
-          type="text"
-          name="namn"
-          value={formData.namn}
+          type="password"
+          name="confirmPassword"
+          value={formData.confirmPassword}
           onChange={handleChange}
           className="text-input"
-          placeholder="Namn *"
+          placeholder="Bekräfta lösenord *"
+          autoComplete="new-password"
         />
+
+        {/* --- FELMEDDELANDE --- */}
+        {errorMsg && (
+          <p style={{ color: "red", fontSize: "0.875rem", marginTop: "0.5rem" }}>
+            {errorMsg}
+          </p>
+        )}
 
         {/* --- NAVIGERINGSKNAPPAR --- */}
         <div className="input-row" style={{ marginTop: "2rem" }}>
@@ -123,7 +145,7 @@ const OrgRegister1 = () => {
           </button>
           <button
             className="btn-primary"
-            onClick={() => navigate("/org-register/2")}
+            onClick={handleNext}
           >
             Nästa
           </button>

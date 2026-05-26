@@ -118,7 +118,7 @@ export default function LoginForm() {
           <input
             type="email"
             className="text-input"
-            placeholder="Mejl *"
+            placeholder="E-postadress *"
             value={email}
             onChange={(e) => {
               setEmail(e.target.value);

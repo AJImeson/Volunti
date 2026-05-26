@@ -228,7 +228,7 @@ const OrgRegister4 = () => {
         </div>
 
         <h3 className="form-section-title">
-          Vill ni bli notifierade via mejl?*
+          Vill ni bli notifierade via e-post?*
         </h3>
         <div className="radio-group">
           <label className="radio-label">

@@ -120,8 +120,7 @@ export const registerOrganization = async (formData) => {
     password: formData.password,
 
     companyName: formData.foretagsnamn,
-    orgName: formData.organisationsnamn,
-    contactName: formData.namn,
+    orgNumber: formData.organisationsnummer,
 
     municipality: formData.kommun,
     description: formData.beskrivning,
