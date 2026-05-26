@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: volunti-frontend
+  name: ${PREFIX}volunti-frontend
   namespace: doe25-group-13
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: volunti-frontend
+      app: ${PREFIX}volunti-frontend
   template:
     metadata:
       labels:
-        app: volunti-frontend
+        app: ${PREFIX}volunti-frontend
     spec:
       imagePullSecrets:
         - name: registry-credentials
       containers:
-      - name: volunti-frontend
+      - name: ${PREFIX}volunti-frontend
         image: registry.chas-lab.dev/chas-challenge-2026/grupp-13/burgundy/frontend:latest
         imagePullPolicy: Always
         ports:

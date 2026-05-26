@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: adminer
+  name: ${PREFIX}adminer
   namespace: doe25-group-13
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: adminer
+      app: ${PREFIX}adminer
   template:
     metadata:
       labels:
-        app: adminer
+        app: ${PREFIX}adminer
     spec:
       containers:
-      - name: adminer
+      - name: ${PREFIX}adminer
         image: adminer:latest
         ports:
         - containerPort: 8080
