@@ -1,12 +1,23 @@
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_COMMIT_BRANCH
+
+variables:
+  KUBE_NAMESPACE: doe25-group-13
+  REGISTRY_IMAGE: registry.chas-lab.dev/chas-challenge-2026/grupp-13/burgundy
 
 stages:
 
-  - lint
   - build
-  - test
-  - security
+  - test-build
   - container-build
+  - test-container
+  - security
   - deploy
+  - cleanup
 
 default:
   tags:

@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: volunti-backend
+  namespace: doe25-group-13
+  labels:
+    release: monitoring
+spec:
+  targetLabels:
+    - namespace
+  selector:
+    matchLabels:
+      app: volunti-backend 
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 20s

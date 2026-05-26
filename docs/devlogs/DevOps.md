@@ -56,7 +56,69 @@
 * 2026-04-16
 
     - Decided to skip the lintin pipeline and designt a pre commit linting test instead - Axel & Mika
+    - Built test and container-build for backend - Mika & Axel
 
+* 2026-04-20
 
+    - Started skeleton for two separate branches:
+        feature/DevOps-Portainer | For testing and deploying to Portainer
+        feature/DevOps-Testing | Future Kubernetes working branch 
+                                                                        /Axel & Mika
 
+* 2026-04-21
 
+    - Started creating variables and mapping for pipelines in Portainer branch - Axel & Mika
+    - Created mock-data for both frontend and backend for testing and integrating - Axel 
+    - Stack is succesfully deployed but can't see frontend (React) on purposed URL (404 not found error) - Axel & Mika
+
+* 2026-04-22
+
+    - Removed the mock data and replaced with code from developers in both frontend and backend for integrating and testing - Axel & Mika
+    - Sucesfully deployed the frontend stack to a working URL - Mika
+
+* 2026-04-30
+
+    - Fixing workflow rules for .gitlab-ci.yml, several deployments per branch occured - Axel
+
+* 2026-05-04
+
+    - Branched out a Monitoring branch for grafana - Axel
+
+* 2026-05-05
+
+    - Branched out a K3s branch for Kubernetes implementation - Mika
+    - Cleaned repository, deleted obsolete branches and merged frontend&backend logic for new 
+
+* 2026-05-06
+
+    - Worked on logic and pipeline building for Grafana monitoring, pipelines pass but no stack for Grafana is built.
+
+* 2026-05-07
+
+    - Structured K3s branch for future implementation of Kubernetes for a multi stack build - Mika
+    - Debugging of the monitoring stack - Axel
+
+* 2026-05-11
+
+    - Started mapping out K3s scripts and - Mika
+    - Continous debugging and fixing of monitor stack - Axel
+
+* 2026-05-13
+
+    - Created base ingresses and secrets for database - Mika
+    - Monitoring succesfull in own stack - Axel
+
+* 2026-05-15
+
+    - Continous implementation of K3s, backend and frontend deployment - Axel & Mika
+    - Monitoring in K3s more sucessfull, connected and prometheus scraping - Axel
+
+* 2026-05-18
+
+    - Sealed secrets fixed for project - Mika
+    - Monitoring in K3s more or less completed, set more alerts and CPU for backend? 
+
+* 2026-05-20
+
+    - Application working in K8s cluster, need debugging - Axel & Mika 
+>>>>>>> origin/Develop

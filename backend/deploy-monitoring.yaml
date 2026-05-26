@@ -1,0 +1,21 @@
+deploy-monitoring:
+  stage: deploy
+  image: python:3.12-slim 
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+      changes: 
+    - K3s/monitoring/**/*
+    - if: '$CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH'
+      when: manual
+      allow_failure: true
+  before_script:
+    - apt-get update && apt-get install -y curl
+    - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    - chmod +x kubectl && mv kubectl /usr/local/bin/
+    - mkdir -p ~/.kube
+    - echo "$KUBECONFIG_BASE64" | base64 -d > ~/.kube/config
+    - chmod 600 ~/.kube/config
+  script:
+    - kubectl apply -f K3s/monitoring/ -n $KUBE_NAMESPACE
+
+

@@ -1,17 +1,51 @@
 # Environment
 
 .env
+.env.local
+.env.*.local
+!.env.example
+!.env.development
+!.env.production
+.claude/
 
-#.NET Build
+#.NET Build & Publish
 
 bin/
 obj/
+publish/
+appsettings.Development.json
 
 # IDE / Editor
 
 .vs/
 .idea/
+*.user
+*.suo
+*.sln.docstates
+
+# Frontend / Node
+
+node_modules/
+dist/
+.eslintcache
 
 # Logs
 
-*.log 
+*.log
+.DS_Store
+Thumbs.db
+
+/backend/Volunti/appsettings.json
+
+# Local context file do not remove
+CC_Context.md
+/backend/Volunti/Volunti.http
+
+# User uploaded files
+/backend/Volunti/uploads/
+backend/Volunti/wwwroot/profile-images/
+
+# SQL Server LocalDB filer
+*.mdf
+*.ldf
+*.ndf

@@ -1,12 +1,10 @@
 frontend-container-build:
   stage: container-build
   image: docker:latest
-  services:
-
   variables:
-    IMAGE_TAG:
-
+    IMAGE_TAG: $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHORT_SHA
   script:
-
-    - echo "frontend-container"
-
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -f frontend/Dockerfile -t $IMAGE_TAG -t $CI_REGISTRY_IMAGE/frontend:latest frontend/Volunti.Web
+    - docker push $IMAGE_TAG
+    - docker push $CI_REGISTRY_IMAGE/frontend:latest

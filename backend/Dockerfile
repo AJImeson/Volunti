@@ -1,15 +1,19 @@
 # Build
-FROM mcr.microsoft.com/dotnet/sdk:10 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src 
 COPY *.csproj ./
 RUN dotnet restore
-COPY . .
-RUN
+COPY . . 
+RUN dotnet publish -c Release -o /app/publish --no-restore
 
 # Runtime 
-FROM mcr.microsoft.com/dotnet/sdk:10 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
-COPY . .
+COPY --from=build /app/publish .
+RUN mkdir -p /app/wwwroot
+RUN chown -R app:app /app
+USER app
 EXPOSE 8080
-ENTRYPOINT ["dotnet", ".dll"]
+ENV ASPNETCORE_HTTP_PORTS=8080
+ENTRYPOINT ["dotnet", "Volunti.dll"]
 
