@@ -146,7 +146,6 @@ const OrgRegister1 = () => {
           autoComplete="new-password"
         />
 
-        {/* --- FELMEDDELANDE --- */}
         {errorMsg && (
           <p style={{ color: "red", fontSize: "0.875rem", marginTop: "0.5rem" }}>
             {errorMsg}
