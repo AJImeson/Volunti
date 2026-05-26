@@ -36,8 +36,9 @@ import VolunteerDashboard from "./components/volunteer/VolunteerDashboard";
 import ComingSoonPage from "./components/placeholder/ComingSoonPage";
 import SchedulePage from "./components/schedule/SchedulePage";
 import AppLayout from "./components/AppLayout";
+import { useState } from "react";
 
-function AnimatedRoutes() {
+function AnimatedRoutes({setFontSize}) {
   const location = useLocation();
   return (
     <div key={location.pathname} className="page-transition">
@@ -81,7 +82,7 @@ function AnimatedRoutes() {
           element={
             <ProtectedRoute>
               <AppLayout>
-                <SettingsPage />
+                <SettingsPage setAppFontSize={setFontSize} />
               </AppLayout>
             </ProtectedRoute>
           }
@@ -173,11 +174,15 @@ function AnimatedRoutes() {
 }
 
 export default function App() {
+  const [fontSize, setFontSize] = useState(
+    localStorage.getItem("fontSize") || "medium"
+  );
+  document.documentElement.className = `font-${fontSize}`;
   return (
     <BrowserRouter>
       <div className="app-container">
         <ScrollToTop />
-        <AnimatedRoutes />
+        <AnimatedRoutes setFontSize={setFontSize}/>
       </div>
     </BrowserRouter>
   );
