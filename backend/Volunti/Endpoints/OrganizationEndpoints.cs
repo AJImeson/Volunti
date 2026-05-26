@@ -89,6 +89,80 @@ namespace Volunti.Endpoints
                 return Results.Ok($"Organization: '{organization.OrgName}' med id: '{organization.OrganizationId}' togs bort.");
             }).RequireAuthorization(policy => policy.RequireRole("OrgAdmin"));
 
+            // hämta inloggad orgs profil
+            app.MapGet("/me/organization", async (
+                VoluntiDbContext db,
+                HttpContext http) =>
+            {
+                var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
+                    return Results.Unauthorized();
+
+                var organization = await db.Organizations
+                    .Include(o => o.User)
+                    .FirstOrDefaultAsync(o => o.UserId == userId);
+                if (organization == null)
+                {
+                    var membership = await db.OrganizationMembers
+                        .Include(m => m.Organization)
+                        .FirstOrDefaultAsync(m => m.UserId == userId);
+                    organization = membership?.Organization;
+                }
+                if (organization == null)
+                    return Results.NotFound("Användaren har ingen organisation.");
+
+                return Results.Ok(organization.ToOrgDto());
+            })
+            .RequireAuthorization(policy => policy.RequireRole("OrgAdmin", "OrgUser"));
+
+            // uppdatera orgens profil
+            app.MapPut("/me/organization", async (
+                UpdateOrgProfileDto dto,
+                VoluntiDbContext db,
+                HttpContext http) =>
+            {
+                var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
+                    return Results.Unauthorized();
+
+                var organization = await db.Organizations.FirstOrDefaultAsync(o => o.UserId == userId);
+                if (organization == null)
+                {
+                    var membership = await db.OrganizationMembers
+                        .Include(m => m.Organization)
+                            .ThenInclude(o => o.User)
+                        .FirstOrDefaultAsync(m => m.UserId == userId);
+                    organization = membership?.Organization;
+                }
+                if (organization == null) return Results.NotFound();
+
+                string Join(string[]? arr) =>
+                    arr == null ? string.Empty : string.Join(", ", arr.Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s)));
+
+                // Uppdatera bara fält som skickats in (null = inte med)
+                if (dto.OrgName != null) organization.OrgName = dto.OrgName.Trim();
+                if (dto.Description != null) organization.Description = dto.Description.Trim();
+                if (dto.City != null) organization.Municipality = dto.City.Trim();
+                if (dto.Website != null) organization.Website = dto.Website.Trim();
+                if (dto.Bio != null) organization.Bio = dto.Bio.Trim();
+                if (dto.OrgNumber != null) organization.OrgNumber = dto.OrgNumber.Trim();
+                if (dto.Areas != null) organization.Areas = Join(dto.Areas);
+                if (dto.TargetGroup != null) organization.TargetGroup = Join(dto.TargetGroup);
+                if (dto.Requirements != null) organization.Requirements = Join(dto.Requirements);
+                if (dto.Activities != null) organization.Activities = Join(dto.Activities);
+                if (dto.ContactPersonName != null)
+                {
+                    organization.ContactPersonName = dto.ContactPersonName.Trim();
+                    if (organization.ContactPersonAddedAt == null)
+                        organization.ContactPersonAddedAt = DateTime.UtcNow;
+                }
+                if (dto.ContactPersonEmail != null) organization.ContactPersonEmail = dto.ContactPersonEmail.Trim();
+                if (dto.ContactPersonPhone != null) organization.ContactPersonPhone = dto.ContactPersonPhone.Trim();
+
+                await db.SaveChangesAsync();
+                return Results.Ok(organization.ToOrgDto());
+            })
+            .RequireAuthorization(policy => policy.RequireRole("OrgAdmin", "OrgUser"));
         }
     }
 }

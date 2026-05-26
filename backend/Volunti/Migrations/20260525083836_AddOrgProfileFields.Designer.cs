@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volunti.Data;
 
@@ -11,9 +12,11 @@ using Volunti.Data;
 namespace Volunti.Migrations
 {
     [DbContext(typeof(VoluntiDbContext))]
-    partial class VoluntiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260525083836_AddOrgProfileFields")]
+    partial class AddOrgProfileFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -333,3 +333,38 @@
 .comment-text {
   white-space: pre-wrap;
 }
+
+.comment-replies-wrap {
+  margin-top: 0.25rem;
+}
+
+.comment-toggle-replies {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: none;
+  border: none;
+  padding: 0.4rem 0 0.4rem 2.75rem;
+  margin-left: 0;
+  color: var(--gray-text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.15s;
+}
+
+.comment-toggle-replies:hover {
+  color: var(--primary-blue);
+}
+
+.comment-toggle-line {
+  display: inline-block;
+  width: 24px;
+  height: 1px;
+  background: var(--gray-border);
+}
+
+.comment-replies {
+  animation: contentFadeIn 0.25s ease-out;
+}

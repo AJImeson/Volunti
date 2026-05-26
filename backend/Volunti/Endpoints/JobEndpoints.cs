@@ -3,6 +3,7 @@ using Volunti.Data;
 using Volunti.Mappers;
 using Volunti.Models;
 using Volunti.DTOs;
+using System.Security.Claims;
 
 namespace Volunti.Endpoints
 {
@@ -99,6 +100,56 @@ namespace Volunti.Endpoints
                 return Results.Created($"/jobs/{job.JobId}", job.ToJobDto());
             })
             .RequireAuthorization(policy => policy.RequireRole("OrgAdmin", "OrgUser"));
+
+            // PUT /jobs/{id} - uppdatera ett jobb (bara orgens ägare/medlem)
+            app.MapPut("/jobs/{id}", async (
+                int id,
+                CreateJobDto dto,
+                VoluntiDbContext db,
+                HttpContext http) =>
+            {
+                var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
+                    return Results.Unauthorized();
+
+                var job = await db.Jobs.FindAsync(id);
+                if (job == null) return Results.NotFound("Jobbet hittades inte.");
+
+                // Verifiera att användaren tillhör orgen som äger jobbet
+                var organization = await db.Organizations.FirstOrDefaultAsync(o => o.UserId == userId);
+                if (organization == null)
+                {
+                    var membership = await db.OrganizationMembers
+                        .Include(m => m.Organization)
+                        .FirstOrDefaultAsync(m => m.UserId == userId);
+                    organization = membership?.Organization;
+                }
+                if (organization == null || job.OrganizationId != organization.OrganizationId)
+                    return Results.Forbid();
+
+                // Validering
+                if (string.IsNullOrWhiteSpace(dto.Title))
+                    return Results.BadRequest("Titel krävs.");
+                if (string.IsNullOrWhiteSpace(dto.City))
+                    return Results.BadRequest("Stad krävs.");
+                if (dto.EndTime <= dto.StartTime)
+                    return Results.BadRequest("Sluttid måste vara efter starttid.");
+
+                // Uppdatera fält
+                job.Title = dto.Title.Trim();
+                job.Description = dto.Description?.Trim() ?? string.Empty;
+                job.Category = dto.Category;
+                job.StartTime = dto.StartTime;
+                job.EndTime = dto.EndTime;
+                job.Address = dto.Address?.Trim() ?? string.Empty;
+                job.City = dto.City.Trim();
+                job.IsUrgent = dto.IsUrgent;
+
+                await db.SaveChangesAsync();
+                return Results.Ok(new { jobId = job.JobId });
+            })
+            .RequireAuthorization(policy => policy.RequireRole("OrgAdmin", "OrgUser"))
+            .RequireRateLimiting("write");
 
             app.MapDelete("/jobs/{id}", async (int id, VoluntiDbContext db, HttpContext http) =>
             {

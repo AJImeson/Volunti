@@ -159,3 +159,45 @@ export const toggleCommentLike = async (commentId) => {
   );
   return response.data;
 };
+
+// Hämta alla ansökningar för ett specifikt jobb (org)
+export const getJobApplications = async (jobId) => {
+  const response = await axios.get(`${API_URL}/jobs/${jobId}/applications`, {
+    headers: authHeaders(),
+  });
+  return response.data;
+};
+
+// Godkänn flera ansökningar samtidigt
+export const bulkApproveApplications = async (applicationIds) => {
+  const response = await axios.post(
+    `${API_URL}/applications/bulk-approve`,
+    { applicationIds },
+    { headers: authHeaders() },
+  );
+  return response.data;
+};
+
+// Hämta full profil för en volontär
+export const getVolunteerProfile = async (volunteerId) => {
+  const response = await axios.get(`${API_URL}/volunteers/${volunteerId}`, {
+    headers: authHeaders(),
+  });
+  return response.data;
+};
+
+// Hämta ett specifikt jobb
+export const getJobById = async (jobId) => {
+  const response = await axios.get(`${API_URL}/jobs/${jobId}`, {
+    headers: authHeaders(),
+  });
+  return response.data;
+};
+
+// Uppdatera ett jobb
+export const updateJob = async (jobId, jobData) => {
+  const response = await axios.put(`${API_URL}/jobs/${jobId}`, jobData, {
+    headers: authHeaders(),
+  });
+  return response.data;
+};

@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Outlet,
-  useLocation,
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import "./App.css";
 import ScrollToTop from "./components/ScrollToTop";
 import MarketingPage from "./components/marketing/MarketingPage";
@@ -37,6 +31,8 @@ import ComingSoonPage from "./components/placeholder/ComingSoonPage";
 import SchedulePage from "./components/schedule/SchedulePage";
 import AppLayout from "./components/AppLayout";
 import { useState } from "react";
+import MessagesPage from "./components/messages/MessagesPage";
+import OrgProfile from "./components/organization/OrgProfile";
 
 function AnimatedRoutes({setFontSize}) {
   const location = useLocation();
@@ -51,9 +47,9 @@ function AnimatedRoutes({setFontSize}) {
         <Route path="/faq" element={<FaqPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/landing" element={<LandingPage />} />
-        
+
         <Route path="/desk-landing" element={<DeskLanding />} />
-        
+
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
 
@@ -95,24 +91,28 @@ function AnimatedRoutes({setFontSize}) {
             </ProtectedRoute>
           }
         />
-
         <Route
+          path="/edit-job/:id"
           element={
-            <OrgRegisterProvider>
-              <Outlet />
-            </OrgRegisterProvider>
+            <RoleProtectedRoute allowedRoles={["OrgAdmin", "OrgUser"]}>
+              <AppLayout>
+                <CreateJobForm />
+              </AppLayout>
+            </RoleProtectedRoute>
           }
-        >
-          <Route path="/org-register/1" element={<OrgRegister1 />} />
-          <Route path="/org-register/2" element={<OrgRegister2 />} />
-          <Route path="/org-register/3" element={<OrgRegister3 />} />
-          <Route path="/org-register/4" element={<OrgRegister4 />} />
-        </Route>
+        />
+        {/* En provider runt alla 4 steg så formData överlever navigering */}
+        <Route path="/org-register/1" element={<OrgRegister1 />} />
+        <Route path="/org-register/2" element={<OrgRegister2 />} />
+        <Route path="/org-register/3" element={<OrgRegister3 />} />
+        <Route path="/org-register/4" element={<OrgRegister4 />} />
         <Route
           path="/org-dashboard"
           element={
             <RoleProtectedRoute allowedRoles={["OrgAdmin"]}>
-              <OrgDashboard />
+              <AppLayout>
+                <OrgDashboard />
+              </AppLayout>
             </RoleProtectedRoute>
           }
         />
@@ -121,6 +121,16 @@ function AnimatedRoutes({setFontSize}) {
           element={
             <RoleProtectedRoute allowedRoles={["OrgUser"]}>
               <OrgUserDashboard />
+            </RoleProtectedRoute>
+          }
+        />
+        <Route
+          path="/org-profile"
+          element={
+            <RoleProtectedRoute allowedRoles={["OrgAdmin", "OrgUser"]}>
+              <AppLayout>
+                <OrgProfile />
+              </AppLayout>
             </RoleProtectedRoute>
           }
         />
@@ -137,10 +147,7 @@ function AnimatedRoutes({setFontSize}) {
           element={
             <ProtectedRoute>
               <AppLayout>
-                <ComingSoonPage
-                  title="Meddelanden"
-                  description="Här kommer du snart kunna chatta direkt med organisationer du arbetar med."
-                />
+                <MessagesPage />
               </AppLayout>
             </ProtectedRoute>
           }
@@ -182,7 +189,9 @@ export default function App() {
     <BrowserRouter>
       <div className="app-container">
         <ScrollToTop />
-        <AnimatedRoutes setFontSize={setFontSize}/>
+        <OrgRegisterProvider>
+          <AnimatedRoutes setFontSize={setFontSize}/>
+        </OrgRegisterProvider>
       </div>
     </BrowserRouter>
   );

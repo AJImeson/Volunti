@@ -10,17 +10,21 @@ using System.Security.Claims;
 
 namespace Volunti.Endpoints
 {
+    public record ChangePasswordDto(
+        string OldPassword,
+        string NewPassword
+        );
     public class AuthEndpoints
     {
         public static void RegisterEndpoints(WebApplication app)
         {
             app.MapPost("/register/volunteer", async (
-     RegisterVolunteerDto dto,
-     UserManager<AppUser> userManager,
-     ITokenService tokenService,
-     VoluntiDbContext db,
-     ILogger<Program> logger) =>
-            {
+             RegisterVolunteerDto dto,
+             UserManager<AppUser> userManager,
+             ITokenService tokenService,
+             VoluntiDbContext db,
+             ILogger<Program> logger) =>
+                {
                 try
                 {
                     // Kolla om mejlen redan är registrerad
@@ -291,6 +295,34 @@ namespace Volunti.Endpoints
                     emailNotifications = volunteer.EmailNotifications,
                     isVerified = volunteer.IsVerified
                 });
+            }).RequireAuthorization();
+
+            app.MapPost("/me/change-password", async (
+                ChangePasswordDto dto,
+                ClaimsPrincipal claimsPrincipal,
+                UserManager<AppUser> userManager) =>
+            {
+                var user = await userManager.GetUserAsync(claimsPrincipal);
+
+                if (user is null)
+                    return Results.Unauthorized();
+
+                var result = await userManager.ChangePasswordAsync(
+                    user,
+                    dto.OldPassword,
+                    dto.NewPassword
+                );
+
+                if (!result.Succeeded)
+                {
+                    return Results.BadRequest(result.Errors.Select(e => e.Description));
+                }
+
+                return Results.Ok(new
+                {
+                    message = "Lösenordet uppdaterades."
+                });
+
             }).RequireAuthorization();
 
             app.MapGet("/me/organization", async (
