@@ -24,7 +24,7 @@ function jobToMission(job) {
 
   return {
     id: job.jobId,
-    organization: "Organisation",
+    organization: job.organization?.orgName || "Okänd organization",
     organizationImageUrl: job.organization?.profileImageUrl || null,
     timeAgo: formatRelativeTime(job.createdOn),
     title: job.title,
@@ -46,7 +46,7 @@ function jobToMission(job) {
 function formatRelativeTime(dateStr) {
   if (!dateStr) return "";
   const diffMin = Math.floor(
-    (Date.now() - new Date(dateStr).getTime()) / 60000,
+    (Date.now() - new Date(dateStr + "Z").getTime()) / 60000,
   );
   if (diffMin < 1) return "nyss";
   if (diffMin < 60) return `${diffMin} min sen`;
@@ -127,13 +127,22 @@ export default function MissionsPage() {
       missions.map((m) =>
         getJobLikes(m.id)
           .then((data) => ({ id: m.id, ...data }))
-          .catch(() => ({ id: m.id, count: 0, likedByMe: false })),
+          .catch(() => ({
+            id: m.id,
+            count: 0,
+            likedByMe: false,
+            commentCount: 0,
+          })),
       ),
     ).then((results) => {
       if (cancelled) return;
       const map = {};
       results.forEach((r) => {
-        map[r.id] = { likes: r.count, likedByMe: r.likedByMe, comments: 0 };
+        map[r.id] = {
+          likes: r.count,
+          likedByMe: r.likedByMe,
+          comments: r.commentCount || 0,
+        };
       });
       setInteractions(map);
     });
@@ -419,6 +428,8 @@ export default function MissionsPage() {
               closeModal();
               setTimeout(() => openAccepted(m), 200);
             }}
+            interaction={interactions[activeMission?.id]}
+            hasApplied={appliedJobIds.has(activeMission?.id)}
           />
         )}
 

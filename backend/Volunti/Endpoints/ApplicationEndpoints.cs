@@ -102,6 +102,38 @@ namespace Volunti.Endpoints
                     return Results.BadRequest("Status måste vara Approved eller Rejected.");
                 application.Status = dto.Status;
                 await db.SaveChangesAsync();
+
+                // När en volontär godkänns. Lägg till dom i alla orgs grupper automatiskt
+                if (dto.Status == ApplicationStatus.Approved)
+                {
+                    var volunteer = await db.Volunteers.FindAsync(application.VolunteerId);
+                    if (volunteer != null)
+                    {
+                        // Hitta alla grupper för denna org
+                        var orgGroups = await db.MessageGroups
+                            .Where(g => g.OrganizationId == organization.OrganizationId)
+                            .Select(g => g.Id)
+                            .ToListAsync();
+
+                        // Hitta vilka grupper användaren redan är med i
+                        var existingMemberships = await db.MessageGroupMembers
+                            .Where(m => m.UserId == volunteer.UserId && orgGroups.Contains(m.MessageGroupId))
+                            .Select(m => m.MessageGroupId)
+                            .ToListAsync();
+
+                        // Lägg till i grupper som dom ännu inte är med i
+                        foreach (var groupId in orgGroups.Except(existingMemberships))
+                        {
+                            db.MessageGroupMembers.Add(new MessageGroupMember
+                            {
+                                MessageGroupId = groupId,
+                                UserId = volunteer.UserId,
+                                Role = GroupMemberRole.Member
+                            });
+                        }
+                        await db.SaveChangesAsync();
+                    }
+                }
                 return Results.Ok(new ApplicationDto
                 {
                     ApplicationId = application.Id,
@@ -152,6 +184,204 @@ namespace Volunti.Endpoints
                 }));
             })
             .RequireAuthorization(policy => policy.RequireRole("Volunteer"));
+
+            // alla ansökningar för ett specifikt jobb
+            app.MapGet("/jobs/{id}/applications", async (
+                int id,
+                VoluntiDbContext db,
+                HttpContext http) =>
+            {
+                var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
+                    return Results.Unauthorized();
+
+                var job = await db.Jobs
+                    .Include(j => j.Organization)
+                    .FirstOrDefaultAsync(j => j.JobId == id);
+                if (job == null) return Results.NotFound("Jobbet hittades inte.");
+
+                // Kolla att användaren tillhör orgen
+                var organization = await db.Organizations.FirstOrDefaultAsync(o => o.UserId == userId);
+                if (organization == null)
+                {
+                    var membership = await db.OrganizationMembers
+                        .Include(m => m.Organization)
+                        .FirstOrDefaultAsync(m => m.UserId == userId);
+                    organization = membership?.Organization;
+                }
+                if (organization == null || job.OrganizationId != organization.OrganizationId)
+                    return Results.Forbid();
+
+                var applications = await db.VolunteerApplications
+                    .Where(a => a.JobId == id)
+                    .Include(a => a.Volunteer)
+                        .ThenInclude(v => v.User)
+                    .ToListAsync();
+
+                // Räkna ut tidigare volontär (om volontär har gjort jobb för denna org tidigare)
+                var volunteerIds = applications.Select(a => a.VolunteerId).ToList();
+                var previousJobs = await db.VolunteerApplications
+                    .Where(a =>
+                        volunteerIds.Contains(a.VolunteerId) &&
+                        a.JobId != id &&
+                        a.Status == ApplicationStatus.Approved &&
+                        a.Job.OrganizationId == organization.OrganizationId)
+                    .Select(a => a.VolunteerId)
+                    .ToListAsync();
+                var previousSet = new HashSet<int>(previousJobs);
+
+                return Results.Ok(applications.Select(a => new
+                {
+                    applicationId = a.Id,
+                    status = a.Status.ToString(),
+                    createdAt = a.CreatedAt,
+                    volunteerId = a.VolunteerId,
+                    volunteerUserId = a.Volunteer.UserId,
+                    volunteerName = $"{a.Volunteer.FirstName} {a.Volunteer.LastName}".Trim(),
+                    volunteerImageUrl = a.Volunteer.ProfileImageUrl,
+                    isPreviousVolunteer = previousSet.Contains(a.VolunteerId)
+                }));
+            })
+            .RequireAuthorization(policy => policy.RequireRole("OrgAdmin", "OrgUser"));
+
+            // godkänn flera samtidigt
+            app.MapPost("/applications/bulk-approve", async (
+                BulkApproveDto dto,
+                VoluntiDbContext db,
+                HttpContext http) =>
+            {
+                var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
+                    return Results.Unauthorized();
+
+                var organization = await db.Organizations.FirstOrDefaultAsync(o => o.UserId == userId);
+                if (organization == null)
+                {
+                    var membership = await db.OrganizationMembers
+                        .Include(m => m.Organization)
+                        .FirstOrDefaultAsync(m => m.UserId == userId);
+                    organization = membership?.Organization;
+                }
+                if (organization == null) return Results.Forbid();
+
+                if (dto.ApplicationIds == null || dto.ApplicationIds.Count == 0)
+                    return Results.BadRequest("Inga ansökningar valda.");
+
+                var applications = await db.VolunteerApplications
+                    .Include(a => a.Job)
+                    .Include(a => a.Volunteer)
+                    .Where(a =>
+                        dto.ApplicationIds.Contains(a.Id) &&
+                        a.Job.OrganizationId == organization.OrganizationId &&
+                        a.Status == ApplicationStatus.Pending)
+                    .ToListAsync();
+
+                foreach (var app in applications)
+                {
+                    app.Status = ApplicationStatus.Approved;
+                }
+                await db.SaveChangesAsync();
+
+                // Auto tillägg till orgens grupper
+                var orgGroupIds = await db.MessageGroups
+                    .Where(g => g.OrganizationId == organization.OrganizationId)
+                    .Select(g => g.Id)
+                    .ToListAsync();
+
+                if (orgGroupIds.Any())
+                {
+                    foreach (var app in applications)
+                    {
+                        var volunteerUserId = app.Volunteer.UserId;
+                        var existing = await db.MessageGroupMembers
+                            .Where(m => m.UserId == volunteerUserId && orgGroupIds.Contains(m.MessageGroupId))
+                            .Select(m => m.MessageGroupId)
+                            .ToListAsync();
+
+                        foreach (var groupId in orgGroupIds.Except(existing))
+                        {
+                            db.MessageGroupMembers.Add(new MessageGroupMember
+                            {
+                                MessageGroupId = groupId,
+                                UserId = volunteerUserId,
+                                Role = GroupMemberRole.Member
+                            });
+                        }
                     }
+                    await db.SaveChangesAsync();
+                }
+
+                return Results.Ok(new { approvedCount = applications.Count });
+            })
+            .RequireAuthorization(policy => policy.RequireRole("OrgAdmin", "OrgUser"));
+
+            // hämta full profil för en volontär 
+            app.MapGet("/volunteers/{id}", async (
+                int id,
+                VoluntiDbContext db,
+                HttpContext http) =>
+            {
+                var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
+                    return Results.Unauthorized();
+
+                var organization = await db.Organizations.FirstOrDefaultAsync(o => o.UserId == userId);
+                if (organization == null)
+                {
+                    var membership = await db.OrganizationMembers
+                        .Include(m => m.Organization)
+                        .FirstOrDefaultAsync(m => m.UserId == userId);
+                    organization = membership?.Organization;
+                }
+                if (organization == null) return Results.Forbid();
+
+                var volunteer = await db.Volunteers
+                    .Include(v => v.User)
+                    .Include(v => v.VolunteerSkills)
+                    .Include(v => v.VolunteerInterests)
+                    .FirstOrDefaultAsync(v => v.Id == id);
+
+                if (volunteer == null) return Results.NotFound();
+
+                // Verifiera att volontären har sökt något av orgens jobb
+                var hasApplied = await db.VolunteerApplications
+                    .AnyAsync(a => a.VolunteerId == id && a.Job.OrganizationId == organization.OrganizationId);
+
+                if (!hasApplied) return Results.Forbid();
+
+                var experiences = await db.VolunteerExperiences
+                    .Where(e => e.VolunteerId == id)
+                    .OrderByDescending(e => e.StartDate)
+                    .ToListAsync();
+
+                return Results.Ok(new
+                {
+                    id = volunteer.Id,
+                    firstName = volunteer.FirstName,
+                    lastName = volunteer.LastName,
+                    bio = volunteer.Bio,
+                    municipality = volunteer.Municipality,
+                    driverLicense = volunteer.DriverLicense?.Split(",", StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>(),
+                    availability = volunteer.Availability?.Split(",", StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>(),
+                    profileImageUrl = volunteer.ProfileImageUrl,
+                    email = volunteer.User?.Email,
+                    phoneNumber = volunteer.PhoneNumber,
+                    skills = volunteer.VolunteerSkills.Select(s => new { id = s.Id, title = s.Title }),
+                    interests = volunteer.VolunteerInterests.Select(i => new { id = i.Id, title = i.Title }),
+                    experiences = experiences.Select(e => new
+                    {
+                        id = e.Id,
+                        title = e.Title,
+                        organization = e.Organization,
+                        startDate = e.StartDate,
+                        endDate = e.EndDate,
+                        description = e.Description,
+                        hoursTotal = e.HoursTotal
+                    })
+                });
+            })
+            .RequireAuthorization(policy => policy.RequireRole("OrgAdmin", "OrgUser"));
+        }
+        public record BulkApproveDto(List<int> ApplicationIds);
     }
 }

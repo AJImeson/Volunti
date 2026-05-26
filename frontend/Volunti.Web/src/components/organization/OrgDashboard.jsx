@@ -1,379 +1,409 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  getMyJobs,
-  getMyApplications,
-  updateApplicationStatus,
-} from "../../services/jobService";
+import "../missions/MissionsPage.css";
 import "./OrgDashboard.css";
+import { getMyJobs, deleteJob } from "../../services/jobService";
 import {
-  clearSession,
-  inviteOrgMember,
   fetchCurrentOrganization,
-  uploadProfileImage,
   getProfileImageUrl,
 } from "../../services/authService";
-import AvatarCropModal from "../profile/AvatarCropModal";
-import { useRef } from "react";
-import "../missions/MissionModal.css";
+import GranskaModal from "./GranskaModal";
+import VolunteerProfileModal from "./VolunteerProfileModal";
+import BottomNav from "../bottomnav/BottomNav";
 
 export default function OrgDashboard() {
   const navigate = useNavigate();
 
   const [jobs, setJobs] = useState([]);
-  const [applications, setApplications] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [showInviteModal, setShowInviteModal] = useState(false);
-
-  const [toast, setToast] = useState(null);
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [invitePassword, setInvitePassword] = useState("");
-
   const [organization, setOrganization] = useState(null);
-  const [pendingAvatarSrc, setPendingAvatarSrc] = useState(null);
-  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
-  const [avatarError, setAvatarError] = useState("");
-  const avatarInputRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const loadDashboardData = async () => {
+  const [granskaJobId, setGranskaJobId] = useState(null);
+  const [profileVolunteerId, setProfileVolunteerId] = useState(null);
+
+  const loadData = async () => {
     try {
-      const [jobsData, applicationsData, orgData] = await Promise.all([
+      const [jobsData, orgData] = await Promise.all([
         getMyJobs(),
-        getMyApplications("Pending"),
         fetchCurrentOrganization().catch(() => null),
       ]);
       setJobs(jobsData);
-      setApplications(applicationsData);
       setOrganization(orgData);
-      setError(null);
+      setError("");
     } catch (err) {
-      console.error("Fel vid hämtning av dashboard-data:", err);
+      console.error(err);
       setError("Kunde inte ladda dashboarden. Försök igen.");
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
-    setTimeout(loadDashboardData, 0);
+    let cancelled = false;
+    Promise.all([getMyJobs(), fetchCurrentOrganization().catch(() => null)])
+      .then(([jobsData, orgData]) => {
+        if (cancelled) return;
+        setJobs(jobsData);
+        setOrganization(orgData);
+        setError("");
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        console.error(err);
+        setError("Kunde inte ladda dashboarden. Försök igen.");
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  useEffect(() => {
-    if (!toast) return;
-    const timer = setTimeout(() => setToast(null), 3000);
-    return () => clearTimeout(timer);
-  }, [toast]);
-
-  const handleApplicationDecision = async (applicationId, decision) => {
+  const handleDeleteJob = async (jobId) => {
+    if (!window.confirm("Är du säker på att du vill ta bort uppdraget?")) {
+      return;
+    }
     try {
-      await updateApplicationStatus(applicationId, decision);
-      await loadDashboardData();
+      await deleteJob(jobId);
+      setJobs((prev) => prev.filter((j) => j.jobId !== jobId));
     } catch (err) {
-      console.error("Fel vid uppdatering av ansökan:", err);
-      setToast({
-        type: "error",
-        message: "Kunde inte uppdatera ansökan. Försök igen.",
-      });
+      console.error(err);
+      alert("Kunde inte ta bort uppdraget.");
     }
   };
 
-  const handleInvite = async () => {
-    try {
-      await inviteOrgMember(inviteEmail, invitePassword);
-      setShowInviteModal(false);
-      setInviteEmail("");
-      setInvitePassword("");
-      setToast({ type: "success", message: "Medarbetare tillagd!" });
-    } catch (err) {
-      console.error("Kunde inte bjuda in medarbetare. Försök igen.", err);
-      setToast({
-        type: "error",
-        message: "Kunde inte bjuda in medarbetare. Försök igen.",
-      });
-    }
-  };
-
-  const handleAvatarClick = () => {
-    avatarInputRef.current?.click();
-  };
-
-  const handleAvatarFileSelected = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      setPendingAvatarSrc(reader.result);
-    };
-    reader.readAsDataURL(file);
-
-    if (avatarInputRef.current) avatarInputRef.current.value = "";
-  };
-
-  const handleAvatarCropSave = async (blob) => {
-    setAvatarError("");
-    setIsUploadingAvatar(true);
-    try {
-      const file = new File([blob], "org-profile.jpg", { type: "image/jpeg" });
-      const result = await uploadProfileImage(file);
-      setOrganization((prev) => ({
-        ...prev,
-        profileImageUrl: result.profileImageUrl,
-      }));
-      setPendingAvatarSrc(null);
-      setToast({ type: "success", message: "Profilbild uppdaterad!" });
-    } catch (err) {
-      setAvatarError(
-        err.response?.data?.detail || err.message || "Uppladdning misslyckades",
-      );
-      setToast({ type: "error", message: "Kunde inte ladda upp bild." });
-    } finally {
-      setIsUploadingAvatar(false);
-    }
-  };
-
-  const handleAvatarCropCancel = () => {
-    setPendingAvatarSrc(null);
-  };
-
-  if (loading) {
-    return (
-      <div className="org-dashboard-wrapper">
-        <p className="org-dashboard-message">Laddar...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="org-dashboard-wrapper">
-        <p className="org-dashboard-error">{error}</p>
-      </div>
-    );
-  }
+  const filteredJobs = jobs.filter((j) =>
+    j.title?.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   return (
-    <div className="org-dashboard-wrapper">
-      {toast && (
-        <div className={`toast toast-${toast.type}`}>{toast.message}</div>
-      )}
-      {/* NAV HÄR */}
-      <div className="org-dashboard-nav">
-        <h1
-          className="org-dashboard-logo"
-          onClick={() => navigate("/org-dashboard")}
-          style={{ cursor: "pointer" }}
-        >
-          VOLUNTI
-        </h1>
+    <div className="missions-wrapper">
+      {/* TOPPMENY */}
+      <div className="missions-top-nav">
+        <h1 className="missions-logo">VOLUNTI</h1>
+      </div>
 
-        <div className="org-dashboard-nav-icons">
-          <button
-            className="icon-btn"
-            aria-label="Logga ut"
-            onClick={() => {
-              clearSession();
-              navigate("/landing");
-            }}
+      {/* SÖKFÄLT */}
+      <div className="missions-search-section">
+        <div className="search-input-wrapper">
+          <svg
+            className="search-icon"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           >
-            Logga ut
-          </button>
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Sök bland uppdrag..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
       </div>
-      <div className="org-dashboard-card">
-        <h1 className="org-dashboard-title">Adminpanel</h1>
-        <p className="org-dashboard-subtitle">
-          Hantera era uppdrag och ansökningar.
-        </p>
 
-        {/* Sektion 0: Medarbetare */}
-        <section className="org-dashboard-section">
-          <div className="org-dashboard-section-header">
-            <h2 className="org-dashboard-section-title">Medarbetare</h2>
-            <button
-              className="btn-primary"
-              onClick={() => setShowInviteModal(true)}
-            >
-              + Bjud in medarbetare
-            </button>
-          </div>
-        </section>
-
-        {/* Sektion 1: Publicerade uppdrag */}
-        <section className="org-dashboard-section">
-          <div className="org-dashboard-section-header">
-            <h2 className="org-dashboard-section-title">
-              Publicerade uppdrag ({jobs.length})
-            </h2>
-            <button
-              className="btn-primary"
-              onClick={() => navigate("/create-job")}
-            >
-              + Publicera nytt uppdrag
-            </button>
-          </div>
-
-          {jobs.length === 0 ? (
-            <p className="org-dashboard-empty">Inga uppdrag publicerade än.</p>
-          ) : (
-            <ul className="org-dashboard-list">
-              {jobs.map((job) => (
-                <li key={job.jobId} className="org-dashboard-job-item">
-                  <div>
-                    <h3 className="org-dashboard-item-title">{job.title}</h3>
-                    <p className="org-dashboard-item-meta">
-                      {job.city} · {job.category} · {job.status}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-
-        {/* Sektion 2: Ansökningar att hantera */}
-        <section className="org-dashboard-section">
-          <h2 className="org-dashboard-section-title">
-            Ansökningar att hantera ({applications.length})
-          </h2>
-
-          {applications.length === 0 ? (
-            <p className="org-dashboard-empty">Inga väntande ansökningar.</p>
-          ) : (
-            <ul className="org-dashboard-list">
-              {applications.map((app) => (
-                <li key={app.applicationId} className="org-dashboard-app-item">
-                  <div className="org-dashboard-app-info">
-                    <h3 className="org-dashboard-item-title">
-                      {app.volunteerName}
-                    </h3>
-                    <p className="org-dashboard-item-meta">
-                      Sökt: {app.jobTitle}
-                    </p>
-                  </div>
-                  <div className="org-dashboard-app-actions">
-                    <button
-                      className="btn-outline-blue"
-                      onClick={() =>
-                        handleApplicationDecision(app.applicationId, "Rejected")
-                      }
-                    >
-                      Avvisa
-                    </button>
-                    <button
-                      className="btn-primary"
-                      onClick={() =>
-                        handleApplicationDecision(app.applicationId, "Approved")
-                      }
-                    >
-                      Godkänn
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-      </div>
-      <div className="org-avatar-section">
-        <input
-          ref={avatarInputRef}
-          type="file"
-          accept=".jpg,.jpeg,.png"
-          style={{ display: "none" }}
-          onChange={handleAvatarFileSelected}
-        />
-        <div
-          className="org-avatar-container"
-          onClick={handleAvatarClick}
-          role="button"
-          tabIndex={0}
-          title={
-            organization?.profileImageUrl
-              ? "Klicka för att byta bild"
-              : "Klicka för att lägga till bild"
-          }
+      {/* RUBRIK + SKAPA */}
+      <div className="orgdash-header-bar">
+        <h2 className="orgdash-title">Dina uppdrag</h2>
+        <button
+          className="orgdash-create-btn"
+          onClick={() => navigate("/create-job")}
         >
+          + Skapa uppdrag
+        </button>
+      </div>
+
+      {/* HUVUDINNEHÅLL */}
+      <div className="missions-content">
+        {isLoading && (
+          <p style={{ textAlign: "center", color: "#666", padding: "2rem" }}>
+            Laddar uppdrag...
+          </p>
+        )}
+        {error && (
+          <p style={{ textAlign: "center", color: "#d33", padding: "2rem" }}>
+            {error}
+          </p>
+        )}
+        {!isLoading && !error && jobs.length === 0 && (
+          <p style={{ textAlign: "center", color: "#666", padding: "2rem" }}>
+            Du har inte publicerat några uppdrag än.
+          </p>
+        )}
+
+        <div className="missions-feed">
+          {filteredJobs.map((job) => (
+            <OrgJobCard
+              key={job.jobId}
+              job={job}
+              organization={organization}
+              onGranska={() => setGranskaJobId(job.jobId)}
+              onRedigera={() => navigate(`/edit-job/${job.jobId}`)}
+              onDelete={() => handleDeleteJob(job.jobId)}
+            />
+          ))}
+        </div>
+      </div>
+
+      {granskaJobId && (
+        <GranskaModal
+          jobId={granskaJobId}
+          onClose={() => setGranskaJobId(null)}
+          onApproved={() => {
+            setGranskaJobId(null);
+            loadData();
+          }}
+          onOpenProfile={(volunteerId) => setProfileVolunteerId(volunteerId)}
+        />
+      )}
+
+      {profileVolunteerId && (
+        <VolunteerProfileModal
+          volunteerId={profileVolunteerId}
+          onClose={() => setProfileVolunteerId(null)}
+        />
+      )}
+
+      <BottomNav />
+    </div>
+  );
+}
+
+/* ==========================================================================
+   JOB CARD - samma stil som FeedCard på MissionsPage
+   ========================================================================== */
+function OrgJobCard({ job, organization, onGranska, onRedigera, onDelete }) {
+  const fmtDate = (dateStr) => {
+    if (!dateStr) return "";
+    return new Date(dateStr).toLocaleDateString("sv-SE", {
+      day: "numeric",
+      month: "short",
+    });
+  };
+
+  const fmtTime = (dateStr) => {
+    if (!dateStr) return "";
+    return new Date(dateStr).toLocaleTimeString("sv-SE", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  return (
+    <div className="feed-card">
+      {/* Header */}
+      <div className="feed-card-header">
+        <div className="org-avatar">
           {organization?.profileImageUrl ? (
             <img
               src={getProfileImageUrl(organization.profileImageUrl)}
-              alt="Organisationsbild"
-              className="org-profile-img"
+              alt={organization?.orgName || ""}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                borderRadius: "50%",
+              }}
             />
           ) : (
-            <div className="org-avatar-placeholder">
-              <span>
-                Lägg till
-                <br />
-                bild
-              </span>
-            </div>
-          )}
-          {isUploadingAvatar && (
-            <div className="org-avatar-overlay">
-              <span>...</span>
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                borderRadius: "50%",
+                background: "var(--primary-blue)",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 700,
+              }}
+            >
+              {(organization?.orgName?.charAt(0) || "?").toUpperCase()}
             </div>
           )}
         </div>
-        {organization && (
-          <div className="org-avatar-info">
-            <h2 className="org-avatar-name">{organization.orgName}</h2>
-            <p className="org-avatar-meta">
-              {organization.companyName}{" "}
-              {organization.municipality && `· ${organization.municipality}`}
-            </p>
-          </div>
-        )}
-        {avatarError && <p className="org-avatar-error">{avatarError}</p>}
-      </div>
-      {showInviteModal && (
-        <div
-          className="modal-backdrop"
-          onClick={() => setShowInviteModal(false)}
+        <div className="org-info">
+          <p className="org-name">{organization?.orgName || "Organisation"}</p>
+          <p className="org-time">{formatTimeAgo(job.createdOn)}</p>
+        </div>
+        <button
+          className="orgdash-delete-btn"
+          onClick={onDelete}
+          title="Ta bort uppdrag"
+          aria-label="Ta bort uppdrag"
         >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-body">
-              <h2>Bjud in medarbetare</h2>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6" />
+            <path d="M10 11v6" />
+            <path d="M14 11v6" />
+            <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+          </svg>
+        </button>
+      </div>
 
-              <input
-                type="email"
-                className="text-input"
-                placeholder="E-postadress"
-                value={inviteEmail}
-                onChange={(e) => setInviteEmail(e.target.value)}
-              />
+      {/* Titel + beskrivning */}
+      <div className="feed-card-body">
+        <h3 className="feed-title">{job.title}</h3>
+        {job.description && (
+          <p className="feed-description">{job.description}</p>
+        )}
 
-              <input
-                type="password"
-                className="text-input"
-                placeholder="Lösenord"
-                value={invitePassword}
-                onChange={(e) => setInvitePassword(e.target.value)}
-              />
-
-              <div className="modal-actions">
-                <button className="btn-primary" onClick={handleInvite}>
-                  Bjud in
-                </button>
-                <button
-                  className="btn-outline-blue"
-                  onClick={() => setShowInviteModal(false)}
-                >
-                  Avbryt
-                </button>
+        {/* Meta */}
+        <div className="feed-meta">
+          <div className="meta-row">
+            <div className="meta-item">
+              <LocationIcon />
+              <span>{job.city || "—"}</span>
+            </div>
+          </div>
+          {job.startTime && (
+            <div className="meta-row">
+              <div className="meta-item">
+                <CalendarIcon />
+                <span>{fmtDate(job.startTime)}</span>
+              </div>
+              <div className="meta-item">
+                <ClockIcon />
+                <span>
+                  {fmtTime(job.startTime)}-{fmtTime(job.endTime)}
+                </span>
               </div>
             </div>
-          </div>
+          )}
         </div>
-      )}
-      {pendingAvatarSrc && (
-        <AvatarCropModal
-          imageSrc={pendingAvatarSrc}
-          onCancel={handleAvatarCropCancel}
-          onSave={handleAvatarCropSave}
-        />
-      )}
+
+        {/* Kategori-pill */}
+        {job.category && (
+          <div className="feed-pills">
+            <span className="feed-pill">
+              <CategoryIcon />
+              {job.category}
+            </span>
+          </div>
+        )}
+
+        {/* Knappar */}
+        <div className="feed-actions">
+          <button className="btn-primary" onClick={onGranska}>
+            Granska
+          </button>
+          <button className="btn-outline-blue" onClick={onRedigera}>
+            Redigera
+          </button>
+        </div>
+      </div>
     </div>
   );
+}
+
+/* ==========================================================================
+   IKONER + HJÄLPARE
+   ========================================================================== */
+function LocationIcon() {
+  return (
+    <svg
+      className="meta-icon"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
+  );
+}
+
+function CalendarIcon() {
+  return (
+    <svg
+      className="meta-icon"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+    </svg>
+  );
+}
+
+function ClockIcon() {
+  return (
+    <svg
+      className="meta-icon"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+  );
+}
+
+function CategoryIcon() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
+  );
+}
+
+function formatTimeAgo(dateStr) {
+  if (!dateStr) return "";
+  const diffMin = Math.floor(
+    (Date.now() - new Date(dateStr).getTime()) / 60000,
+  );
+  if (diffMin < 1) return "nyss";
+  if (diffMin < 60) return `${diffMin} min sen`;
+  const diffH = Math.floor(diffMin / 60);
+  if (diffH < 24) return `${diffH} tim sen`;
+  return `${Math.floor(diffH / 24)} dagar sen`;
 }

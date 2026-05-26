@@ -1,16 +1,24 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./Sidebar.css";
+import { useUnreadCount } from "../../hooks/useUnreadCount";
 import {
   clearSession,
   getCurrentUser,
   getProfileImageUrl,
+  isOrgUser,
 } from "../../services/authService";
 
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const user = getCurrentUser();
+  const unreadCount = useUnreadCount();
+
+  const isOrg = isOrgUser();
+  const profilePath = isOrg ? "/org-profile" : "/profile";
+  const homePath = isOrg ? "/org-dashboard" : "/missions";
+  const roleLabel = isOrg ? "Organisation" : "Volontär";
 
   const [collapsed, setCollapsed] = useState(() => {
     return localStorage.getItem("volunti_sidebar_collapsed") === "true";
@@ -35,7 +43,7 @@ export default function Sidebar() {
 
   const navItems = [
     {
-      path: "/missions",
+      path: homePath,
       label: "Hem",
       icon: (
         <>
@@ -47,6 +55,7 @@ export default function Sidebar() {
     {
       path: "/messages",
       label: "Meddelanden",
+      badge: unreadCount,
       icon: (
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
       ),
@@ -60,16 +69,6 @@ export default function Sidebar() {
           <line x1="16" y1="2" x2="16" y2="6" />
           <line x1="8" y1="2" x2="8" y2="6" />
           <line x1="3" y1="10" x2="21" y2="10" />
-        </>
-      ),
-    },
-    {
-      path: "/profile",
-      label: "Profil",
-      icon: (
-        <>
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-          <circle cx="12" cy="7" r="4" />
         </>
       ),
     },
@@ -100,7 +99,7 @@ export default function Sidebar() {
       </button>
 
       <div className="sidebar-top">
-        <h1 className="sidebar-logo" onClick={() => navigate("/missions")}>
+        <h1 className="sidebar-logo" onClick={() => navigate(homePath)}>
           {collapsed ? "V" : "VOLUNTI"}
         </h1>
 
@@ -112,16 +111,23 @@ export default function Sidebar() {
               onClick={() => navigate(item.path)}
               title={collapsed ? item.label : ""}
             >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                {item.icon}
-              </svg>
+              <div className="sidebar-link-icon-wrap">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  {item.icon}
+                </svg>
+                {item.badge > 0 && (
+                  <span className="sidebar-link-badge">
+                    {item.badge > 9 ? "9+" : item.badge}
+                  </span>
+                )}
+              </div>
               <span>{item.label}</span>
             </button>
           ))}
@@ -151,7 +157,7 @@ export default function Sidebar() {
         {user && (
           <div
             className="sidebar-user"
-            onClick={() => navigate("/profile")}
+            onClick={() => navigate(profilePath)}
             title={collapsed ? fullName : ""}
           >
             <div className="sidebar-avatar">
@@ -163,7 +169,7 @@ export default function Sidebar() {
             </div>
             <div className="sidebar-user-info">
               <p className="sidebar-user-name">{fullName}</p>
-              <p className="sidebar-user-role">Volontär</p>
+              <p className="sidebar-user-role">{roleLabel}</p>
             </div>
           </div>
         )}

@@ -35,6 +35,11 @@ namespace Volunti.Data
 
         public DbSet<JobCommentLike> JobCommentLikes { get; set; }
 
+        public DbSet<MessageGroup> MessageGroups { get; set; }
+        public DbSet<MessageGroupMember> MessageGroupMembers { get; set; }
+        public DbSet<GroupMessage> GroupMessages { get; set; }
+        public DbSet<GroupMessageAttachment> GroupMessageAttachments { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -179,6 +184,60 @@ namespace Volunti.Data
                 .WithMany()
                 .HasForeignKey(cl => cl.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            // MessageGroup
+            modelBuilder.Entity<MessageGroup>()
+                .HasOne(g => g.Organization)
+                .WithMany()
+                .HasForeignKey(g => g.OrganizationId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<MessageGroup>()
+                .HasOne(g => g.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(g => g.CreatedByUserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // MessageGroupMember 
+            modelBuilder.Entity<MessageGroupMember>()
+                .HasIndex(m => new { m.MessageGroupId, m.UserId })
+                .IsUnique();
+
+            modelBuilder.Entity<MessageGroupMember>()
+                .HasOne(m => m.MessageGroup)
+                .WithMany(g => g.Members)
+                .HasForeignKey(m => m.MessageGroupId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<MessageGroupMember>()
+                .HasOne(m => m.User)
+                .WithMany()
+                .HasForeignKey(m => m.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<MessageGroupMember>()
+                .Property(m => m.Role)
+                .HasConversion<string>();
+
+            // GroupMessage
+            modelBuilder.Entity<GroupMessage>()
+                .HasOne(m => m.MessageGroup)
+                .WithMany(g => g.Messages)
+                .HasForeignKey(m => m.MessageGroupId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<GroupMessage>()
+                .HasOne(m => m.SenderUser)
+                .WithMany()
+                .HasForeignKey(m => m.SenderUserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // GroupMessageAttachment
+            modelBuilder.Entity<GroupMessageAttachment>()
+                .HasOne(a => a.GroupMessage)
+                .WithMany(m => m.Attachments)
+                .HasForeignKey(a => a.GroupMessageId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
