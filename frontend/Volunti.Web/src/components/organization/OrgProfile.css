@@ -22,43 +22,11 @@
   color: white;
 }
 
-.profile-wrapper .header-blue .top-nav {
-  display: flex !important;
-  justify-content: space-between !important;
+.top-nav {
+  display: flex;
+  justify-content: flex-start;
   align-items: center;
   margin-bottom: 1rem;
-  width: 100%;
-}
-
-/* Fixa settings ikon*/
-.settings-icon-btn {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: var(--text-light);
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.15s;
-  padding: 0;
-}
-
-.settings-icon-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
-}
-
-.settings-icon-btn svg {
-  width: 20px;
-  height: 20px;
-}
-
-@media (min-width: 768px) {
-  .settings-icon-btn {
-    display: none;
-  }
 }
 
 .volunti-logo {
@@ -1052,5 +1020,25 @@
     text-align: center;
     background: transparent;
     color: #fca5a5;
+  }
+}
+
+.profile-wrapper .avatar-container {
+  border-radius: 50%;
+}
+
+/* Tab content animering */
+.tab-content-anim {
+  animation: fadeInTab 0.25s ease-out;
+}
+
+@keyframes fadeInTab {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

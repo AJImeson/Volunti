@@ -198,6 +198,7 @@ FileEndpoints.RegisterEndpoints(app);
 ApplicationEndpoints.RegisterEndpoints(app);
 ScheduleEndpoints.RegisterEndpoints(app);
 JobInteractionEndpoints.RegisterEndpoints(app);
+MessageGroupEndpoints.RegisterEndpoints(app);
 
 app.MapMetrics(); // For prometheus
 app.MapHealthChecks("/health"); // For k3s

@@ -413,6 +413,49 @@ export const inviteOrgMember = async (email, password) => {
   return data;
 };
 
+const decodeJwtPayload = () => {
+  const session = getSession();
+  if (!session?.token) return null;
+  try {
+    return JSON.parse(atob(session.token.split(".")[1]));
+  } catch {
+    return null;
+  }
+};
+
+export const getCurrentUserRole = () => {
+  const payload = decodeJwtPayload();
+  if (!payload) return null;
+
+  const role =
+    payload.role ||
+    payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+
+  if (Array.isArray(role)) return role[0];
+  return role || null;
+};
+
+export const isOrgUser = () => {
+  const role = getCurrentUserRole();
+  return role === "OrgAdmin" || role === "OrgUser";
+};
+
+export const isVolunteer = () => {
+  return getCurrentUserRole() === "Volunteer";
+};
+
+// Hämta full org-profil
+export const fetchOrgProfile = async () => {
+  const { data } = await api.get("/me/organization");
+  return data;
+};
+
+// Uppdatera org-profil
+export const updateOrgProfile = async (payload) => {
+  const { data } = await api.put("/me/organization", payload);
+  return data;
+};
+
 export const deleteJob = async (jobId) => {
   const { data } = await api.delete(`/jobs/${jobId}`);
   return data;

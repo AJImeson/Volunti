@@ -230,4 +230,28 @@
     background: var(--text-light);
     color: var(--primary-blue);
   }
+
+  .sidebar-link-icon-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .sidebar-link-badge {
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    background: #e11d48;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.05rem 0.35rem;
+    border-radius: 999px;
+    min-width: 18px;
+    text-align: center;
+    border: 2px solid var(--primary-blue);
+    line-height: 1.2;
+  }
 }
