@@ -20,6 +20,24 @@ const OrgRegister1 = () => {
       setErrorMsg("Lösenorden stämmer inte överens.");
       return;
     }
+
+    const pwd = formData.password;
+    const hasUpper = /[A-Z]/.test(pwd);
+    const hasLower = /[a-z]/.test(pwd);
+    const hasDigit = /\d/.test(pwd);
+    const hasSymbol = /[^a-zA-Z0-9]/.test(pwd);
+
+    if (pwd.length < 12 || !hasUpper || !hasLower || !hasDigit || !hasSymbol) {
+      const missing = [];
+      if (pwd.length < 12) missing.push("minst 12 tecken");
+      if (!hasUpper) missing.push("en stor bokstav");
+      if (!hasLower) missing.push("en liten bokstav");
+      if (!hasDigit) missing.push("en siffra");
+      if (!hasSymbol) missing.push("ett specialtecken");
+      setErrorMsg(`Lösenordet måste innehålla: ${missing.join(", ")}.`);
+      return;
+    }
+
     setErrorMsg("");
     navigate("/org-register/2");
   };
