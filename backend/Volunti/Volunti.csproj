@@ -31,7 +31,6 @@
 
   <ItemGroup>
     <Folder Include="DTOs\Message\" />
-    <Folder Include="DTOs\User\" />
     <Folder Include="DTOs\VolunteerInterest\" />
     <Folder Include="DTOs\VolunteerSkill\" />
     <Folder Include="DTOs\VolunteerApplication\" />

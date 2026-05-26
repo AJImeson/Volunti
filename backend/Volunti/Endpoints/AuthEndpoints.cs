@@ -6,6 +6,10 @@ using Volunti.Models;
 
 namespace Volunti.Endpoints
 {
+    public record ChangePasswordDto(
+        string OldPassword,
+        string NewPassword
+        );
     public class AuthEndpoints
     {
         public static void RegisterEndpoints(WebApplication app)
@@ -75,6 +79,35 @@ namespace Volunti.Endpoints
 
                 var result = await authService.GetMeAsync(userId);
                 return result is null ? Results.NotFound() : Results.Ok(result);
+            }).RequireAuthorization();
+
+            // Added from Reza's settings page feature — uses UserManager directly (acceptable for Identity ops)
+            app.MapPost("/me/change-password", async (
+                ChangePasswordDto dto,
+                ClaimsPrincipal claimsPrincipal,
+                UserManager<AppUser> userManager) =>
+            {
+                var user = await userManager.GetUserAsync(claimsPrincipal);
+
+                if (user is null)
+                    return Results.Unauthorized();
+
+                var result = await userManager.ChangePasswordAsync(
+                    user,
+                    dto.OldPassword,
+                    dto.NewPassword
+                );
+
+                if (!result.Succeeded)
+                {
+                    return Results.BadRequest(result.Errors.Select(e => e.Description));
+                }
+
+                return Results.Ok(new
+                {
+                    message = "Lösenordet uppdaterades."
+                });
+
             }).RequireAuthorization();
 
             app.MapGet("/me/organization", async (
