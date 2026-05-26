@@ -9,6 +9,10 @@ const OrgRegister4 = () => {
   const [errorMsg, setErrorMsg] = useState("");
 
   const handleRegister = async () => {
+    if (!formData.emailNotification) {
+      setErrorMsg("Välj ett alternativ för e-postnotifieringar.");
+      return;
+    }
     try {
       await registerOrganization(formData);
       navigate("/org-dashboard");
