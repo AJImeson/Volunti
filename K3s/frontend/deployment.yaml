@@ -21,6 +21,13 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 80
+        env:
+          - name: BACKEND_URL
+            value: "https://${PREFIX}volunti-api.cc.k3s.chas-lab.dev"
+        volumeMounts:
+          - name: nginx-config
+            mountPath: /etc/nginx/templates/default.conf.template
+            subPath: default.conf.template
         resources:
           requests:
             cpu: "50m"
@@ -43,6 +50,10 @@ spec:
         securityContext:
           runAsNonRoot: false
           allowPrivilegeEscalation: false
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: ${PREFIX}frontend-nginx-config
 
 
 ---
