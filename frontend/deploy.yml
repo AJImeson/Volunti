@@ -3,10 +3,22 @@ frontend-deploy:
   image: python:3.12-slim
   needs: ["backend-deploy"]
   rules:
-    - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
-    - if: '$CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH'
-      when: manual
-      allow_failure: true
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      variables:
+        PREFIX: ""
+        ASPNET_ENV: "Production"
+        FRONTEND_HOST: "volunti.cc.k3s.chas-lab.dev"
+        BACKEND_HOST: "volunti-api.cc.k3s-chas-lab.dev"
+        ADMINER_HOST: "adminer.volunti.cc.k3s.chas-lab.dev"
+        BACKEND_URL: "https://volunti-api.cc.k3s.chas-lab.dev"
+    - if: '$CI_COMMIT_REF_NAME == "Develop"'
+      variables:
+        PREFIX: "dev-"
+        ASPNET_ENV: "Development"
+        FRONTEND_HOST: "dev-volunti.cc.k3s.chas-lab.dev"
+        BACKEND_HOST: "dev-volunti-api.cc.k3s-chas-lab.dev"
+        ADMINER_HOST: "dev-adminer.volunti.cc.k3s.chas-lab.dev"
+        BACKEND_URL: "https://dev-volunti-api.cc.k3s.chas-lab.dev" 
   before_script:
     - apt-get update && apt-get install -y curl
     - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -17,18 +29,22 @@ frontend-deploy:
   script:
     - python deploy.py frontend
   environment:
-    name: frontend-production
-    url: https://volunti.cc.k3s.chas-lab.dev
+    name: frontend-$CI_COMMIT_REF_NAME
+    url: https://$FRONTEND_HOST
     on_stop: frontend-stop
 
 frontend-stop:
   stage: cleanup
   image: python:3.12-slim
   rules:
-    - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_REF_NAME == "main"'
       when: manual
-    - if: '$CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH'
+      variables:
+        PREFIX: ""
+    - if: '$CI_COMMIT_REF_NAME == "Develop"'
       when: manual
+      variables:
+        PREFIX: "dev-"
   before_script:
     - apt-get update && apt-get install -y curl
     - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -39,7 +55,7 @@ frontend-stop:
   script:
     - python delete.py
   environment:
-    name: frontend-production
+    name: frontend-$CI_COMMIT_REF_NAME
     action: stop
   allow_failure: true
 
