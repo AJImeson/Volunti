@@ -12,6 +12,18 @@ const OrgRegister1 = () => {
   };
 
   const handleNext = () => {
+    if (
+      !formData.foretagsnamn ||
+      !formData.organisationsnummer ||
+      !formData.email ||
+      !formData.confirmEmail ||
+      !formData.password ||
+      !formData.confirmPassword
+    ) {
+      setErrorMsg("Fyll i alla obligatoriska fält.");
+      return;
+    }
+
     if (formData.email !== formData.confirmEmail) {
       setErrorMsg("E-postadresserna stämmer inte överens.");
       return;
