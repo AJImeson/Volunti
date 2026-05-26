@@ -9,6 +9,25 @@ TAG = os.getenv("CI_COMMIT_SHORT_SHA")
 COMPONENT = sys.argv[1]
 PREFIX = os.getenv("PREFIX", "")
 
+if not TAG:
+    try:
+        result = subprocess.run(
+                ["git", "rev-parse", "--short=8", "HEAD"],
+                capture_output=True, text=True, check=True
+        )
+        TAG = result.stdout.strip()
+        print(f"Commit SHA not set", flush=True)
+    except subprocess.CalledProcessError:
+        print(f"Error: Commit SHA not set and rev-parse failed", file=sys.stderr)
+        sys.exit(1)
+
+if len(TAG) != 8:
+    print(
+        f"Error: SHA length - {len(TAG)} characters ('{TAG}') - Expected 8\n",
+        file=sys.stderr
+    )
+    sys.exit(1)
+
 def run_script(cmd, check=True):
     print(f"$ {' '.join(cmd)}", flush=True)
     result = subprocess.run(cmd, text=True)
