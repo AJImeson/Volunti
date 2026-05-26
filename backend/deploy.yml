@@ -11,6 +11,7 @@ backend-deploy:
         ADMINER_HOST: "adminer.volunti.cc.k3s.chas-lab.dev"
         BACKEND_URL: "https://volunti-api.cc.k3s.chas-lab.dev"
     - if: '$CI_COMMIT_REF_NAME == "Develop"'
+      variables:
         PREFIX: "dev-"
         ASPNET_ENV: "Development"
         FRONTEND_HOST: "dev-volunti.cc.k3s.chas-lab.dev"
