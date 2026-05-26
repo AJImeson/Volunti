@@ -10,6 +10,7 @@ using Volunti.Endpoints;
 using Volunti.Interfaces;
 using Volunti.Models;
 using Volunti.Service;
+using Volunti.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -120,6 +121,25 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddScoped<ITokenService, TokenService>();
+
+// Repositories
+builder.Services.AddScoped<IJobRepository, JobRepository>();
+builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+builder.Services.AddScoped<IVolunteerRepository, VolunteerRepository>();
+builder.Services.AddScoped<IFileRepository, FileRepository>();
+builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
+builder.Services.AddScoped<IJobInteractionRepository, JobInteractionRepository>();
+builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
+
+// Services
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IJobService, JobService>();
+builder.Services.AddScoped<IOrganizationService, OrganizationService>();
+builder.Services.AddScoped<IVolunteerProfileService, VolunteerProfileService>();
+builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<IApplicationService, ApplicationService>();
+builder.Services.AddScoped<IJobInteractionService, JobInteractionService>();
+builder.Services.AddScoped<IScheduleService, ScheduleService>();
 
 var app = builder.Build();
 
