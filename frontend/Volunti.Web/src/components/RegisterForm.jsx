@@ -670,7 +670,7 @@ export default function RegisterPage() {
               value={formData.email}
               onChange={handleChange}
               className={`text-input ${fieldErrors.email ? "input-error" : ""}`}
-              placeholder="Mejl *"
+              placeholder="E-postadress *"
               autoComplete="email"
             />
             <input
@@ -679,7 +679,7 @@ export default function RegisterPage() {
               value={formData.confirmEmail}
               onChange={handleChange}
               className={`text-input ${fieldErrors.confirmEmail ? "input-error" : ""}`}
-              placeholder="Bekräfta mejladress *"
+              placeholder="Bekräfta e-postadress *"
               autoComplete="off"
             />
 

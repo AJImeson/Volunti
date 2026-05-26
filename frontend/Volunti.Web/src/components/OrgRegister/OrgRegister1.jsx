@@ -83,7 +83,7 @@ const OrgRegister1 = () => {
           value={formData.email}
           onChange={handleChange}
           className="text-input"
-          placeholder="Mejl *"
+          placeholder="E-postadress *"
           autoComplete="email"
         />
         <input
@@ -92,7 +92,7 @@ const OrgRegister1 = () => {
           value={formData.confirmEmail}
           onChange={handleChange}
           className="text-input"
-          placeholder="Bekräfta mejladress *"
+          placeholder="Bekräfta e-postadress *"
           autoComplete="off"
         />
         <input

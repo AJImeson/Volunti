@@ -188,7 +188,7 @@ export default function GroupSettingsModal({
                   <input
                     type="text"
                     className="cg-input"
-                    placeholder="Sök på namn eller mejl..."
+                    placeholder="Sök på namn eller e-postadress..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
