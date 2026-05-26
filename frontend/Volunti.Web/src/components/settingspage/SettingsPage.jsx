@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./SettingsPage.css";
 import { useNavigate } from "react-router-dom";
+import { getToken } from "../../services/authService";
 
 /* ==========================================================================
    IKONKOMPONENT
@@ -127,11 +128,18 @@ function SettingsTopNav() {
 /* ==========================================================================
    HUVUDMENY
    ========================================================================== */
-const MENU_ITEMS = [
-  { id: "profile", icon: "user", label: "Alex Axelsson", group: 1 },
+
+const getMenuItems = (volunteerName) => [
+  { id: "profile", icon: "user", label: volunteerName, group: 1 },
   { id: "notifications", icon: "bell", label: "Notifikationer", group: 2 },
   { id: "password", icon: "lock", label: "Lösenord", group: 2 },
-  { id: "screen", icon: "type", label: "Skärm och Textstorlek", group: 2 },
+  {
+    id: "screen",
+    icon: "type",
+    label: "Skärm och Textstorlek",
+    group: 2,
+  },
+
   { id: "support", icon: "help", label: "Support", group: 3 },
   { id: "faq", icon: "info", label: "FAQ", group: 3 },
   {
@@ -143,7 +151,8 @@ const MENU_ITEMS = [
   },
 ];
 
-function SettingsMenu({ onNavigate }) {
+function SettingsMenu({ onNavigate, volunteerName }) {
+  const MENU_ITEMS = getMenuItems(volunteerName);
   const groups = MENU_ITEMS.reduce((acc, item) => {
     const last = acc[acc.length - 1];
     if (last && last[0].group === item.group) {
@@ -213,6 +222,35 @@ function NotificationSettings() {
   const [selected, setSelected] = useState("recommended");
   const [emailNotify, setEmailNotify] = useState("no");
 
+  // Fetch notification settings from backend
+  useEffect(() => {
+    fetch("https://localhost:7007/me/notifications", {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setSelected(data.notificationPreference);
+        setEmailNotify(data.emailNotifications ? "yes" : "no");
+      });
+  }, []);
+
+  // Save settings to backend
+  const saveNotifications = async (pref, email) => {
+    await fetch("https://localhost:7007/me/notifications", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify({
+        notificationPreference: pref,
+        emailNotifications: email,
+      }),
+    });
+  };
+
   return (
     <>
       {NOTIFICATION_OPTIONS.map((opt) => (
@@ -220,13 +258,19 @@ function NotificationSettings() {
           <span className="notification-label">{opt.section}</span>
           <div
             className={`notification-card ${selected === opt.id ? "active" : ""}`}
-            onClick={() => setSelected(opt.id)}
+            onClick={() => {
+              setSelected(opt.id);
+              saveNotifications(opt.id, emailNotify === "yes");
+            }}
           >
             <div className="card-header">
               <input
                 type="radio"
                 checked={selected === opt.id}
-                onChange={() => setSelected(opt.id)}
+                onChange={() => {
+                  setSelected(opt.id);
+                  saveNotifications(opt.id, emailNotify === "yes");
+                }}
                 style={{ accentColor: "var(--primary-blue)" }}
               />
               <p className="card-title">{opt.title}</p>
@@ -254,7 +298,10 @@ function NotificationSettings() {
               type="radio"
               name="email-notify"
               checked={emailNotify === "yes"}
-              onChange={() => setEmailNotify("yes")}
+              onChange={() => {
+                setEmailNotify("yes");
+                saveNotifications(selected, true);
+              }}
             />
             Ja
           </label>
@@ -263,7 +310,10 @@ function NotificationSettings() {
               type="radio"
               name="email-notify"
               checked={emailNotify === "no"}
-              onChange={() => setEmailNotify("no")}
+              onChange={() => {
+                setEmailNotify("no");
+                saveNotifications(selected, false);
+              }}
             />
             Nej, enbart via appen.
           </label>
@@ -281,8 +331,9 @@ function PasswordSettings() {
   const [newPwd, setNewPwd] = useState("");
   const [confirmPwd, setConfirmPwd] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
     setError("");
     if (!oldPwd || !newPwd || !confirmPwd) {
@@ -297,38 +348,301 @@ function PasswordSettings() {
       setError("Lösenordet måste vara minst 8 tecken.");
       return;
     }
-    console.log("Spara lösenord:", { oldPwd, newPwd });
-    alert("Lösenord uppdaterat (mockad)");
+    try {
+      const response = await fetch(
+        "https://localhost:7007/me/change-password",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify({
+            oldPassword: oldPwd,
+            newPassword: newPwd,
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Gamla lösenordet är felaktigt.");
+      }
+
+      alert("Lösenordet har uppdaterats.");
+      setOldPwd("");
+      setNewPwd("");
+      setConfirmPwd("");
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
     <form className="password-form" onSubmit={handleSave}>
       {error && <div className="error-msg-box">{error}</div>}
       <input
-        type="password"
+        type={showPassword ? "text" : "password"}
         className="text-input"
         placeholder="Gamla lösenordet"
         value={oldPwd}
         onChange={(e) => setOldPwd(e.target.value)}
       />
       <input
-        type="password"
+        type={showPassword ? "text" : "password"}
         className="text-input"
         placeholder="Nya lösenordet"
         value={newPwd}
         onChange={(e) => setNewPwd(e.target.value)}
       />
       <input
-        type="password"
+        type={showPassword ? "text" : "password"}
         className="text-input"
         placeholder="Bekräfta lösenordet"
         value={confirmPwd}
         onChange={(e) => setConfirmPwd(e.target.value)}
       />
+      <button
+      type="button"
+      className="show-password-btn"
+      onClick={() => setShowPassword(!showPassword)}
+      >
+        {showPassword ? "Dölj lösenord" : "Visa lösenord"}
+      </button>
       <button type="submit" className="btn-primary">
         Spara
       </button>
     </form>
+  );
+}
+
+function ScreenSettings({ setAppFontSize }) {
+  const [fontSize, setFontSize] = useState(
+    localStorage.getItem("fontSize") || "medium",
+  );
+
+  const changeFontSize = (size) => {
+    setFontSize(size);
+    setAppFontSize(size);
+    localStorage.setItem("fontSize", size);
+    window.location.reload();
+  };
+
+  return (
+    <div className="stub-view">
+      <p className="form-section-title">Textstorlek</p>
+
+      <div className="radio-group">
+        <button
+          className={`font-size-btn ${fontSize === "small" ? "active" : ""}`}
+          onClick={() => changeFontSize("small")}
+        >
+          Small
+        </button>
+
+        <button
+          className={`font-size-btn ${fontSize === "medium" ? "active" : ""}`}
+          onClick={() => changeFontSize("medium")}
+        >
+          Medium
+        </button>
+
+        <button
+          className={`font-size-btn ${fontSize === "large" ? "active" : ""}`}
+          onClick={() => changeFontSize("large")}
+        >
+          Large
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function SupportSettings() {
+  const [category, setCategory] = useState("");
+  const [message, setMessage] = useState("");
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    if (!category || !message) {
+      setError("Du måste välja en kategori och skriva ett meddelande.");
+      return;
+    }
+    setLoading(true);
+
+    const response = await fetch("https://localhost:7007/support", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify({
+        category,
+        message,
+      }),
+    });
+
+    if (response.ok) {
+      setSuccess("Meddelandet skickades.");
+      setError("");
+      setCategory("");
+      setMessage("");
+    }
+
+    setLoading(false);
+  };
+
+  return (
+    <div className="support-form">
+      <p className="form-section-title">Kontakta support</p>
+
+      <select
+        className="text-input"
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+      >
+        <option value="">Välj kategori</option>
+        <option>Bugg</option>
+        <option>Konto</option>
+        <option>Uppdrag</option>
+        <option>Annat</option>
+      </select>
+
+      <textarea
+        className="text-input"
+        placeholder="Beskriv ditt problem..."
+        rows="6"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+      />
+
+      <button
+        type="button"
+        className="support-btn"
+        onClick={handleSubmit}
+        disabled={loading}
+      >
+        {loading ? "Skickar..." : "Skicka"}
+      </button>
+      {success && <div className="success-message">{success}</div>}
+      {error && <p className="error-message">{error}</p>}
+    </div>
+  );
+}
+
+function FAQSettings() {
+  const [openIndex, setOpenIndex] = useState(null);
+  return (
+    <div className="faq-list">
+      <div
+        className="faq-item"
+        onClick={() => setOpenIndex(openIndex === 0 ? null : 0)}
+      >
+        <h3>Hur hittar jag uppdrag?</h3>
+        {openIndex === 0 && (
+          <p>Du kan hitta uppdrag via startsidan.</p>
+        )}
+      </div>
+
+      <div
+        className="faq-item"
+        onClick={() => setOpenIndex(openIndex === 1 ? null : 1)}
+      >
+        <h3>Hur ändrar jag lösenord?</h3>
+        {openIndex === 1 && <p>Gå till Inställningar och välj Lösenord.</p>}
+      </div>
+
+      <div
+        className="faq-item"
+        onClick={() => setOpenIndex(openIndex === 2 ? null : 2)}
+      >
+        <h3>Hur kontaktar jag support?</h3>
+        {openIndex === 2 && <p>Gå till Inställningar och välj Support.</p>}
+      </div>
+
+      <div
+        className="faq-item"
+        onClick={() => setOpenIndex(openIndex === 3 ? null : 3)}
+      >
+        <h3>Hur ansöker jag till ett uppdrag?</h3>
+        {openIndex === 3 && (
+          <p>
+            Klicka på ett uppdrag och välj “Acceptera” för att skicka din
+            ansökan.
+          </p>
+        )}
+      </div>
+
+      <div
+        className="faq-item"
+        onClick={() => setOpenIndex(openIndex === 4 ? null : 4)}
+      >
+        <h3>Hur uppdaterar jag min tillgänglighet?</h3>
+        {openIndex === 4 && (
+          <p>
+            Gå till Schema och välj fliken “Tillgänglighet” för att markera
+            vilka dagar du är tillgänglig.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DeleteAccountSettings() {
+  const [confirmText, setConfirmText] = useState("");
+
+  const handleDelete = async () => {
+    try {
+      const response = await fetch("https://localhost:7007/delete-account", {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        alert("Fel: " + errorText);
+        return;
+      }
+
+      localStorage.removeItem("token");
+      alert("Kontot har raderats.");
+      window.location.href = "/";
+    } catch (error) {
+      console.error(error);
+      alert("Något gick fel.");
+    }
+  };
+
+  return (
+    <div className="delete-account-view">
+      <h3>Radera konto</h3>
+
+      <p>Detta går inte att ångra. All din data kommer att tas bort.</p>
+
+      <p className="delete-warning">
+        Skriv <strong>RADERA</strong> för att bekräfta att du vill ta bort ditt
+        konto.
+      </p>
+
+      <input
+        className="text-input"
+        placeholder="RADERA"
+        value={confirmText}
+        onChange={(e) => setConfirmText(e.target.value)}
+      />
+
+      <button
+        className="delete-account-btn"
+        disabled={confirmText !== "RADERA"}
+        onClick={handleDelete}
+      >
+        Radera konto
+      </button>
+    </div>
   );
 }
 
@@ -361,8 +675,37 @@ const SUB_VIEW_TITLES = {
   delete: "Radera konto",
 };
 
-export default function SettingsPage() {
+export default function SettingsPage({ setAppFontSize }) {
+  const [user, setUser] = useState(null);
+  const [skills, setSkills] = useState([]);
+  const [interests, setInterests] = useState([]);
   const [subView, setSubView] = useState("menu");
+
+  useEffect(() => {
+    fetch("https://localhost:7007/me", {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => setUser(data));
+
+      fetch("https://localhost:7007/me/skills", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => setSkills(data));
+
+      fetch("https://localhost:7007/me/interests", {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => setInterests(data));
+  }, []);
 
   const isMenu = subView === "menu";
   const headerTitle = isMenu ? "Inställningar" : SUB_VIEW_TITLES[subView];
@@ -370,11 +713,74 @@ export default function SettingsPage() {
   const renderSubView = () => {
     switch (subView) {
       case "menu":
-        return <SettingsMenu onNavigate={setSubView} />;
+        return (
+          <SettingsMenu
+            onNavigate={setSubView}
+            volunteerName={`${user?.firstName ?? ""} ${user?.lastName ?? ""}`}
+          />
+        );
+        case "profile":
+          return (
+            <div className="account-card">
+
+              <h3 className="account-name">
+                {user?.firstName} {user?.lastName}
+              </h3>
+
+              <div className="account-info-box">
+                <div className="account-info-row">
+                  <span>Förnamn</span>
+                  <strong>{user?.firstName}</strong>
+                </div>
+
+                <div className="account-info-row">
+                  <span>Efternamn</span>
+                  <strong>{user?.lastName}</strong>
+                </div>
+
+                <div className="account-info-row">
+                  <span>Email</span>
+                  <strong>{user?.email}</strong>
+                </div>
+
+                <div className="account-info-row">
+                  <span>Telefon</span>
+                  <strong>{user?.phoneNumber || "Inte tillagt"}</strong>
+                </div>
+
+                <div className="account-info-row">
+                  <span>Skills</span>
+                  <strong>
+                    {skills?.length
+                      ? skills.map(s => s.title).join(", ")
+                      : "Inga skills"}
+                  </strong>
+                </div>
+
+                <div className="account-info-row">
+                  <span>Intressen</span>
+                  <strong>
+                    {interests?.length
+                      ? interests.map(i => i.title).join(", ")
+                      : "Inga intressen"}
+                  </strong>
+                </div>
+              </div>
+            </div>
+          );
+      
       case "notifications":
         return <NotificationSettings />;
       case "password":
         return <PasswordSettings />;
+      case "screen":
+        return <ScreenSettings setAppFontSize={setAppFontSize} />;
+      case "support":
+        return <SupportSettings />;
+      case "faq":
+        return <FAQSettings />;
+      case "delete":
+        return <DeleteAccountSettings />;
       default:
         return <StubView title={SUB_VIEW_TITLES[subView]} />;
     }

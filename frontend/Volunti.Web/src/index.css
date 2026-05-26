@@ -43,3 +43,19 @@ code {
   border-radius: 4px;
   color: var(--text-h);
 }
+
+html.font-small {
+  --app-font-size: 14px;
+}
+
+html.font-medium {
+  --app-font-size: 16px;
+}
+
+html.font-large {
+  --app-font-size: 20px;
+}
+
+html {
+  font-size: var(--app-font-size, 16px);
+}
