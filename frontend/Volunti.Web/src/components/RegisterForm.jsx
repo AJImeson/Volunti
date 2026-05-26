@@ -1101,7 +1101,7 @@ export default function RegisterPage() {
             </div>
 
             <h3 className="form-section-title">
-              Vill du bli notifierad via mejl?*
+              Vill du bli notifierad via e-post?*
             </h3>
             <div className="radio-group">
               <label className="radio-label">
