@@ -278,7 +278,7 @@ const OrgRegister4 = () => {
             Föregående
           </button>
           <button className="btn-primary" onClick={handleRegister}>
-            Registrera
+            Skapa konto
           </button>
         </div>
       </div>
