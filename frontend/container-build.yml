@@ -8,6 +8,9 @@ frontend-container-build:
     - if: '$CI_COMMIT_REF_NAME == "Develop"'
       variables:
         FRONTEND_API_BASE: "https://dev-volunti-api.cc.k3s.chas-lab.dev"
+    - when: always
+      variables:
+        FRONTEND_API_BASE: "https://dev-volunti-api.cc.k3s.chas-lab.dev"
   variables:
     IMAGE_TAG: $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHORT_SHA
   script:
