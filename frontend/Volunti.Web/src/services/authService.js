@@ -223,6 +223,10 @@ export const fetchCurrentUserProfile = async () => {
 export const fetchCurrentOrganization = async () => {
   try {
     const { data } = await api.get("/me/organization");
+    const session = getSession();
+    if (session?.profile && data?.profileImageUrl) {
+      saveSession({ ...session, profile: { ...session.profile, profileImageUrl: data.profileImageUrl } });
+    }
     return data;
   } catch (error) {
     if (error.response?.status === 401) {
@@ -244,6 +248,12 @@ export const uploadProfileImage = async (file) => {
   const { data } = await api.post("/me/profile-image", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
+
+  const session = getSession();
+  if (session?.profile && data?.profileImageUrl) {
+    saveSession({ ...session, profile: { ...session.profile, profileImageUrl: data.profileImageUrl } });
+  }
+
   return data;
 };
 
@@ -379,6 +389,7 @@ export const fetchMyApplications = async () => {
 
 export const saveSession = (session) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+  window.dispatchEvent(new Event("volunti:session"));
 };
 
 export const getSession = () => {
