@@ -13,7 +13,7 @@ backend-deploy:
     - if: '$CI_COMMIT_REF_NAME == "Develop"'
       variables:
         PREFIX: "dev-"
-        ASPNET_ENV: "Development"
+        ASPNET_ENV: "Production"
         FRONTEND_HOST: "dev-volunti.cc.k3s.chas-lab.dev"
         BACKEND_HOST: "dev-volunti-api.cc.k3s.chas-lab.dev"
         ADMINER_HOST: "dev-adminer.volunti.cc.k3s.chas-lab.dev"
