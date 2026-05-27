@@ -8,7 +8,7 @@ frontend-deploy:
         PREFIX: ""
         ASPNET_ENV: "Production"
         FRONTEND_HOST: "volunti.cc.k3s.chas-lab.dev"
-        BACKEND_HOST: "volunti-api.cc.k3s-chas-lab.dev"
+        BACKEND_HOST: "volunti-api.cc.k3s.chas-lab.dev"
         ADMINER_HOST: "adminer.volunti.cc.k3s.chas-lab.dev"
         BACKEND_URL: "https://volunti-api.cc.k3s.chas-lab.dev"
     - if: '$CI_COMMIT_REF_NAME == "Develop"'
@@ -16,7 +16,7 @@ frontend-deploy:
         PREFIX: "dev-"
         ASPNET_ENV: "Development"
         FRONTEND_HOST: "dev-volunti.cc.k3s.chas-lab.dev"
-        BACKEND_HOST: "dev-volunti-api.cc.k3s-chas-lab.dev"
+        BACKEND_HOST: "dev-volunti-api.cc.k3s.chas-lab.dev"
         ADMINER_HOST: "dev-adminer.volunti.cc.k3s.chas-lab.dev"
         BACKEND_URL: "https://dev-volunti-api.cc.k3s.chas-lab.dev" 
   before_script:
