@@ -20,7 +20,7 @@ frontend-deploy:
         ADMINER_HOST: "dev-adminer.volunti.cc.k3s.chas-lab.dev"
         BACKEND_URL: "https://dev-volunti-api.cc.k3s.chas-lab.dev" 
   before_script:
-    - apt-get update && apt-get install -y curl
+    - apt-get update && apt-get install -y curl gettext-base
     - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
     - chmod +x kubectl && mv kubectl /usr/local/bin
     - mkdir -p ~/.kube
