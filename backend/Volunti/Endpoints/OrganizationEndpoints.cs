@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using Volunti.Data;
 using Volunti.Dtos.Organization;
+using Volunti.Interfaces;
 using Volunti.Mappers;
 using Volunti.Models;
 
@@ -12,15 +11,15 @@ namespace Volunti.Endpoints
     {
         public static void RegisterEndpoints(WebApplication app)
         {
-            app.MapGet("/organizations", async (VoluntiDbContext db) =>
+            app.MapGet("/organizations", async (IOrganizationService orgService) =>
             {
-                var orgs = await db.Organizations.ToListAsync();
+                var orgs = await orgService.GetAllAsync();
                 return Results.Ok(orgs.Select(o => o.ToOrgDto()));
             });
 
-            app.MapGet("/organizations/{id}", async (int id, VoluntiDbContext db) =>
+            app.MapGet("/organizations/{id}", async (int id, IOrganizationService orgService) =>
             {
-                var org = await db.Organizations.FindAsync(id);
+                var org = await orgService.GetByIdAsync(id);
                 return org is null ? Results.NotFound() : Results.Ok(org.ToOrgDto());
             }).WithName("GetOrgById");
 
@@ -28,141 +27,32 @@ namespace Volunti.Endpoints
                 CreateOrgMemberDto dto,
                 ClaimsPrincipal claimsPrincipal,
                 UserManager<AppUser> userManager,
-                VoluntiDbContext db) =>
+                IOrganizationService orgService) =>
             {
                 var userIdStr = userManager.GetUserId(claimsPrincipal);
                 if (userIdStr is null || !int.TryParse(userIdStr, out var adminUserId))
                     return Results.Unauthorized();
 
-                var org = await db.Organizations.FirstOrDefaultAsync(o => o.UserId == adminUserId);
-                if (org is null)
-                    return Results.Forbid();
+                var (success, email, orgId, error) = await orgService.AddMemberAsync(dto, adminUserId);
+                if (!success)
+                    return error == "Forbidden" ? Results.Forbid() : Results.BadRequest(error);
 
-                var newUser = new AppUser { UserName = dto.Email.ToLower(), Email = dto.Email.ToLower() };
-                var createdUser = await userManager.CreateAsync(newUser, dto.Password!);
-                if (!createdUser.Succeeded)
-                    return Results.BadRequest(createdUser.Errors.Select(e => e.Description));
-
-                var roleResult = await userManager.AddToRoleAsync(newUser, "OrgUser");
-                if (!roleResult.Succeeded)
-                    return Results.Problem(string.Join(", ", roleResult.Errors.Select(e => e.Description)), statusCode: 500);
-
-                db.OrganizationMembers.Add(new OrganizationMember
-                {
-                    UserId = newUser.Id,
-                    OrganizationId = org.OrganizationId,
-                    CreatedAt = DateTime.UtcNow
-                });
-                await db.SaveChangesAsync();
-
-                return Results.Ok(new { newUser.Email, org.OrganizationId });
+                return Results.Ok(new { email, orgId });
             }).RequireAuthorization(policy => policy.RequireRole("OrgAdmin"));
 
-
-            // Endpoint för att ta bort en organization
-            app.MapDelete("/organizations/{id}", async (int id, VoluntiDbContext db, HttpContext http) =>
+            app.MapDelete("/organizations/{id}", async (int id, IOrganizationService orgService, HttpContext http) =>
             {
-                var userIdClaim = http.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-
-                if (userIdClaim == null)
-                    return Results.Unauthorized();
-
-                if (!int.TryParse(userIdClaim, out var userId))
+                var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
                     return Results.Unauthorized();
 
                 var isAdmin = http.User.IsInRole("Admin");
+                var (success, error) = await orgService.DeleteAsync(id, userId, isAdmin);
 
-                var organization = await db.Organizations.Include(o => o.Jobs).FirstOrDefaultAsync(o => o.OrganizationId == id);
-
-                if (organization == null)
-                    return Results.NotFound("Organization hittades inte.");
-
-                if (!isAdmin && organization.UserId != userId)
-                    return Results.BadRequest("Du har inte behörighet att ta bort denna organization.");
-
-                db.Jobs.RemoveRange(organization.Jobs);
-
-                db.Organizations.Remove(organization);
-
-                await db.SaveChangesAsync();
-
-                return Results.Ok($"Organization: '{organization.OrgName}' med id: '{organization.OrganizationId}' togs bort.");
-            }).RequireAuthorization(policy => policy.RequireRole("OrgAdmin"));
-
-            // hämta inloggad orgs profil
-            app.MapGet("/me/organization", async (
-                VoluntiDbContext db,
-                HttpContext http) =>
-            {
-                var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
-                    return Results.Unauthorized();
-
-                var organization = await db.Organizations
-                    .Include(o => o.User)
-                    .FirstOrDefaultAsync(o => o.UserId == userId);
-                if (organization == null)
-                {
-                    var membership = await db.OrganizationMembers
-                        .Include(m => m.Organization)
-                        .FirstOrDefaultAsync(m => m.UserId == userId);
-                    organization = membership?.Organization;
-                }
-                if (organization == null)
-                    return Results.NotFound("Användaren har ingen organisation.");
-
-                return Results.Ok(organization.ToOrgDto());
-            })
-            .RequireAuthorization(policy => policy.RequireRole("OrgAdmin", "OrgUser"));
-
-            // uppdatera orgens profil
-            app.MapPut("/me/organization", async (
-                UpdateOrgProfileDto dto,
-                VoluntiDbContext db,
-                HttpContext http) =>
-            {
-                var userIdClaim = http.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
-                    return Results.Unauthorized();
-
-                var organization = await db.Organizations.FirstOrDefaultAsync(o => o.UserId == userId);
-                if (organization == null)
-                {
-                    var membership = await db.OrganizationMembers
-                        .Include(m => m.Organization)
-                            .ThenInclude(o => o.User)
-                        .FirstOrDefaultAsync(m => m.UserId == userId);
-                    organization = membership?.Organization;
-                }
-                if (organization == null) return Results.NotFound();
-
-                string Join(string[]? arr) =>
-                    arr == null ? string.Empty : string.Join(", ", arr.Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s)));
-
-                // Uppdatera bara fält som skickats in (null = inte med)
-                if (dto.OrgName != null) organization.OrgName = dto.OrgName.Trim();
-                if (dto.Description != null) organization.Description = dto.Description.Trim();
-                if (dto.City != null) organization.Municipality = dto.City.Trim();
-                if (dto.Website != null) organization.Website = dto.Website.Trim();
-                if (dto.Bio != null) organization.Bio = dto.Bio.Trim();
-                if (dto.OrgNumber != null) organization.OrgNumber = dto.OrgNumber.Trim();
-                if (dto.Areas != null) organization.Areas = Join(dto.Areas);
-                if (dto.TargetGroup != null) organization.TargetGroup = Join(dto.TargetGroup);
-                if (dto.Requirements != null) organization.Requirements = Join(dto.Requirements);
-                if (dto.Activities != null) organization.Activities = Join(dto.Activities);
-                if (dto.ContactPersonName != null)
-                {
-                    organization.ContactPersonName = dto.ContactPersonName.Trim();
-                    if (organization.ContactPersonAddedAt == null)
-                        organization.ContactPersonAddedAt = DateTime.UtcNow;
-                }
-                if (dto.ContactPersonEmail != null) organization.ContactPersonEmail = dto.ContactPersonEmail.Trim();
-                if (dto.ContactPersonPhone != null) organization.ContactPersonPhone = dto.ContactPersonPhone.Trim();
-
-                await db.SaveChangesAsync();
-                return Results.Ok(organization.ToOrgDto());
-            })
-            .RequireAuthorization(policy => policy.RequireRole("OrgAdmin", "OrgUser"));
+                if (!success)
+                    return error == "NotFound" ? Results.NotFound() : Results.BadRequest(error);
+                return Results.Ok();
+            }).RequireAuthorization();
         }
     }
 }

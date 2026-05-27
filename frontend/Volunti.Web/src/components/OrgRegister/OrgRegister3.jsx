@@ -1,10 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useOrgRegister } from "../context/OrgRegisterContext";
 
 const OrgRegister3 = () => {
   const navigate = useNavigate();
   const { formData, setFormData } = useOrgRegister();
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleNext = () => {
+    if (formData.branscher.length === 0) {
+      setErrorMsg("Välj minst en bransch för att fortsätta.");
+      return;
+    }
+    navigate("/org-register/4");
+  };
 
   const toggleBransch = (value) => {
     setFormData((prev) => ({
@@ -123,6 +132,12 @@ const OrgRegister3 = () => {
         </div>
 
         {/* --- NAVIGERINGSKNAPPAR --- */}
+        {errorMsg && (
+          <p style={{ color: "red", fontSize: "0.875rem", marginTop: "0.5rem" }}>
+            {errorMsg}
+          </p>
+        )}
+
         <div className="input-row" style={{ marginTop: "2rem" }}>
           <button
             className="btn-outline-blue"
@@ -130,10 +145,7 @@ const OrgRegister3 = () => {
           >
             Föregående
           </button>
-          <button
-            className="btn-primary"
-            onClick={() => navigate("/org-register/4")}
-          >
+          <button className="btn-primary" onClick={handleNext}>
             Nästa
           </button>
         </div>

@@ -6,11 +6,11 @@ const OrgRegisterContext = createContext();
 export const OrgRegisterProvider = ({ children }) => {
   const [formData, setFormData] = useState({
     foretagsnamn: "",
-    organisationsnamn: "",
+    organisationsnummer: "",
     email: "",
     confirmEmail: "",
     password: "",
-    namn: "",
+    confirmPassword: "",
 
     kommun: "",
     beskrivning: "",
@@ -22,9 +22,11 @@ export const OrgRegisterProvider = ({ children }) => {
     emailNotification: "",
   });
 
+  const [profileImage, setProfileImage] = useState(null);
+
   return (
     <OrgRegisterContext.Provider
-      value={{ formData, setFormData }}
+      value={{ formData, setFormData, profileImage, setProfileImage }}
     >
       {children}
     </OrgRegisterContext.Provider>

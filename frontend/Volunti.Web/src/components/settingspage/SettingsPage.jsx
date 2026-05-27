@@ -291,7 +291,7 @@ function NotificationSettings() {
       ))}
 
       <div className="email-notify-section">
-        <p className="form-section-title">Vill du bli notifierad via mejl?*</p>
+        <p className="form-section-title">Vill du bli notifierad via e-post?*</p>
         <div className="radio-group">
           <label className="radio-label">
             <input
@@ -739,7 +739,7 @@ export default function SettingsPage({ setAppFontSize }) {
                 </div>
 
                 <div className="account-info-row">
-                  <span>Email</span>
+                  <span>E-postadress</span>
                   <strong>{user?.email}</strong>
                 </div>
 
