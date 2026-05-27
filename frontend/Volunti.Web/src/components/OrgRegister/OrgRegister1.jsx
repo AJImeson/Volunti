@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useOrgRegister } from "../context/OrgRegisterContext";
 import AvatarCropModal from "../profile/AvatarCropModal";
+import "../profile/Profile.css";
 
 const OrgRegister1 = () => {
   const navigate = useNavigate();
@@ -11,6 +12,9 @@ const OrgRegister1 = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [pendingAvatarSrc, setPendingAvatarSrc] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
+  const [hoveringAvatar, setHoveringAvatar] = useState(false);
+  const [hoverAndra, setHoverAndra] = useState(false);
+  const [hoverTaBort, setHoverTaBort] = useState(false);
   const avatarInputRef = useRef(null);
 
   const handleAvatarClick = () => avatarInputRef.current?.click();
@@ -154,23 +158,52 @@ const OrgRegister1 = () => {
         <div
           className="avatar-container"
           onClick={handleAvatarClick}
+          onMouseEnter={() => setHoveringAvatar(true)}
+          onMouseLeave={() => setHoveringAvatar(false)}
           role="button"
           tabIndex={0}
-          style={{ margin: "0 auto 1rem", cursor: "pointer" }}
+          style={{ margin: "0 auto 0.3rem", cursor: "pointer", border: avatarPreview ? "none" : "2px dashed var(--gray-border)", background: avatarPreview ? "transparent" : "#f8f9fa" }}
         >
           {avatarPreview ? (
             <img src={avatarPreview} alt="Profilbild" className="profile-img" />
           ) : (
-            <div className="avatar-placeholder">
+            <div className="avatar-placeholder" style={{ background: "transparent", color: "#999" }}>
               Lägg till
               <br />
               bild
             </div>
           )}
+          {avatarPreview && hoveringAvatar && (
+            <div className="avatar-overlay">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+            </div>
+          )}
         </div>
-        <p style={{ textAlign: "center", fontSize: "0.8rem", color: "var(--gray-text)", marginBottom: "1rem" }}>
-          Profilbild (valfritt)
-        </p>
+
+        {avatarPreview ? (
+          <p style={{ textAlign: "center", fontSize: "0.72rem", marginBottom: "0.75rem", color: "var(--gray-text)" }}>
+            <span
+              onClick={handleAvatarClick}
+              onMouseEnter={() => setHoverAndra(true)}
+              onMouseLeave={() => setHoverAndra(false)}
+              style={{ color: "var(--primary-blue)", cursor: "pointer", textDecoration: hoverAndra ? "underline" : "none" }}
+            >Ändra</span>
+            <span style={{ margin: "0 0.35rem" }}>·</span>
+            <span
+              onClick={() => { setAvatarPreview(null); setProfileImage(null); }}
+              onMouseEnter={() => setHoverTaBort(true)}
+              onMouseLeave={() => setHoverTaBort(false)}
+              style={{ color: "#c0392b", cursor: "pointer", textDecoration: hoverTaBort ? "underline" : "none" }}
+            >Ta bort</span>
+          </p>
+        ) : (
+          <p style={{ textAlign: "center", fontSize: "0.78rem", color: "var(--gray-text)", marginBottom: "0.75rem" }}>
+            Profilbild (valfritt)
+          </p>
+        )}
 
         <input
           type="text"
