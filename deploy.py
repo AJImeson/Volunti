@@ -56,7 +56,7 @@ def apply_manifest(path): # Renders a manifest by using envsubst
         )
 
 def apply_manifests(component): # Applies all manifests
-    for directory in ["K3s/base", "K3s/database", "K3s/adminer2",
+    for directory in ["K3s/base", "K3s/database", "K3s/adminer",
                       f"K3s/{component}", "K3s/ingress"]:
         for k3s_file in sorted(glob.glob(f"{directory}/*.yaml")):
             apply_manifest(k3s_file)
