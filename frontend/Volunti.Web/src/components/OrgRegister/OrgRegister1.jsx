@@ -1,13 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useOrgRegister } from "../context/OrgRegisterContext";
+import AvatarCropModal from "../profile/AvatarCropModal";
 
 const OrgRegister1 = () => {
   const navigate = useNavigate();
-  const { formData, setFormData } = useOrgRegister();
+  const { formData, setFormData, setProfileImage } = useOrgRegister();
   const [errorMsg, setErrorMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [pendingAvatarSrc, setPendingAvatarSrc] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const avatarInputRef = useRef(null);
+
+  const handleAvatarClick = () => avatarInputRef.current?.click();
+
+  const handleAvatarFileSelected = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setPendingAvatarSrc(reader.result);
+    reader.readAsDataURL(file);
+    if (avatarInputRef.current) avatarInputRef.current.value = "";
+  };
+
+  const handleAvatarCropSave = (blob) => {
+    const file = new File([blob], "org-profile.jpg", { type: "image/jpeg" });
+    setProfileImage(file);
+    setAvatarPreview(URL.createObjectURL(blob));
+    setPendingAvatarSrc(null);
+  };
 
   const eyeOpen = (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -71,6 +93,7 @@ const OrgRegister1 = () => {
   };
 
   return (
+    <>
     <div className="auth-wrapper">
       {/* --- TOPPMENY --- */}
       <div className="auth-top-nav">
@@ -121,6 +144,34 @@ const OrgRegister1 = () => {
 
       {/* --- FORMULÄR --- */}
       <div className="bottom-sheet-card auth-form-container">
+        <input
+          ref={avatarInputRef}
+          type="file"
+          accept=".jpg,.jpeg,.png"
+          style={{ display: "none" }}
+          onChange={handleAvatarFileSelected}
+        />
+        <div
+          className="avatar-container"
+          onClick={handleAvatarClick}
+          role="button"
+          tabIndex={0}
+          style={{ margin: "0 auto 1rem", cursor: "pointer" }}
+        >
+          {avatarPreview ? (
+            <img src={avatarPreview} alt="Profilbild" className="profile-img" />
+          ) : (
+            <div className="avatar-placeholder">
+              Lägg till
+              <br />
+              bild
+            </div>
+          )}
+        </div>
+        <p style={{ textAlign: "center", fontSize: "0.8rem", color: "var(--gray-text)", marginBottom: "1rem" }}>
+          Profilbild (valfritt)
+        </p>
+
         <input
           type="text"
           name="foretagsnamn"
@@ -207,7 +258,18 @@ const OrgRegister1 = () => {
         </div>
       </div>
     </div>
+
+    {pendingAvatarSrc && (
+      <AvatarCropModal
+        imageSrc={pendingAvatarSrc}
+        onCancel={() => setPendingAvatarSrc(null)}
+        onSave={handleAvatarCropSave}
+      />
+    )}
+    </>
   );
 };
 
 export default OrgRegister1;
+
+
