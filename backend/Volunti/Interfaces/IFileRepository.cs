@@ -5,6 +5,7 @@ namespace Volunti.Interfaces
     public interface IFileRepository
     {
         Task<Volunteer?> GetVolunteerByUserIdAsync(int userId);
+        Task<Organization?> GetOrganizationByUserIdAsync(int userId);
         Task<List<VolunteerFile>> GetFilesByVolunteerIdAsync(int volunteerId, string? category = null);
         Task<VolunteerFile?> GetFileByIdAsync(int fileId, int volunteerId);
         Task<List<VolunteerFile>> GetCvFilesAsync(int volunteerId);

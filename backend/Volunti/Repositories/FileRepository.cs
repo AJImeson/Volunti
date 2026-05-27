@@ -10,6 +10,9 @@ namespace Volunti.Repositories
         public Task<Volunteer?> GetVolunteerByUserIdAsync(int userId) =>
             db.Volunteers.FirstOrDefaultAsync(v => v.UserId == userId);
 
+        public Task<Organization?> GetOrganizationByUserIdAsync(int userId) =>
+            db.Organizations.FirstOrDefaultAsync(o => o.UserId == userId);
+
         public Task<List<VolunteerFile>> GetFilesByVolunteerIdAsync(int volunteerId, string? category = null)
         {
             var query = db.VolunteerFiles.Where(f => f.VolunteerId == volunteerId);

@@ -148,19 +148,23 @@ namespace Volunti.Service
                 return (false, null, "Endast JPG och PNG är tillåtna.");
 
             var volunteer = await fileRepo.GetVolunteerByUserIdAsync(userId);
-            if (volunteer is null) return (false, null, "NotFound");
+            var organization = volunteer is null ? await fileRepo.GetOrganizationByUserIdAsync(userId) : null;
+            if (volunteer is null && organization is null) return (false, null, "NotFound");
+
+            var entityId = volunteer is not null ? volunteer.Id : organization!.OrganizationId;
+            var currentImageUrl = volunteer is not null ? volunteer.ProfileImageUrl : organization!.ProfileImageUrl;
 
             var publicFolder = Path.Combine(contentRootPath, "wwwroot", "profile-images");
             Directory.CreateDirectory(publicFolder);
 
-            if (!string.IsNullOrEmpty(volunteer.ProfileImageUrl))
+            if (!string.IsNullOrEmpty(currentImageUrl))
             {
-                var oldFileName = Path.GetFileName(volunteer.ProfileImageUrl);
+                var oldFileName = Path.GetFileName(currentImageUrl);
                 var oldPath = Path.Combine(publicFolder, oldFileName);
                 if (File.Exists(oldPath)) File.Delete(oldPath);
             }
 
-            var newFileName = $"profile-{volunteer.Id}-{Guid.NewGuid()}{ext}";
+            var newFileName = $"profile-{entityId}-{Guid.NewGuid()}{ext}";
             var fullPath = Path.Combine(publicFolder, newFileName);
             using (var stream = new FileStream(fullPath, FileMode.Create))
             {
@@ -168,7 +172,11 @@ namespace Volunti.Service
             }
 
             var publicUrl = $"/profile-images/{newFileName}";
-            volunteer.ProfileImageUrl = publicUrl;
+            if (volunteer is not null)
+                volunteer.ProfileImageUrl = publicUrl;
+            else
+                organization!.ProfileImageUrl = publicUrl;
+
             await fileRepo.SaveChangesAsync();
 
             return (true, new { profileImageUrl = publicUrl }, null);
@@ -177,16 +185,23 @@ namespace Volunti.Service
         public async Task<(bool success, string? error)> DeleteProfileImageAsync(int userId, string contentRootPath)
         {
             var volunteer = await fileRepo.GetVolunteerByUserIdAsync(userId);
-            if (volunteer is null) return (false, "NotFound");
+            var organization = volunteer is null ? await fileRepo.GetOrganizationByUserIdAsync(userId) : null;
+            if (volunteer is null && organization is null) return (false, "NotFound");
 
-            if (!string.IsNullOrEmpty(volunteer.ProfileImageUrl))
+            var currentImageUrl = volunteer is not null ? volunteer.ProfileImageUrl : organization!.ProfileImageUrl;
+
+            if (!string.IsNullOrEmpty(currentImageUrl))
             {
-                var fileName = Path.GetFileName(volunteer.ProfileImageUrl);
+                var fileName = Path.GetFileName(currentImageUrl);
                 var fullPath = Path.Combine(contentRootPath, "wwwroot", "profile-images", fileName);
                 if (File.Exists(fullPath)) File.Delete(fullPath);
             }
 
-            volunteer.ProfileImageUrl = string.Empty;
+            if (volunteer is not null)
+                volunteer.ProfileImageUrl = string.Empty;
+            else
+                organization!.ProfileImageUrl = string.Empty;
+
             await fileRepo.SaveChangesAsync();
             return (true, null);
         }

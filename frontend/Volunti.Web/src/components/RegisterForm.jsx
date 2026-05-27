@@ -1144,7 +1144,7 @@ export default function RegisterPage() {
             {isSubmitting
               ? "Skickar..."
               : currentStep === 4
-                ? "Kom igång"
+                ? "Skapa konto"
                 : "Nästa"}
           </button>
         </div>
