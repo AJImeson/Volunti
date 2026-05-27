@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useOrgRegister } from "../context/OrgRegisterContext";
-import { registerOrganization } from "../../services/authService";
+import { registerOrganization, uploadProfileImage } from "../../services/authService";
 
 const OrgRegister4 = () => {
   const navigate = useNavigate();
-  const { formData, setFormData } = useOrgRegister();
+  const { formData, setFormData, profileImage } = useOrgRegister();
   const [errorMsg, setErrorMsg] = useState("");
 
   const handleRegister = async () => {
@@ -15,6 +15,9 @@ const OrgRegister4 = () => {
     }
     try {
       await registerOrganization(formData);
+      if (profileImage) {
+        await uploadProfileImage(profileImage);
+      }
       navigate("/org-dashboard");
     } catch (error) {
       setErrorMsg(error.message);

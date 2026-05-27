@@ -25,6 +25,7 @@ export default function OrgProfile() {
   const [pendingAvatarSrc, setPendingAvatarSrc] = useState(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [avatarError, setAvatarError] = useState("");
+  const [hoveringAvatar, setHoveringAvatar] = useState(false);
   const avatarInputRef = useRef(null);
 
   useEffect(() => {
@@ -142,8 +143,11 @@ export default function OrgProfile() {
             <div
               className="avatar-container"
               onClick={handleAvatarClick}
+              onMouseEnter={() => setHoveringAvatar(true)}
+              onMouseLeave={() => setHoveringAvatar(false)}
               role="button"
               tabIndex={0}
+              style={{ cursor: "pointer" }}
             >
               {org.profileImageUrl ? (
                 <img
@@ -158,7 +162,16 @@ export default function OrgProfile() {
                   bild
                 </div>
               )}
-              {isUploadingAvatar && <div className="avatar-overlay">...</div>}
+              {isUploadingAvatar ? (
+                <div className="avatar-overlay" style={{ fontSize: "0.75rem" }}>Laddar...</div>
+              ) : hoveringAvatar && (
+                <div className="avatar-overlay">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                    <circle cx="12" cy="13" r="4"/>
+                  </svg>
+                </div>
+              )}
             </div>
             {avatarError && <p className="cv-error-text">{avatarError}</p>}
           </div>

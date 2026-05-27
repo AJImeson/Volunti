@@ -22,9 +22,11 @@ export const OrgRegisterProvider = ({ children }) => {
     emailNotification: "",
   });
 
+  const [profileImage, setProfileImage] = useState(null);
+
   return (
     <OrgRegisterContext.Provider
-      value={{ formData, setFormData }}
+      value={{ formData, setFormData, profileImage, setProfileImage }}
     >
       {children}
     </OrgRegisterContext.Provider>

@@ -1,13 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useOrgRegister } from "../context/OrgRegisterContext";
+import AvatarCropModal from "../profile/AvatarCropModal";
+import "../profile/Profile.css";
 
 const OrgRegister1 = () => {
   const navigate = useNavigate();
-  const { formData, setFormData } = useOrgRegister();
+  const { formData, setFormData, setProfileImage } = useOrgRegister();
   const [errorMsg, setErrorMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [pendingAvatarSrc, setPendingAvatarSrc] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const [hoveringAvatar, setHoveringAvatar] = useState(false);
+  const [hoverAndra, setHoverAndra] = useState(false);
+  const [hoverTaBort, setHoverTaBort] = useState(false);
+  const avatarInputRef = useRef(null);
+
+  const handleAvatarClick = () => avatarInputRef.current?.click();
+
+  const handleAvatarFileSelected = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setPendingAvatarSrc(reader.result);
+    reader.readAsDataURL(file);
+    if (avatarInputRef.current) avatarInputRef.current.value = "";
+  };
+
+  const handleAvatarCropSave = (blob) => {
+    const file = new File([blob], "org-profile.jpg", { type: "image/jpeg" });
+    setProfileImage(file);
+    setAvatarPreview(URL.createObjectURL(blob));
+    setPendingAvatarSrc(null);
+  };
 
   const eyeOpen = (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -71,6 +97,7 @@ const OrgRegister1 = () => {
   };
 
   return (
+    <>
     <div className="auth-wrapper">
       {/* --- TOPPMENY --- */}
       <div className="auth-top-nav">
@@ -121,6 +148,63 @@ const OrgRegister1 = () => {
 
       {/* --- FORMULÄR --- */}
       <div className="bottom-sheet-card auth-form-container">
+        <input
+          ref={avatarInputRef}
+          type="file"
+          accept=".jpg,.jpeg,.png"
+          style={{ display: "none" }}
+          onChange={handleAvatarFileSelected}
+        />
+        <div
+          className="avatar-container"
+          onClick={handleAvatarClick}
+          onMouseEnter={() => setHoveringAvatar(true)}
+          onMouseLeave={() => setHoveringAvatar(false)}
+          role="button"
+          tabIndex={0}
+          style={{ margin: "0 auto 0.3rem", cursor: "pointer", border: avatarPreview ? "none" : "2px dashed var(--gray-border)", background: avatarPreview ? "transparent" : "#f8f9fa" }}
+        >
+          {avatarPreview ? (
+            <img src={avatarPreview} alt="Profilbild" className="profile-img" />
+          ) : (
+            <div className="avatar-placeholder" style={{ background: "transparent", color: "#999" }}>
+              Lägg till
+              <br />
+              bild
+            </div>
+          )}
+          {avatarPreview && hoveringAvatar && (
+            <div className="avatar-overlay">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+            </div>
+          )}
+        </div>
+
+        {avatarPreview ? (
+          <p style={{ textAlign: "center", fontSize: "0.72rem", marginBottom: "0.75rem", color: "var(--gray-text)" }}>
+            <span
+              onClick={handleAvatarClick}
+              onMouseEnter={() => setHoverAndra(true)}
+              onMouseLeave={() => setHoverAndra(false)}
+              style={{ color: "var(--primary-blue)", cursor: "pointer", textDecoration: hoverAndra ? "underline" : "none" }}
+            >Ändra</span>
+            <span style={{ margin: "0 0.35rem" }}>·</span>
+            <span
+              onClick={() => { setAvatarPreview(null); setProfileImage(null); }}
+              onMouseEnter={() => setHoverTaBort(true)}
+              onMouseLeave={() => setHoverTaBort(false)}
+              style={{ color: "#c0392b", cursor: "pointer", textDecoration: hoverTaBort ? "underline" : "none" }}
+            >Ta bort</span>
+          </p>
+        ) : (
+          <p style={{ textAlign: "center", fontSize: "0.78rem", color: "var(--gray-text)", marginBottom: "0.75rem" }}>
+            Profilbild (valfritt)
+          </p>
+        )}
+
         <input
           type="text"
           name="foretagsnamn"
@@ -207,7 +291,18 @@ const OrgRegister1 = () => {
         </div>
       </div>
     </div>
+
+    {pendingAvatarSrc && (
+      <AvatarCropModal
+        imageSrc={pendingAvatarSrc}
+        onCancel={() => setPendingAvatarSrc(null)}
+        onSave={handleAvatarCropSave}
+      />
+    )}
+    </>
   );
 };
 
 export default OrgRegister1;
+
+
