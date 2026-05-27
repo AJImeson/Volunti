@@ -2,22 +2,22 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: mssql-sts
+  name: ${PREFIX}mssql-sts
   namespace: doe25-group-13
 spec:
   selector:
     matchLabels:
-      app: mssql-sts
-  serviceName: "mssql-sts"
+      app: ${PREFIX}mssql-sts
+  serviceName: "${PREFIX}mssql-sts"
   replicas: 1
   template:
     metadata:
       labels:
-        app: mssql-sts
+        app: ${PREFIX}mssql-sts
     spec:
       terminationGracePeriodSeconds: 10
       containers:
-      - name: mssql-sts
+      - name: ${PREFIX}mssql-sts
         image: mcr.microsoft.com/mssql/server:2022-latest
         ports:
         - containerPort: 1433
@@ -35,6 +35,13 @@ spec:
         volumeMounts:
         - name: mssql-data
           mountPath: /var/opt/mssql
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "512Mi"
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
   volumeClaimTemplates:
   - metadata:
       name: mssql-data

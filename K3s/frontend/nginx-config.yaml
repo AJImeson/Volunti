@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ${PREFIX}frontend-nginx-config
+  namespace: doe25-group-13
+data:
+  default.conf.template: |
+    server {
+        listen       80;
+        listen  [::]:80;
+        server_name  localhost;
+
+        location / {
+            root   /usr/share/nginx/html;
+            index  index.html index.htm;
+
+            sub_filter 'https://volunti-api.cc.k3s.chas-lab.dev' '${BACKEND_URL}';
+            sub_filter_once off;
+            sub_filter_types application/javascript text/javascript;
+        }
+
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   /usr/share/nginx/html;
+        }
+    }

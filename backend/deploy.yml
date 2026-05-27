@@ -2,12 +2,24 @@ backend-deploy:
   stage: deploy
   image: python:3.12-slim
   rules:
-    - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
-    - if: '$CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH'
-      when: manual
-      allow_failure: true
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      variables:
+        PREFIX: ""
+        ASPNET_ENV: "Production"
+        FRONTEND_HOST: "volunti.cc.k3s.chas-lab.dev"
+        BACKEND_HOST: "volunti-api.cc.k3s.chas-lab.dev"
+        ADMINER_HOST: "adminer.volunti.cc.k3s.chas-lab.dev"
+        BACKEND_URL: "https://volunti-api.cc.k3s.chas-lab.dev"
+    - if: '$CI_COMMIT_REF_NAME == "Develop"'
+      variables:
+        PREFIX: "dev-"
+        ASPNET_ENV: "Production"
+        FRONTEND_HOST: "dev-volunti.cc.k3s.chas-lab.dev"
+        BACKEND_HOST: "dev-volunti-api.cc.k3s.chas-lab.dev"
+        ADMINER_HOST: "dev-adminer.volunti.cc.k3s.chas-lab.dev"
+        BACKEND_URL: "https://dev-volunti-api.cc.k3s.chas-lab.dev"
   before_script:
-    - apt-get update && apt-get install -y curl
+    - apt-get update && apt-get install -y curl gettext-base
     - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
     - chmod +x kubectl && mv kubectl /usr/local/bin/
     - mkdir -p ~/.kube
@@ -16,18 +28,22 @@ backend-deploy:
   script:
     - python deploy.py backend
   environment:
-    name: backend-production
-    url: https://api.volunti.cc.k3s.chas-lab.dev
+    name: backend-$CI_COMMIT_REF_NAME
+    url: https://$BACKEND_HOST
     on_stop: backend-stop
 
 backend-stop:
   stage: cleanup
   image: python:3.12-slim
   rules:
-    - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_REF_NAME == "main"'
       when: manual
-    - if: '$CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH'
+      variables:
+        PREFIX: ""
+    - if: '$CI_COMMIT_REF_NAME == "Develop"'
       when: manual
+      variables:
+        PREFIX: "dev-"
   before_script:
     - apt-get update && apt-get install -y curl
     - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -38,6 +54,6 @@ backend-stop:
   script:
     - python delete.py
   environment:
-    name: backend-production
+    name: backend-$CI_COMMIT_REF_NAME
     action: stop
   allow_failure: true

@@ -1,10 +1,19 @@
 frontend-container-build:
   stage: container-build
   image: docker:latest
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      variables:
+        FRONTEND_API_BASE: "https://volunti-api.cc.k3s.chas-lab.dev"
+    - if: '$CI_COMMIT_REF_NAME == "Develop"'
+      variables:
+        FRONTEND_API_BASE: "https://dev-volunti-api.cc.k3s.chas-lab.dev"
   variables:
     IMAGE_TAG: $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHORT_SHA
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - echo "VITE_API_BASE=$FRONTEND_API_BASE" > frontend/Volunti.Web/.env.production
+    - cat frontend/Volunti.Web/.env.production
     - docker build -f frontend/Dockerfile -t $IMAGE_TAG -t $CI_REGISTRY_IMAGE/frontend:latest frontend/Volunti.Web
     - docker push $IMAGE_TAG
     - docker push $CI_REGISTRY_IMAGE/frontend:latest

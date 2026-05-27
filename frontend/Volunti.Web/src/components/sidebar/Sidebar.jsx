@@ -12,8 +12,18 @@ import {
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const user = getCurrentUser();
+  const [user, setUser] = useState(getCurrentUser);
   const unreadCount = useUnreadCount();
+
+  useEffect(() => {
+    setUser(getCurrentUser());
+  }, [location]);
+
+  useEffect(() => {
+    const handler = () => setUser(getCurrentUser());
+    window.addEventListener("volunti:session", handler);
+    return () => window.removeEventListener("volunti:session", handler);
+  }, []);
 
   const isOrg = isOrgUser();
   const profilePath = isOrg ? "/org-profile" : "/profile";

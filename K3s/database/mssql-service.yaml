@@ -2,12 +2,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mssql-service
+  name: ${PREFIX}mssql-service
   namespace: doe25-group-13
 spec:
   clusterIP: None
   selector:
-    app: mssql-sts
+    app: ${PREFIX}mssql-sts
   ports:
   - name: mssql
     protocol: TCP

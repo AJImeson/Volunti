@@ -3,6 +3,7 @@ import sys
 import subprocess
 
 NAMESPACE = os.getenv("KUBE_NAMESPACE", "doe25-group-13")
+PREFIX = os.getenv("PREFIX", "")
 
 def run_script(cmd, check=True):
     print(f"$ {' '.join(cmd)}", flush=True)
@@ -13,8 +14,7 @@ def run_script(cmd, check=True):
 
 def delete_environment():
     print(f"Deleting environment: {NAMESPACE}")
-    run_script(["kubectl", "delete", "deployment", "backend", "frontend",
-                "-n", NAMESPACE, "--ignore-not-found"])
+    run_script(["kubectl", "delete", "deployment", f"{PREFIX}volunti-backend", f"{PREFIX}volunti-frontend",                "-n", NAMESPACE, "--ignore-not-found"])
     print("Completed")
 
 if __name__ == "__main__":
