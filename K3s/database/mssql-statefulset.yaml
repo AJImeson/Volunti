@@ -35,6 +35,13 @@ spec:
         volumeMounts:
         - name: mssql-data
           mountPath: /var/opt/mssql
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "512Mi"
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
   volumeClaimTemplates:
   - metadata:
       name: mssql-data
