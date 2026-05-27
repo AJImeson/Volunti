@@ -1,4 +1,9 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Volunti.Interfaces;
+using Volunti.Service;
+using Volunti.Endpoints;
+using Prometheus; // Prometheus dependencies
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +15,8 @@ using Volunti.Endpoints;
 using Volunti.Interfaces;
 using Volunti.Models;
 using Volunti.Service;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Volunti.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -67,23 +74,32 @@ builder.Services.AddAuthentication(options =>
 
 // Rate limiting begränsar antal requests per IP/användare under en tidsperiod - skyddar mot brute-force (t.ex. lösenordsgissning på /login) och spam (t.ex. massregistrering av konton)
 builder.Services.AddRateLimiter(options =>
-{
-    options.AddFixedWindowLimiter("auth", opt =>
-    {
-        opt.PermitLimit = 5;
-        opt.Window = TimeSpan.FromMinutes(1);
-        opt.QueueLimit = 0;
-    });
+  {
+      options.AddPolicy("auth", context =>
+      {
+          var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+          return RateLimitPartition.GetFixedWindowLimiter(ip, _ => new FixedWindowRateLimiterOptions
+          {
+              PermitLimit = 5,
+              Window = TimeSpan.FromMinutes(1),
+              QueueLimit = 0
+          });
+      });
 
-    options.AddFixedWindowLimiter("write", opt =>
-    {
-        opt.PermitLimit = 20;
-        opt.Window = TimeSpan.FromMinutes(1);
-        opt.QueueLimit = 0;
-    });
-});
-
+      options.AddPolicy("write", context =>
+      {
+          var ip = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+          return RateLimitPartition.GetFixedWindowLimiter(ip, _ => new FixedWindowRateLimiterOptions
+          {
+              PermitLimit = 20,
+              Window = TimeSpan.FromMinutes(1),
+              QueueLimit = 0
+          });
+      });
+  });
 builder.Services.AddAuthorization();
+builder.Services.AddHealthChecks()
+    .AddSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")!); //for k3s
 
 // TODO: PRODUKTION - Lås CORS till specifik frontend-domän innan deploy
 // HUR: Byt ut AllowAnyOrigin() mot .WithOrigins("https://volunti.se") (eller riktiga frontend-URL:en)
@@ -106,13 +122,13 @@ builder.Services.AddCors(options =>
                 var allowedHosts = new[]
                 {
                     "https://volunti.se",
-                    "https://volunti.doe25.swarm.chas-lab.dev"
+                    "https://volunti.cc.k3s.chas-lab.dev"
                 };
                 if (allowedHosts.Contains(origin)) return true;
                 
                 // Tillåt review-environments
                 var uri = new Uri(origin);
-                return uri.Host.EndsWith(".doe25.swarm.chas-lab.dev");
+                return uri.Host.EndsWith(".k3s.chas-lab.dev");
             })
             .AllowAnyHeader()
             .AllowAnyMethod();
@@ -142,6 +158,14 @@ builder.Services.AddScoped<IJobInteractionService, JobInteractionService>();
 builder.Services.AddScoped<IScheduleService, ScheduleService>();
 
 var app = builder.Build();
+
+var forwardedOptions = new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+};
+forwardedOptions.KnownNetworks.Clear();
+forwardedOptions.KnownProxies.Clear();
+app.UseForwardedHeaders(forwardedOptions);
 
 //Profilbild
 var wwwroot = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
@@ -174,15 +198,17 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
-
 if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
+
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
+
+app.UseHttpMetrics(); // For prometheus
 
 AuthEndpoints.RegisterEndpoints(app);
 OrganizationEndpoints.RegisterEndpoints(app);
@@ -194,4 +220,7 @@ ScheduleEndpoints.RegisterEndpoints(app);
 JobInteractionEndpoints.RegisterEndpoints(app);
 MessageGroupEndpoints.RegisterEndpoints(app);
 
+app.MapMetrics(); // For prometheus
+app.MapHealthChecks("/health"); // For k3s
 app.Run();
+

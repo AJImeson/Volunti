@@ -1,0 +1,60 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ${PREFIX}volunti
+  namespace: doe25-group-13
+  annotations:
+    traefik.io/router.tls.certresolver: letsencrypt
+    traefik.io/router.middlewares: doe25-group-13-secure-headers@kubernetescrd
+spec:
+  rules:
+    - host: ${FRONTEND_HOST}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ${PREFIX}volunti-frontend
+                port:
+                  number: 80
+    - host: ${BACKEND_HOST}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: volunti-backend
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - ${FRONTEND_HOST}
+        - ${BACKEND_HOST}
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ${PREFIX}volunti-adminer
+  namespace: doe25-group-13
+  annotations:
+    traefik.io/router.tls.certresolver: letsencrypt
+    traefik.io/router.middlewares: doe25-group-13-secure-headers@kubernetescrd,doe25-group-13-volunti-basic-auth@kubernetescrd
+spec:
+  rules:
+    - host: ${ADMINER_HOST}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ${PREFIX}adminer
+                port:
+                  number: 8080
+  tls:
+    - hosts:
+        - ${ADMINER_HOST}

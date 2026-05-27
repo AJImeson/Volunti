@@ -121,3 +121,4 @@
 * 2026-05-20
 
     - Application working in K8s cluster, need debugging - Axel & Mika 
+>>>>>>> origin/Develop

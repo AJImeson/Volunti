@@ -1,38 +1,61 @@
 frontend-deploy:
   stage: deploy
-  image: alpine:latest
+  image: python:3.12-slim
   needs: ["backend-deploy"]
-  variables:
-    STACK_NAME: "volunti-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG"
-    PUBLIC_HOST: "volunti-$CI_COMMIT_REF_SLUG"
   rules:
-    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_REF_NAME == "main"'
       variables:
-        PUBLIC_HOST: "volunti"
-        STACK_NAME: "volunti-$CI_DEFAULT_BRANCH"
-    - if: '$CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH'
-      when: manual
-      allow_failure: true
+        PREFIX: ""
+        ASPNET_ENV: "Production"
+        FRONTEND_HOST: "volunti.cc.k3s.chas-lab.dev"
+        BACKEND_HOST: "volunti-api.cc.k3s-chas-lab.dev"
+        ADMINER_HOST: "adminer.volunti.cc.k3s.chas-lab.dev"
+        BACKEND_URL: "https://volunti-api.cc.k3s.chas-lab.dev"
+    - if: '$CI_COMMIT_REF_NAME == "Develop"'
       variables:
-        PUBLIC_HOST: "volunti-$CI_COMMIT_REF_SLUG"
-        STACK_NAME: "volunti-$CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG"
+        PREFIX: "dev-"
+        ASPNET_ENV: "Development"
+        FRONTEND_HOST: "dev-volunti.cc.k3s.chas-lab.dev"
+        BACKEND_HOST: "dev-volunti-api.cc.k3s-chas-lab.dev"
+        ADMINER_HOST: "dev-adminer.volunti.cc.k3s.chas-lab.dev"
+        BACKEND_URL: "https://dev-volunti-api.cc.k3s.chas-lab.dev" 
+  before_script:
+    - apt-get update && apt-get install -y curl
+    - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    - chmod +x kubectl && mv kubectl /usr/local/bin
+    - mkdir -p ~/.kube
+    - echo "$KUBECONFIG_BASE64" | base64 -d > ~/.kube/config
+    - chmod 600 ~/.kube/config
   script:
-    - apk add --no-cache curl
-    - sleep 40
-    - curl -fk "https://${PUBLIC_HOST}.doe25.swarm.chas-lab.dev" || exit 1
+    - python deploy.py frontend
   environment:
-    name: review/$CI_COMMIT_REF_SLUG
-    url: https://${PUBLIC_HOST}.doe25.swarm.chas-lab.dev
-    on_stop: stop_review
+    name: frontend-$CI_COMMIT_REF_NAME
+    url: https://$FRONTEND_HOST
+    on_stop: frontend-stop
 
-stop_review:
+frontend-stop:
   stage: cleanup
-  image: python:3.10-slim
+  image: python:3.12-slim
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+      when: manual
+      variables:
+        PREFIX: ""
+    - if: '$CI_COMMIT_REF_NAME == "Develop"'
+      when: manual
+      variables:
+        PREFIX: "dev-"
+  before_script:
+    - apt-get update && apt-get install -y curl
+    - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    - chmod +x kubectl && mv kubectl /usr/local/bin
+    - mkdir -p ~/.kube
+    - echo "$KUBECONFIG_BASE64" | base64 -d > ~/.kube/config
+    - chmod 600 ~/.kube/config
   script:
-    - pip install requests
     - python delete.py
   environment:
-    name: review/$CI_COMMIT_REF_SLUG
+    name: frontend-$CI_COMMIT_REF_NAME
     action: stop
-  when: manual
   allow_failure: true
+
