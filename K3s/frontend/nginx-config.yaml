@@ -14,7 +14,7 @@ data:
             root   /usr/share/nginx/html;
             index  index.html index.htm;
 
-            sub_filter 'https://api-volunti.doe25.swarm.chas-lab.dev' '${BACKEND_URL}';
+            sub_filter 'https://volunti-api.cc.k3s.chas-lab.dev' '${BACKEND_URL}';
             sub_filter_once off;
             sub_filter_types application/javascript text/javascript;
         }
