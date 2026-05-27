@@ -4,10 +4,8 @@ deploy-monitoring:
   rules:
     - if: '$CI_COMMIT_REF_NAME == "main"'
       changes: 
-    - K3s/monitoring/**/*
-    - if: '$CI_COMMIT_REF_NAME != "main"'
-      when: manual
-      allow_failure: true
+        - K3s/monitoring/**/*
+    - when: manual
   before_script:
     - apt-get update && apt-get install -y curl
     - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
