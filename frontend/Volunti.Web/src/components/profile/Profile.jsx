@@ -663,6 +663,7 @@ const Profile = () => {
 
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [avatarError, setAvatarError] = useState("");
+  const [hoveringAvatar, setHoveringAvatar] = useState(false);
   const avatarInputRef = React.useRef(null);
   const [pendingAvatarSrc, setPendingAvatarSrc] = useState(null);
 
@@ -953,13 +954,11 @@ const Profile = () => {
             <div
               className="avatar-container"
               onClick={handleAvatarClick}
+              onMouseEnter={() => setHoveringAvatar(true)}
+              onMouseLeave={() => setHoveringAvatar(false)}
               role="button"
               tabIndex={0}
-              title={
-                user.profileImageUrl
-                  ? "Klicka för att byta bild"
-                  : "Klicka för att lägga till bild"
-              }
+              style={{ cursor: "pointer" }}
             >
               {user.profileImageUrl ? (
                 <img
@@ -976,9 +975,14 @@ const Profile = () => {
                   </span>
                 </div>
               )}
-              {isUploadingAvatar && (
+              {isUploadingAvatar ? (
+                <div className="avatar-overlay" style={{ fontSize: "0.75rem" }}>Laddar...</div>
+              ) : hoveringAvatar && (
                 <div className="avatar-overlay">
-                  <span>...</span>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                    <circle cx="12" cy="13" r="4"/>
+                  </svg>
                 </div>
               )}
             </div>
